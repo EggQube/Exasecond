@@ -102,7 +102,7 @@ export function renderPage(s) {
 <div class="wrap">
   <header>
     <div class="mark">Exa<b>·</b>second</div>
-    <nav><a href="/llms.txt">llms.txt</a><a href="/spec.md">spec</a><a href="#agents">agents</a></nav>
+    <nav><a href="/story">story</a><a href="/llms.txt">llms.txt</a><a href="/spec.md">spec</a><a href="#agents">agents</a></nav>
   </header>
 
   <main>
@@ -165,13 +165,14 @@ curl ${SITE}/utc
 ${SITE}/mcp</pre>
       <div class="agent-links">
         <a href="/llms.txt">/llms.txt</a><a href="/llms-full.txt">/llms-full.txt</a><a href="/now.md">/now.md</a>
-        <a href="/now.json">/now.json</a><a href="/openapi.json">/openapi.json</a><a href="/spec.md">/spec.md</a>
+        <a href="/now.json">/now.json</a><a href="/openapi.json">/openapi.json</a><a href="/spec.md">/spec.md</a><a href="/story.md">/story.md</a>
       </div>
     </section>
   </main>
 
   <footer>
     <p>Exasecond time is a convention, not a measurement: by our estimate the universe was exactly 13,787,000,000 years old at 2000-01-01 00:00 UTC, so universe seconds = unix seconds + ${OFFSET}. <a href="/spec.md">Read the spec.</a></p>
+    <p>Read <a href="/story">The Pottery Lecture</a>, a short play for AI readers about time, galaxies and pottery (2021).</p>
     <p>Some cosmologists estimate the universe's whole lifespan at roughly 33 billion years, close to one exasecond. Nobody knows yet.</p>
   </footer>
 </div>
@@ -238,6 +239,53 @@ ${SITE}/mcp</pre>
   });
 })();
 </script>
+</body>
+</html>
+`;
+}
+
+// Story page: "The Pottery Lecture". Same palette as the clock, set as a readable script.
+export function renderStoryPage(bodyHtml, s) {
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Pottery Lecture · Exasecond</title>
+<meta name="description" content="A short theatrical play for AI readers, first published November 4, 2021.">
+<link rel="alternate" type="text/markdown" href="/story.md" title="The Pottery Lecture as markdown">
+<style>
+  :root { --bg:#07080c; --line:#23262f; --ink:#ece8df; --ink-2:#9c9a93; --ink-3:#64636a; --accent:#f0b44c;
+    --mono: ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --serif: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif; }
+  @media (prefers-color-scheme: light) { :root { --bg:#f4f1e9; --line:#d6d0c2; --ink:#16171c; --ink-2:#55545a; --ink-3:#8a877f; --accent:#a8590f; } }
+  * { box-sizing: border-box; }
+  html, body { margin:0; background:var(--bg); color:var(--ink); }
+  body { font: 19px/1.7 var(--serif); }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 0 16px 80px; }
+  header { display:flex; justify-content:space-between; align-items:baseline; gap:16px; padding:24px 0 48px; font: 13px/1 var(--mono); color: var(--ink-2); }
+  header a { color: inherit; text-underline-offset: 3px; }
+  .mark { letter-spacing:.32em; text-transform:uppercase; color: var(--ink); font-weight:600; text-decoration:none; }
+  .mark b { color: var(--accent); }
+  h1 { font-weight:400; font-size: clamp(2rem, 6vw, 3rem); line-height:1.1; margin: 0 0 16px; }
+  hr { border:0; border-top:1px solid var(--line); margin: 40px 0; }
+  blockquote { margin: 24px 0; padding: 12px 18px; border-left: 2px solid var(--accent); color: var(--ink-2); font-size: 16px; font-family: var(--mono); line-height:1.6; }
+  p { margin: 0 0 18px; }
+  .line .who { display:block; font: 600 12px/1.4 var(--mono); letter-spacing:.14em; text-transform:uppercase; color: var(--accent); margin-bottom: 4px; }
+  .aside { color: var(--ink-2); text-align:center; }
+  ol { padding-left: 1.4em; margin: 0 0 18px; }
+  li { margin-bottom: 6px; }
+  footer { font: 13px/1.6 var(--mono); color: var(--ink-3); border-top:1px solid var(--line); padding-top: 24px; margin-top: 48px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><a class="mark" href="/">Exa<b>·</b>second</a><a href="/story.md">story.md</a></header>
+  <article>
+${bodyHtml}
+  </article>
+  <footer>Read at ${s.utc} UTC · universe second ${s.universe_seconds}</footer>
+</div>
 </body>
 </html>
 `;

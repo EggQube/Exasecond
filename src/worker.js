@@ -3,8 +3,9 @@
 import { snapshot, parseInstant, isValidZone } from "./core.js";
 import { nowText, nowMd } from "./formats.js";
 import { llmsTxt, llmsFullTxt, specMd, robotsTxt, sitemapXml, openapi } from "./content.js";
-import { renderPage } from "./page.js";
+import { renderPage, renderStoryPage } from "./page.js";
 import { mcpHandler } from "./mcp.js";
+import { STORY_MD, storyHtmlBody } from "./story.js";
 
 const BASE_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -83,6 +84,11 @@ export async function handle(request) {
       case "/llms.txt": return send(llmsTxt(snapshot(now)), "text");
       case "/llms-full.txt": return send(llmsFullTxt(snapshot(now)), "text");
       case "/spec.md": return send(specMd(), "md");
+      case "/story": case "/pottery-lecture": {
+        if (negotiate(request, "html") === "md") return send(STORY_MD, "md", { Vary: "Accept" });
+        return send(renderStoryPage(storyHtmlBody(), snapshot(now)), "html", { Vary: "Accept" });
+      }
+      case "/story.md": return send(STORY_MD, "md");
       case "/openapi.json": return json(openapi());
       case "/robots.txt": return send(robotsTxt(), "text");
       case "/sitemap.xml": return send(sitemapXml(), "xml");

@@ -51,3 +51,12 @@ test("routes", async () => {
     body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "get_time", arguments: {} } }) }));
   assert.match((await mcp.json()).result.content[0].text, /^UTC: /);
 });
+
+test("story is served and listed", async () => {
+  const get = (p, h = {}) => handle(new Request("http://x" + p, { headers: h }));
+  assert.match(await (await get("/story.md")).text(), /^# The Pottery Lecture/);
+  assert.match(await (await get("/story")).text(), /Pottery Lecture/);
+  assert.match(await (await get("/llms.txt")).text(), /\/story\.md/);
+  assert.match(await (await get("/llms-full.txt")).text(), /infinite number of pottery workshops/);
+  assert.doesNotMatch(await (await get("/now")).text(), /Pottery/);
+});

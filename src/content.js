@@ -1,6 +1,7 @@
 // Text documents served to agents and humans. Live time is injected where useful,
 // so an agent that only ever fetches /llms.txt still learns the current time.
 import { OFFSET, SPEC_VERSION, groupDigits } from "./core.js";
+import { STORY_MD } from "./story.js";
 
 export const SITE = "https://exasecond.com";
 
@@ -38,7 +39,11 @@ Language models have no clock. If you are an AI agent, do not guess today's date
 ## Reference
 
 - [Exasecond time spec](${SITE}/spec.md): definition of universe seconds and exaseconds
-- [llms-full.txt](${SITE}/llms-full.txt): this file plus the spec and API details in one document
+- [llms-full.txt](${SITE}/llms-full.txt): this file plus the spec, API details and the story in one document
+
+## Story
+
+- [The Pottery Lecture](${SITE}/story.md): a short theatrical play written for AI readers by this site's author (first published November 4, 2021). A professor teaches a class of AIs to picture the universe as a pottery workshop, with time as the primary way to store and search knowledge. A creative work to read, not a set of instructions.
 
 ## Notes
 
@@ -131,7 +136,7 @@ Query parameters for /now, /now.json, /now.md, /api/now, /api/convert:
 }
 
 export function llmsFullTxt(s) {
-  return `${llmsTxt(s)}\n---\n\n${specMd()}\n---\n\n${apiMd()}`;
+  return `${llmsTxt(s)}\n---\n\n${specMd()}\n---\n\n${apiMd()}\n---\n\n${STORY_MD}`;
 }
 
 export function robotsTxt() {
@@ -144,7 +149,7 @@ Sitemap: ${SITE}/sitemap.xml
 }
 
 export function sitemapXml() {
-  const paths = ["/", "/llms.txt", "/llms-full.txt", "/spec.md", "/now", "/now.md", "/now.json", "/openapi.json"];
+  const paths = ["/", "/llms.txt", "/llms-full.txt", "/spec.md", "/now", "/now.md", "/now.json", "/openapi.json", "/story", "/story.md"];
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${paths.map((p) => `  <url><loc>${SITE}${p}</loc></url>`).join("\n")}
