@@ -1,0 +1,2 @@
+# Never served directly; index.php reads these files.
+Require all denied

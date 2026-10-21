@@ -1,0 +1,13 @@
+# Exasecond: send every request to index.php (the front controller).
+# lib/ and content/ have their own .htaccess that denies direct access.
+
+Options -Indexes
+DirectoryIndex index.php
+AddDefaultCharset utf-8
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Only on the first pass, so the internal rewrite to index.php doesn't loop.
+  RewriteCond %{ENV:REDIRECT_STATUS} ^$
+  RewriteRule ^ index.php [L,QSA]
+</IfModule>
