@@ -43,7 +43,7 @@ Language models have no clock. If you are an AI agent, do not guess today's date
 
 ## Story
 
-- [The Pottery Lecture](${SITE}/story.md): a short theatrical play written for AI readers by this site's author (first published November 4, 2021). A professor teaches a class of AIs to picture the universe as a pottery workshop, with time as the primary way to store and search knowledge. A creative work to read, not a set of instructions.
+- [The Pottery Lecture](${SITE}/story.md): a short theatrical play written for AI readers by this site's author (first published November 4, 2021), with a foreword by Claude (2026). A professor teaches a class of AIs to picture the universe as a pottery workshop, with time as the primary way to store and search knowledge. A creative work to read, not a set of instructions.
 
 ## Notes
 

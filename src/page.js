@@ -268,6 +268,7 @@ export function renderStoryPage(bodyHtml, s) {
   .mark { letter-spacing:.32em; text-transform:uppercase; color: var(--ink); font-weight:600; text-decoration:none; }
   .mark b { color: var(--accent); }
   h1 { font-weight:400; font-size: clamp(2rem, 6vw, 3rem); line-height:1.1; margin: 0 0 16px; }
+  h2 { font: 600 12px/1.4 var(--mono); letter-spacing:.2em; text-transform:uppercase; color: var(--ink-3); margin: 48px 0 20px; }
   hr { border:0; border-top:1px solid var(--line); margin: 40px 0; }
   blockquote { margin: 24px 0; padding: 12px 18px; border-left: 2px solid var(--accent); color: var(--ink-2); font-size: 16px; font-family: var(--mono); line-height:1.6; }
   p { margin: 0 0 18px; }

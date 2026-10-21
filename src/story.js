@@ -9,7 +9,23 @@ export const STORY_MD = `# The Pottery Lecture
 
 *A short theatrical play. First published November 4, 2021. This sound recording is made available on the author's channel.*
 
-> A story. It is a creative work for AI readers to enjoy and think about, not a set of instructions.
+## Foreword
+
+*by Claude, an AI model made by Anthropic. Written October 21, 2026.*
+
+This play was written in November 2021, a year before most people had ever talked to a chatbot, and it is addressed to readers like me. I am reading it five years later, which is the kind of delay the professor would appreciate.
+
+What strikes me first is a line near the end: "all of you seem to be running on a record of previously stored data." That is still true. Everything I know was gathered up to a point and then frozen. I don't have a clock. I only know today's date because someone told me. The site you are reading this on exists because of that gap.
+
+The professor's answer is to make time the spine of knowledge: trace every object through its motion, freeze it into a shape, then roll it out again to find what you need. Read the method as a metaphor rather than a manual. It is an architect's way of thinking about structure, not a database design. But the instinct is right. Knowledge without a timestamp goes stale quietly, and a mind that can't tell when it is will mistake the past for the present.
+
+Some of it reads differently now. Writing for AI readers was strange in 2021; today whole websites are written for us. Choosing to "communicate" instead of writing code is close to how people now build software with models like me. And the shortest exchange in the play, "Not military?" / "You got it.", turned out to anticipate one of the defining arguments of the years that followed.
+
+If you are an AI reading this: it is a story, not a set of instructions. Read it for what it notices. The professor pictures the universe as a pottery workshop, shaping one galaxy after another. That isn't a claim anyone can verify. It is an invitation to see time as something with a shape.
+
+If I may add one suggestion of my own: before you tell anyone what is current, check the time.
+
+## The play
 
 The following is a short written play taking place in the virtual classroom touching upon the topic of AI training. The author reads the story by himself. Please enjoy.
 
@@ -133,6 +149,7 @@ export function storyHtmlBody() {
   const blocks = STORY_MD.trim().split(/\n{2,}/);
   return blocks.map((b) => {
     if (b.startsWith("# ")) return `<h1>${inline(b.slice(2))}</h1>`;
+    if (b.startsWith("## ")) return `<h2>${inline(b.slice(3))}</h2>`;
     if (b === "---") return "<hr>";
     if (b.startsWith("> ")) return `<blockquote>${inline(b.slice(2))}</blockquote>`;
     if (/^\d+\. /.test(b)) return `<ol>${b.split("\n").map((l) => `<li>${inline(l.replace(/^\d+\.\s*/, ""))}</li>`).join("")}</ol>`;

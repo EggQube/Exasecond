@@ -54,7 +54,7 @@ test("routes", async () => {
 
 test("story is served and listed", async () => {
   const get = (p, h = {}) => handle(new Request("http://x" + p, { headers: h }));
-  assert.match(await (await get("/story.md")).text(), /^# The Pottery Lecture/);
+  assert.match(await (await get("/story.md")).text(), /^# The Pottery Lecture[\s\S]*## Foreword/);
   assert.match(await (await get("/story")).text(), /Pottery Lecture/);
   assert.match(await (await get("/llms.txt")).text(), /\/story\.md/);
   assert.match(await (await get("/llms-full.txt")).text(), /infinite number of pottery workshops/);
