@@ -44,6 +44,7 @@ function cmp(a, b, path) {
     return;
   }
   if (a === b) return;
+  if (a === undefined && /^local\.(abbreviation|dst|next_change|part_of_day)/.test(path)) return; // added in the PHP site (2026-10-21), not in Node
   if (typeof a === "number" && typeof b === "number" && Math.abs(a - b) < 1e-6) return;
   if (ACCEPT.some((r) => r.test(path))) {
     soft++;

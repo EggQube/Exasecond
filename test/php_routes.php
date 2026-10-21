@@ -20,7 +20,38 @@ check('exaseconds', to_exaseconds(435084632045903278) === '0.435084632045903278'
 check('/utc', (bool)preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\n$/', get('/utc')[2]));
 check('/now text', str_starts_with(get('/now')[2], 'UTC: '));
 check('/now markdown', get('/now', 'text/markdown')[1]['Content-Type'] === 'text/markdown; charset=utf-8');
-check('/now bad tz is 400', get('/now?tz=Not/AZone')[0] === 400);
+// Time zones: forgiving input, and a bad zone never costs the agent the time
+[$st, , $b] = get('/now?tz=Not/AZone');
+check('/now bad tz: 200, time kept, note given', $st === 200 && str_starts_with($b, 'UTC: ') && str_contains($b, 'Time zone: "Not/AZone" is not a time zone'));
+$z = fn($in) => resolve_zone($in);
+check('tz exact IANA', $z('Europe/Oslo')['zone'] === 'Europe/Oslo' && $z('Europe/Oslo')['how'] === 'iana');
+check('tz any case', $z('europe/oslo')['zone'] === 'Europe/Oslo');
+check('tz city', $z('Oslo')['zone'] === 'Europe/Oslo' && $z('new york')['zone'] === 'America/New_York' && $z('Beijing')['zone'] === 'Asia/Shanghai');
+check('tz Chinese city', $z('北京')['zone'] === 'Asia/Shanghai');
+check('tz country', $z('Norway')['zone'] === 'Europe/Oslo' && $z('China')['zone'] === 'Asia/Shanghai' && $z('挪威')['zone'] === 'Europe/Oslo');
+check('tz abbreviation means the region, with summer time', $z('CET')['zone'] === 'Europe/Paris' && $z('EST')['zone'] === 'America/New_York');
+check('tz offsets', $z('+02:00')['zone'] === '+02:00' && $z('UTC+2')['zone'] === '+02:00' && $z('+0530')['zone'] === '+05:30' && $z('GMT')['zone'] === 'UTC');
+check('tz ambiguous lists options', $z('IST')['zone'] === null && in_array('Asia/Kolkata', $z('IST')['options'], true) && $z('US')['options'][0] === 'America/New_York');
+check('tz unknown', $z('xyz')['how'] === 'unknown');
+$oslo = get('/now?tz=Oslo')[2];
+check('/now?tz=Oslo local line', (bool)preg_match('/^Local \(Europe\/Oslo\): \S+ \w+ [a-z ]+, CES?T \(UTC\+[12](, summer time)?\)$/m', $oslo));
+$jul = snapshot([1784980800, 0], tz_opts('Oslo', null));   // 2026-07-25: next change is 2026-10-25, 92 days away
+check('next clock change in JSON', $jul['local']['next_change']['utc'] === '2026-10-25T01:00:00Z' && $jul['local']['next_change']['direction'] === 'back' && $jul['local']['next_change']['local_before'] === '2026-10-25T03:00:00');
+check('clock change line only when near (60 days)', !str_contains(now_text($jul), 'Clock change') && str_contains(now_text(snapshot([1792607000, 0], tz_opts('Oslo', null))), 'Clock change: 2026-10-25 at 03:00 local, back 1 hour to CET (UTC+1)'));
+check('/zones lists zones', substr_count(get('/zones')[2], "\n") > 300 && str_contains(get('/zones?q=oslo')[2], 'Europe/Oslo'));
+check('/zones.json', json_decode(get('/zones.json?q=tokyo')[2], true)[0]['zone'] === 'Asia/Tokyo');
+// /local: one sentence for talking to a person
+check('part of day', part_of_day(7) === 'early morning' && part_of_day(9) === 'morning' && part_of_day(21) === 'evening' && part_of_day(2) === 'night' && part_of_day(23) === 'late evening');
+$o = tz_opts('Oslo', null);
+check('/local sentence (evening, clock change near)', local_sentence(snapshot([1792610508, 0], $o), $o['tz_res']) === 'Wednesday 21 October 2026, 21:21 in Oslo (evening, CEST, UTC+2). Clocks go back 1 hour on Sunday 25 October.');
+check('/local next morning, after the change', local_sentence(snapshot([1792909200, 0], $o), $o['tz_res']) === 'Sunday 25 October 2026, 07:20 in Oslo (early morning, CET, UTC+1).');
+check('/local route', (bool)preg_match('/^\w+day \d+ \w+ \d{4}, \d\d:\d\d in Oslo \((night|early morning|morning|midday|afternoon|evening|late evening), /', get('/local?tz=Oslo')[2]));
+check('/local without tz gives UTC and a hint', str_contains(get('/local')[2], ' UTC. For a person'));
+check('/local bad tz keeps the time', str_contains(get('/local?tz=IST')[2], ' UTC. Time zone: "IST" is ambiguous'));
+check('/local is short', strlen(get('/local?tz=Oslo')[2]) < 160);
+[$st, , $b] = route('POST', '/mcp', [], [], '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"get_time","arguments":{"tz":"Oslo","detail":"local"}}}');
+check('mcp get_time detail=local', str_contains(json_decode($b, true)['result']['content'][0]['text'], ' in Oslo ('));
+check('/now without tz unchanged', !str_contains(get('/now')[2], 'Time zone') && str_contains(get('/now')[2], 'Tip: add ?tz='));
 check('/time stays a clock for agents', str_starts_with(get('/time')[2], 'UTC: '));
 check('/time is the contents page for browsers', str_contains(get('/time', 'text/html')[2], 'The question of time'));
 check('/zh/time contents', str_contains(get('/zh/time', 'text/html')[2], '时间之问'));

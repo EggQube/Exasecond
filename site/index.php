@@ -8,6 +8,7 @@ ini_set('serialize_precision', '-1');
 ini_set('display_errors', '0');
 
 require __DIR__ . '/lib/core.php';
+require __DIR__ . '/lib/zones.php';
 require __DIR__ . '/lib/formats.php';
 require __DIR__ . '/lib/chapters.php';
 require __DIR__ . '/lib/content.php';
@@ -60,11 +61,10 @@ function negotiate(string $accept, string $fallback): string {
     return $fallback;
 }
 
+/** ?tz= is forgiving (city, country, abbreviation, offset). A zone that can't be read never costs the agent the time: it gets a tz_note instead. */
 function opts(array $q): array {
-    $tz = isset($q['tz']) && is_string($q['tz']) && $q['tz'] !== '' ? $q['tz'] : null;
-    if ($tz !== null && !is_valid_zone($tz)) throw new InputError("Unknown time zone \"$tz\". Use an IANA name like Europe/Oslo.");
-    $cutoff = isset($q['cutoff']) && is_string($q['cutoff']) && $q['cutoff'] !== '' ? $q['cutoff'] : null;
-    return ['tz' => $tz, 'cutoff' => $cutoff];
+    $str = fn($k) => isset($q[$k]) && is_string($q[$k]) && $q[$k] !== '' ? $q[$k] : null;
+    return tz_opts($str('tz'), $str('cutoff'));
 }
 
 /** Snapshot plus, for the Chinese pages' own scripts, calendar dates written in Chinese (?lang=zh). */
@@ -139,6 +139,17 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
             case '/robots.txt': return send(robots_txt(), 'text');
             case '/sitemap.xml': return send(sitemap_xml(), 'xml');
             case '/health': return json_resp(['ok' => true]);
+            case '/local': case '/local.txt':
+                $o = opts($q);
+                $s = snapshot(null, $o);
+                $line = local_sentence($s, $o['tz_res']);
+                if ($path === '/local' && negotiate($accept, 'text') === 'json') return json_resp(['text' => $line, 'utc' => $s['utc'], 'local' => $s['local']] + (isset($s['tz_note']) ? ['tz_note' => $s['tz_note']] : []));
+                return send($line . "\n", 'text', ['Vary' => 'Accept']);
+            case '/zones': case '/zones.txt':
+                $zq = isset($q['q']) && is_string($q['q']) ? $q['q'] : null;
+                if ($path === '/zones' && negotiate($accept, 'text') === 'json') return json_resp(zones_list(time(), $zq));
+                return send(zones_text(time(), $zq), 'text', ['Vary' => 'Accept']);
+            case '/zones.json': return json_resp(zones_list(time(), isset($q['q']) && is_string($q['q']) ? $q['q'] : null));
         }
         if (str_contains($accept, 'text/html')) return send(render_not_found('en', $path), 'html', [], 404);
         return send("Not found: $path\nTry /now, /utc, /llms.txt\n", 'text', [], 404);
