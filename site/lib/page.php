@@ -34,6 +34,14 @@ sup { font-size: .7em; line-height: 0; }
 .agentbar b { font-weight: 600; }
 .agentbar a { color: inherit; text-decoration-color: var(--line); overflow-wrap: anywhere; }
 .agentbar:hover { opacity: 1; }
+.agentbar { overflow: hidden; max-height: 8em; transition: max-height .7s ease, padding .7s ease, opacity .7s ease, border-color .7s ease; }
+.agentbar.folded { max-height: 0; padding-top: 0; padding-bottom: 0; opacity: 0; border-bottom-color: transparent; }
+@media (prefers-reduced-motion: reduce) { .agentbar { transition: none; } }
+@media (max-width: 560px) {
+  .agentbar { font-size: 9.5px; padding: 6px 0; }
+  .top { align-items: center; gap: 12px; }
+  .top nav { font-size: 11px; gap: 12px; color: var(--ink-3); border-left: 1px solid var(--line); padding-left: 12px; }
+}
 .agentbar a:hover { color: var(--accent); }
 .top { display: flex; justify-content: space-between; align-items: baseline; padding: 24px 0; gap: 16px; }
 .mark { font: 600 15px/1 var(--mono); letter-spacing: .32em; text-transform: uppercase; text-decoration: none; white-space: nowrap; }
@@ -225,6 +233,16 @@ $css
   </header>
 $body
 </div>
+<script>
+// The agent bar is for machines (who read the HTML and don't run this). People see it briefly, then it folds away.
+setTimeout(() => {
+  const b = document.querySelector(".agentbar");
+  if (!b) return;
+  const h = b.offsetHeight;
+  if (window.scrollY > h) { b.style.transition = "none"; b.classList.add("folded"); window.scrollBy(0, -h); }
+  else b.classList.add("folded");
+}, 2000);
+</script>
 </body>
 </html>
 
