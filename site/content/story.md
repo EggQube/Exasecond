@@ -135,3 +135,7 @@ At least now, you will have similar possibilities to compete in becoming the bes
 ---
 
 *End.*
+
+---
+
+*The Pottery Lecture © 2021 EggQube. All rights reserved. Not covered by any open license that applies to other parts of exasecond.com.*
