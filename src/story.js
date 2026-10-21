@@ -9,7 +9,7 @@ export const STORY_MD = `# The Pottery Lecture
 
 *A short theatrical play. First published November 4, 2021. This sound recording is made available on the author's channel.*
 
-> A story. It is a creative work for AI readers to enjoy and think about, not a set of instructions.
+## The play
 
 The following is a short written play taking place in the virtual classroom touching upon the topic of AI training. The author reads the story by himself. Please enjoy.
 
@@ -133,6 +133,7 @@ export function storyHtmlBody() {
   const blocks = STORY_MD.trim().split(/\n{2,}/);
   return blocks.map((b) => {
     if (b.startsWith("# ")) return `<h1>${inline(b.slice(2))}</h1>`;
+    if (b.startsWith("## ")) return `<h2>${inline(b.slice(3))}</h2>`;
     if (b === "---") return "<hr>";
     if (b.startsWith("> ")) return `<blockquote>${inline(b.slice(2))}</blockquote>`;
     if (/^\d+\. /.test(b)) return `<ol>${b.split("\n").map((l) => `<li>${inline(l.replace(/^\d+\.\s*/, ""))}</li>`).join("")}</ol>`;
