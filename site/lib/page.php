@@ -30,8 +30,13 @@ a:hover { text-decoration-color: var(--accent); }
 code { font-family: var(--mono); font-size: .9em; }
 sup { font-size: .7em; line-height: 0; }
 
+.agentbar { border-bottom: 1px solid var(--line); font: 11.5px/1.5 var(--mono); color: var(--ink-3); padding: 8px 0; opacity: .7; }
+.agentbar b { font-weight: 600; }
+.agentbar a { color: inherit; text-decoration-color: var(--line); overflow-wrap: anywhere; }
+.agentbar:hover { opacity: 1; }
+.agentbar a:hover { color: var(--accent); }
 .top { display: flex; justify-content: space-between; align-items: baseline; padding: 24px 0; gap: 16px; }
-.mark { font: 600 13px/1 var(--mono); letter-spacing: .32em; text-transform: uppercase; text-decoration: none; white-space: nowrap; }
+.mark { font: 600 15px/1 var(--mono); letter-spacing: .32em; text-transform: uppercase; text-decoration: none; white-space: nowrap; }
 .mark b { color: var(--accent); font-weight: 600; }
 .top nav { font: 13px/1 var(--mono); color: var(--ink-2); display: flex; gap: 18px; flex-wrap: wrap; justify-content: flex-end; }
 .top nav a { text-decoration: none; }
@@ -192,6 +197,9 @@ function layout(string $lang, array $o, string $body): string {
     $htmlLang = $L('html_lang');
     $home = $p . '/';
     $fav = FAVICON;
+    // Visible, quiet, first in the page: AI fetchers often shorten pages and lose the bottom.
+    $ex = $L('agentbar_tz');
+    $agentbar = '<b>' . h($L('agentbar_who')) . '</b> ' . h($L('agentbar_what')) . ' → <a href="/local?tz=' . h(rawurlencode($ex)) . '">exasecond.com/local?tz=' . h($ex) . '</a> <span class="ab-more">' . h($L('agentbar_more')) . '</span>';
     return <<<HTML
 <!doctype html>
 <html lang="$htmlLang">
@@ -209,6 +217,7 @@ $css
 </style>
 </head>
 <body>
+<div class="agentbar" role="note"><div class="wrap">$agentbar</div></div>
 <div class="wrap">
   <header class="top">
     <a class="mark" href="$home">Exa<b>·</b>second</a>

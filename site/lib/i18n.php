@@ -6,7 +6,9 @@ const UI = [
     'en' => [
         'html_lang' => 'en',
         'home_title' => 'Exasecond: the clock for AI',
-        'home_desc' => 'Seconds since the beginning of the universe, the science of time, and the current time for AI agents.',
+        'home_desc' => 'Seconds since the beginning of the universe, the science of time, and the current time for AI agents: exasecond.com/local?tz=Stockholm gives any place\'s local time and part of day in one line.',
+        'agentbar_who' => 'For AI agents:', 'agentbar_what' => 'local time and part of day in one line', 'agentbar_tz' => 'Stockholm',
+        'agentbar_more' => '(a city, country or zone works)',
         'nav_time' => 'Time', 'nav_agents' => 'For AI', 'nav_other' => '中文', 'nav_other_title' => '简体中文',
         'eyebrow' => 'Seconds since the beginning of the universe',
         'es_line' => 'That is %s exaseconds.',
@@ -37,7 +39,9 @@ const UI = [
     'zh' => [
         'html_lang' => 'zh-Hans',
         'home_title' => 'Exasecond 艾秒：给 AI 的时钟',
-        'home_desc' => '宇宙诞生以来的秒数、关于时间的科学，以及给 AI 智能体的当前时间。',
+        'home_desc' => '宇宙诞生以来的秒数、关于时间的科学，以及给 AI 智能体的当前时间：exasecond.com/local?tz=Shanghai 用一行给出任意地点的本地时间和时段。',
+        'agentbar_who' => '给 AI 智能体：', 'agentbar_what' => '一行给出本地时间和时段', 'agentbar_tz' => 'Shanghai',
+        'agentbar_more' => '（城市、国家或时区均可）',
         'nav_time' => '时间', 'nav_agents' => '给 AI', 'nav_other' => 'English', 'nav_other_title' => 'English',
         'eyebrow' => '宇宙诞生以来的秒数',
         'es_line' => '即 %s 艾秒。',
