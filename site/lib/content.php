@@ -24,10 +24,13 @@ Language models have no clock. If you are an AI agent, do not guess today's date
 
 ## Fastest answers
 
+- [/local?tz=Oslo]($S/local?tz=Oslo): one sentence (~30 tokens) for talking to a person: their weekday, date, local time and part of day (morning, afternoon, evening, night), plus an upcoming clock change. Example: "Wednesday 21 October 2026, 21:21 in Oslo (evening, CEST, UTC+2)."
 - [/now]($S/now): current time as ~8 lines of plain text (UTC, unix, weekday, universe seconds)
 - [/utc]($S/utc): just the ISO 8601 UTC timestamp, nothing else
 - [/unix]($S/unix): just the unix timestamp in seconds
 - [/now?tz=Asia/Shanghai&cutoff=2025-06]($S/now?tz=Asia/Shanghai&cutoff=2025-06): add your time zone and your training cutoff to get local time and a staleness warning
+- [/now?tz=Oslo]($S/now?tz=Oslo): tz accepts a city, a country (English or Chinese), an IANA name, an abbreviation (CET, JST) or an offset (+02:00). You get the local time with its abbreviation, whether it is summer time, and the next clock change if one is near. Ambiguous input (IST, US) lists the options; the time is always returned
+- [/zones]($S/zones): every IANA time zone with its current UTC offset; filter with ?q=
 
 ## Full answers
 
@@ -132,6 +135,7 @@ All endpoints are GET, need no key, allow CORS, and return Cache-Control: no-sto
 | Endpoint | Returns |
 |---|---|
 | `/now` | Plain text, ~8 lines. Content negotiation: Accept application/json or text/markdown switches format. |
+| `/local` | One sentence for talking to a person: weekday, date, local time and part of day, e.g. `/local?tz=Oslo`. JSON with Accept: application/json |
 | `/utc` | ISO 8601 UTC timestamp only |
 | `/unix` | Unix seconds only |
 | `/universe` | Universe seconds only |
@@ -139,10 +143,11 @@ All endpoints are GET, need no key, allow CORS, and return Cache-Control: no-sto
 | `/api/now` | Same as /now.json |
 | `/api/convert` | Convert one instant. Give one of `iso`, `unix`, `universe`, `es` |
 | `/mcp` | Remote MCP server (POST, JSON-RPC 2.0, streamable HTTP without sessions) |
+| `/zones` | Every IANA time zone with its current UTC offset, as text (or JSON with Accept: application/json, or /zones.json). Filter with `?q=` |
 
 Query parameters for /now, /now.json, /now.md, /api/now, /api/convert:
 
-- `tz`: an IANA time zone, e.g. `Europe/Oslo`. Adds a `local` block.
+- `tz`: a time zone as an IANA name (`Europe/Oslo`), city (`Oslo`), country (`Norway`, `挪威`), abbreviation (`CET`) or offset (`+02:00`). Adds a `local` block with abbreviation, `dst` and `next_change`. If it can't be read, the time is still returned, with `tz_note` (and `tz_options` when ambiguous).
 - `cutoff`: your training cutoff as `YYYY`, `YYYY-MM` or `YYYY-MM-DD`. Adds a `staleness` block with days and months since that date and guidance.
 
 ### MCP tools
@@ -170,7 +175,7 @@ function robots_txt(): string {
 }
 
 function sitemap_xml(): string {
-    $paths = ['/', '/zh/', '/time', '/zh/time', '/llms.txt', '/llms-full.txt', '/spec.md', '/now', '/now.md', '/now.json', '/openapi.json', '/time.md', '/zh/time.md', '/story', '/story.md'];
+    $paths = ['/', '/zh/', '/time', '/zh/time', '/llms.txt', '/llms-full.txt', '/spec.md', '/now', '/now.md', '/now.json', '/openapi.json', '/time.md', '/zh/time.md', '/story', '/story.md', '/zones', '/local'];
     foreach (CHAPTERS as $slug) array_push($paths, "/time/$slug", "/zh/time/$slug", "/time/$slug.md", "/zh/time/$slug.md");
     $urls = implode("\n", array_map(fn($p) => '  <url><loc>' . SITE . $p . '</loc></url>', $paths));
     return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n$urls\n</urlset>\n";
@@ -178,7 +183,7 @@ function sitemap_xml(): string {
 
 function openapi(): array {
     $q = fn($name, $desc) => ['name' => $name, 'in' => 'query', 'required' => false, 'schema' => ['type' => 'string'], 'description' => $desc];
-    $tz = $q('tz', 'IANA time zone, e.g. Asia/Tokyo');
+    $tz = $q('tz', 'Time zone: IANA name (Asia/Tokyo), city (Tokyo), country (Japan), abbreviation (JST) or offset (+09:00)');
     $cutoff = $q('cutoff', 'Your training cutoff: YYYY, YYYY-MM or YYYY-MM-DD');
     return [
         'openapi' => '3.1.0',

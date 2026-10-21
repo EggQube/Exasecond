@@ -11,9 +11,9 @@ function mcp_tools(): array {
             'name' => 'get_time',
             'description' => "Get the current date and time. Call this instead of guessing today's date from training data.",
             'inputSchema' => ['type' => 'object', 'properties' => [
-                'tz' => ['type' => 'string', 'description' => 'IANA time zone, e.g. Europe/Oslo'],
+                'tz' => ['type' => 'string', 'description' => 'Time zone of the person you are talking to: a city (Oslo), country (Norway), IANA name (Europe/Oslo), abbreviation (CET) or offset (+02:00)'],
                 'cutoff' => ['type' => 'string', 'description' => 'Your training cutoff, YYYY-MM'],
-                'detail' => ['type' => 'string', 'enum' => ['basic', 'full'], 'description' => 'full adds all calendars and world clocks'],
+                'detail' => ['type' => 'string', 'enum' => ['basic', 'full', 'local'], 'description' => 'local: one sentence with the person\'s date, time and part of day (use with tz when talking to someone); full adds all calendars and world clocks'],
             ]],
         ],
         [
@@ -33,12 +33,14 @@ function mcp_call_tool($name, $args): string {
     $args = is_array($args) ? $args : [];
     $str = fn($k) => isset($args[$k]) && is_scalar($args[$k]) ? (string)$args[$k] : null;
     if ($name === 'get_time') {
-        $s = snapshot(null, ['tz' => $str('tz'), 'cutoff' => $str('cutoff')]);
+        $o = tz_opts($str('tz'), $str('cutoff'));
+        $s = snapshot(null, $o);
+        if ($str('detail') === 'local') return local_sentence($s, $o['tz_res']);
         return $str('detail') === 'full' ? now_md($s) : now_text($s);
     }
     if ($name === 'convert_time') {
         $d = parse_instant($args);
-        return now_md(snapshot($d, ['tz' => $str('tz')]), 'Converted time');
+        return now_md(snapshot($d, tz_opts($str('tz'), null)), 'Converted time');
     }
     throw new McpError('Unknown tool: ' . (is_scalar($name) ? $name : ''), -32602);
 }

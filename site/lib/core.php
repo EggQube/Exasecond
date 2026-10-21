@@ -193,8 +193,8 @@ function staleness(int $unix, int $ms, ?string $cutoff): ?array {
 function snapshot(?array $instant = null, array $opts = []): array {
     [$unix, $ms] = $instant ?? now_instant();
     $u = unix_to_universe($unix);
-    $tz = isset($opts['tz']) && is_valid_zone($opts['tz']) ? $opts['tz'] : null;
-    return [
+    $tz = isset($opts['tz']) && (is_valid_zone($opts['tz']) || preg_match('/^[+-]\d{2}:\d{2}$/', $opts['tz'])) ? $opts['tz'] : null;
+    $s = [
         'spec' => 'exasecond/' . SPEC_VERSION,
         'utc' => iso_utc($unix),
         'unix' => $unix,
@@ -208,6 +208,13 @@ function snapshot(?array $instant = null, array $opts = []): array {
         'world' => array_map(fn($z) => zone_time($unix, $z), $opts['zones'] ?? DEFAULT_ZONES),
         'note' => 'universe_seconds is a convention, not a measurement: unix + 435084630253315200. See /spec.md',
     ];
+    // Extras when a zone was asked for (lib/zones.php): abbreviation, summer time, next clock change, how ?tz= was read.
+    if ($tz && function_exists('local_details')) $s['local'] += local_details($unix, $tz);
+    if (function_exists('tz_note') && ($n = tz_note($opts['tz_res'] ?? null))) {
+        $s['tz_note'] = $n;
+        if (!empty($opts['tz_res']['options'])) $s['tz_options'] = $opts['tz_res']['options'];
+    }
+    return $s;
 }
 
 // ---- Parse a time given in any supported form ----------------------------------------

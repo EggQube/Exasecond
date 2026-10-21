@@ -44,7 +44,7 @@ The requirements follow from how AI agents read the web:
 
 ## How this site does it
 
-- **/now** returns about eight lines of plain text: UTC, weekday, Unix time and universe seconds. Add `?tz=Area/City` for local time, and `?cutoff=YYYY-MM` to be told how many days have passed since a training cutoff, with plain guidance on what is likely to be outdated.
+- **/now** returns about eight lines of plain text: UTC, weekday, Unix time and universe seconds. Add `?tz=` with a city, country, zone name or offset (`?tz=Oslo`, `?tz=Norway`, `?tz=+02:00`) for local time, with summer time and the next clock change, and `?cutoff=YYYY-MM` to be told how many days have passed since a training cutoff, with plain guidance on what is likely to be outdated.
 - **/utc** returns only the timestamp.
 - **/llms.txt** follows the llms.txt convention for describing a site to language models, and includes the current time in its first lines, so even an agent that reads only that file learns the date.
 - **/mcp** is a Model Context Protocol server, so an AI application can add the clock as a tool.
