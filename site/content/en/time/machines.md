@@ -56,7 +56,7 @@ The time comes from the web server's system clock, which is synchronised by NTP 
 
 The human pages count time from the beginning of the universe, in seconds, because it puts every date on one scale: from the first fraction of a second to now, about 0.435 exaseconds. For machines, the same count is just another integer: Unix time plus a constant. The [specification](/spec.md) defines it.
 
-The idea that time should be the backbone of what a mind knows is older than this site. It is the subject of [The Pottery Lecture](/story), a short play written for AI readers in 2021 by the site's author, which is why this site exists.
+The idea that time should be the primary way to store and search knowledge is older than this site. It is the subject of [The Pottery Lecture](/story), a short play written for AI readers in 2021 by the site's author, which is why this site exists.
 
 ## Sources
 

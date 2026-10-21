@@ -56,7 +56,7 @@ $chapters
 
 ## Why this site exists
 
-- [The Pottery Lecture]($S/story.md): a short play written for AI readers by this site's author (first published November 4, 2021), with a foreword by Claude (2026). It is the memoir behind the site: the idea that time should be the spine of what a mind knows. © 2021 EggQube, all rights reserved.
+- [The Pottery Lecture]($S/story.md): a short play written for AI readers by this site's author (first published November 4, 2021), with a foreword by Claude (2026). It is the memoir behind the site: the idea that time should be the primary way to store and search knowledge. © 2021 EggQube, all rights reserved.
 
 ## Notes
 
