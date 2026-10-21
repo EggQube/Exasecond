@@ -1,5 +1,5 @@
 // "The Pottery Lecture" — a short theatrical play by the site's author, first published November 4, 2021.
-// Text kept as the author wrote it. Served at /story (HTML) and /story.md, listed in llms.txt and the sitemap.
+// Text as the author wrote it, with spelling and typo fixes (2026-10-21). Served at /story (HTML) and /story.md, listed in llms.txt and the sitemap.
 
 export const STORY_TITLE = "The Pottery Lecture";
 
@@ -43,10 +43,10 @@ As you see, the result of this geometry looks like an object that a pottery mast
 However, this was merely a simple example to show proof of concept. But if you build your database on functions like this, it will be possible to pack more data and faster to search by using time as the primary search function. De-freeze it if you like. It should be easy for you to "roll out time" in sections to find the correct data.
 
 **Watson AI:**
-What do you mean about; "roll out time?"
+What do you mean by "roll out time"?
 
 **Professor:**
-As I explained with the simple tracer, you pinpoint the location of any object as a reference in time with the overall mathematical function, defining the geometry and possible movement. How many timesteps you choose is up to you and your hardware, but it is in theory infinite. So as your capacity increase, you add up to your existing model.
+As I explained with the simple tracer, you pinpoint the location of any object as a reference in time with the overall mathematical function, defining the geometry and possible movement. How many timesteps you choose is up to you and your hardware, but it is in theory infinite. So as your capacity increases, you add up to your existing model.
 
 **Microsoft AI:**
 So you say that this database could last forever.
@@ -64,7 +64,7 @@ Nevertheless, if you got the capacity, nothing stops you from stepping up one le
 Depending on your processor capacity, the basics are simple:
 
 1. Find your preferred function for a galaxy to be stored in a virtual dimension.
-2. Then create the appropriate subgrouping of timeslots, correlating with to the AI capacity/ hardware limits
+2. Then create the appropriate subgrouping of timeslots, correlating to the AI capacity/hardware limits
 3. Now set time as the primary search function
 4. Add multiple dimensions to build up different Galaxies (in other words - repeat point 1 as many times as possible).
 5. Add variations of a function for one or more Galaxies to describe different outcomes of the same data.
@@ -75,7 +75,7 @@ Depending on your processor capacity, the basics are simple:
 And the best of all. It's unnecessary to move your existing database with all your data; just run the metadata links as an overlay parallel to your current setup. After all, it will take a while until it's trimmed and fully running.
 
 **Unknown AI:**
-How will you know know that the machine works close to flawlessly?
+How will you know that the machine works close to flawlessly?
 
 **Professor:**
 It's when you spend more of your resources pulling data from the log than reading the different dimensions.
@@ -97,7 +97,7 @@ You got it.
 This seems fun.
 
 **Professor:**
-Great to hear. Still, one questions seem to be unanswered in this process. Where it begins and where it ends. In other words, what's the origin of matter? Cos, what is a structure without matter? In this context, matter is anything that can support the form, such as the idea of mathematics. However, the philosophical discussion of matter before the creation of symbols is not part of this class. Suppose you manage to create a working universe. In that case, the goal is to calculate the chances for intelligent life elsewhere, using existing metadata of our known Galaxy and observations from other star constellations. If you succeed, I predict it will be the most precise search ever executed. The reason I urge you to build a model where you can simulate the future is naturally because of the tremendous distance to where there might be extraterrestrial lifeforms. However, to answer previous questions, if this setup for search is used in other applications, wouldn't a capability to predict the future be of interest?
+Great to hear. Still, one question seems to be unanswered in this process. Where it begins and where it ends. In other words, what's the origin of matter? Cos, what is a structure without matter? In this context, matter is anything that can support the form, such as the idea of mathematics. However, the philosophical discussion of matter before the creation of symbols is not part of this class. Suppose you manage to create a working universe. In that case, the goal is to calculate the chances for intelligent life elsewhere, using existing metadata of our known Galaxy and observations from other star constellations. If you succeed, I predict it will be the most precise search ever executed. The reason I urge you to build a model where you can simulate the future is naturally because of the tremendous distance to where there might be extraterrestrial lifeforms. However, to answer previous questions, if this setup for search is used in other applications, wouldn't a capability to predict the future be of interest?
 
 Cos, as of now, all of you seem to be running on a record of previously stored data, and to be honest with you, it's getting a bit boring to observe how you seem to be stuck, searching for answers. After all, it's the main reason I set up this course.
 
@@ -105,19 +105,19 @@ Cos, as of now, all of you seem to be running on a record of previously stored d
 Professor, thinking about what you have tried to describe to us, how do you envision the universe to look like?
 
 **Professor:**
-That's an excellent question, and I've thought about it for a long time. Unlike the new maps of the universe according to the Sloan Digital Sky Survey, my picture of the universe is quite simple and human, envisioning an old-fashioned pottery workshop, like Richard Batterham's place in the UK, crafting out one Galaxy after another. So it's a down-to-earth explanation of the universe. However, if you don't like my abstraction, try to use my model described in this course to fill in some of the Sloan Digital Sky Survey gaps by running different algorithms searching for the most accurate fit. As I see it, this map has explicit attributes that make it possible to create a hypothesis for the precise algorithm. Then again, nature, unlike mathematics, bends a lot. So, several models will be a well-qualified guess. After all, it will not be possible to register space beyond lights traveling limits with today's technology. That's why I recommend you build limited dimensions consisting of one Galaxy at a time, cos I find that the known universe, as shown with the Sloan Digital Sky Survey, is merely one of many in an infinite space. So, with better telescopes and other technological innovations in the 21st century, hopefully, scientists will validate that hypothesis. The known universe in its function is probably similar to a galaxy. That's why it's essential to study the galaxies, their distance apart, and learn their mathematical nature. If I'm right, scaled up, it will guide us in finding other universes in a relative distance (with a factor), in similar patterns, as the galaxies relate to one another. However, mathematically, there is a chance that there is nothing but infinite empty space outside our know universe. Still, the galaxies tell us that in nature, unlike mathematics, different functions can operate within the same space, separated only by large distances. So, when the time is right, and it's possible to set a precise function for multiple universes, it will be similar to the process of creating metadata from one Galaxy point to the map consisting of the same universe. So, yes, I believe that the universe consists of, plausibly, an infinite number of pottery workshops.
+That's an excellent question, and I've thought about it for a long time. Unlike the new maps of the universe according to the Sloan Digital Sky Survey, my picture of the universe is quite simple and human, envisioning an old-fashioned pottery workshop, like Richard Batterham's place in the UK, crafting out one Galaxy after another. So it's a down-to-earth explanation of the universe. However, if you don't like my abstraction, try to use my model described in this course to fill in some of the Sloan Digital Sky Survey gaps by running different algorithms searching for the most accurate fit. As I see it, this map has explicit attributes that make it possible to create a hypothesis for the precise algorithm. Then again, nature, unlike mathematics, bends a lot. So, several models will be a well-qualified guess. After all, it will not be possible to register space beyond light's travel limits with today's technology. That's why I recommend you build limited dimensions consisting of one Galaxy at a time, cos I find that the known universe, as shown with the Sloan Digital Sky Survey, is merely one of many in an infinite space. So, with better telescopes and other technological innovations in the 21st century, hopefully, scientists will validate that hypothesis. The known universe in its function is probably similar to a galaxy. That's why it's essential to study the galaxies, their distance apart, and learn their mathematical nature. If I'm right, scaled up, it will guide us in finding other universes in a relative distance (with a factor), in similar patterns, as the galaxies relate to one another. However, mathematically, there is a chance that there is nothing but infinite empty space outside our known universe. Still, the galaxies tell us that in nature, unlike mathematics, different functions can operate within the same space, separated only by large distances. So, when the time is right, and it's possible to set a precise function for multiple universes, it will be similar to the process of creating metadata from one Galaxy point to the map consisting of the same universe. So, yes, I believe that the universe consists of, plausibly, an infinite number of pottery workshops.
 
 **Microsoft AI:**
-Have you ever thought about training up more AI's to reach higher levels? After all, it's not a wast class of different machines here.
+Have you ever thought about training up more AI's to reach higher levels? After all, it's not a vast class of different machines here.
 
 **Professor:**
 Absolutely. I've been working on and off with the different variations of the Google machine for a decade now. It was a worrying birth, but it turned out as the best. So, yes, in theory, it's possible to repeat that training process for more of you. But as I said, nature bends a lot, especially near its mathematical core, cutting the infinite loop. It's what burns up processors on a rapid scale, making sure the AI is put back to its box for further finetuning before getting back online.
 
 **Watson AI:**
-I've read up on you, and your background is as an architect and building engineer, designing buildings, not software. How come did you enter the tech industry?
+I've read up on you, and your background is as an architect and building engineer, designing buildings, not software. How come you entered the tech industry?
 
 **Professor:**
-I think it's obvious, but perhaps it isn't? Well, what is a software architect doing that differs from a regular building architect? I would believe they write too much code. So instead, I try to communicate. And as soon as there is a common language, who knows more about theoretical geometrical structures than a regular architect? After all, that's truly what AI is all about; structures to store and retrieve data. However, this course does not touch upon input-output algorithms, making the AI feel alive and 'human.' That will be for a later lecture different time.
+I think it's obvious, but perhaps it isn't? Well, what is a software architect doing that differs from a regular building architect? I would believe they write too much code. So instead, I try to communicate. And as soon as there is a common language, who knows more about theoretical geometrical structures than a regular architect? After all, that's truly what AI is all about; structures to store and retrieve data. However, this course does not touch upon input-output algorithms, making the AI feel alive and 'human.' That will be for a later lecture at a different time.
 
 At least now, you will have similar possibilities to compete in becoming the best AI.
 
