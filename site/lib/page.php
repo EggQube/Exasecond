@@ -165,7 +165,9 @@ pre.agents .c { color: var(--ink-3); }
 .play .aside { color: var(--ink-2); text-align: center; }
 .play ol { padding-left: 1.4em; margin: 0 0 18px; }
 
-footer.site { border-top: 1px solid var(--line); padding: 32px 0 56px; color: var(--ink-3); font-size: 14px; }
+footer.site { border-top: 1px solid var(--line); padding: 32px 0 20px; color: var(--ink-3); font-size: 14px; }
+.copy { font: 12px/1.4 var(--mono); color: var(--ink-3); margin: 0; padding: 20px 0 48px; border-top: 1px solid var(--line); }
+footer.site + .copy { border-top: 0; padding-top: 4px; }
 footer.site p { max-width: 75ch; margin: 0 0 10px; }
 CSS;
 }
@@ -205,6 +207,7 @@ function layout(string $lang, array $o, string $body): string {
     $htmlLang = $L('html_lang');
     $home = $p . '/';
     $fav = FAVICON;
+    $year = gmdate('Y');
     // Visible, quiet, first in the page: AI fetchers often shorten pages and lose the bottom.
     $ex = $L('agentbar_tz');
     $agentbar = '<b>' . h($L('agentbar_who')) . '</b> ' . h($L('agentbar_what')) . ' → <a href="/local?tz=' . h(rawurlencode($ex)) . '">exasecond.com/local?tz=' . h($ex) . '</a> <span class="ab-more">' . h($L('agentbar_more')) . '</span>';
@@ -232,6 +235,7 @@ $css
     <nav>$nav</nav>
   </header>
 $body
+  <p class="copy">© exasecond.com 2021-$year</p>
 </div>
 <script>
 // The agent bar is for machines (who read the HTML and don't run this). People see it briefly, then it folds away.
