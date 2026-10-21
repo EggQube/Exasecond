@@ -1,0 +1,13 @@
+{
+  "name": "exasecond",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The clock for AI agents. Universe seconds for humans.",
+  "scripts": {
+    "dev": "node server.js",
+    "test": "node --test test/*.test.js",
+    "deploy": "npx wrangler deploy"
+  },
+  "engines": { "node": ">=18" }
+}

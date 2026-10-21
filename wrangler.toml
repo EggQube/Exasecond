@@ -1,0 +1,6 @@
+name = "exasecond"
+main = "src/worker.js"
+compatibility_date = "2025-09-01"
+
+# After `npx wrangler login`, attach the domain:
+# routes = [{ pattern = "exasecond.com", custom_domain = true }]
