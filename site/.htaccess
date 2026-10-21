@@ -7,6 +7,9 @@ AddDefaultCharset utf-8
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  # One address: www.exasecond.com redirects permanently to exasecond.com (same path and query).
+  RewriteCond %{HTTP_HOST} ^www\.exasecond\.com$ [NC]
+  RewriteRule ^ https://exasecond.com%{REQUEST_URI} [R=301,L]
   # Only on the first pass, so the internal rewrite to index.php doesn't loop.
   RewriteCond %{ENV:REDIRECT_STATUS} ^$
   RewriteRule ^ index.php [L,QSA]
