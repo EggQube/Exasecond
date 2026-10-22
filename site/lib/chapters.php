@@ -52,7 +52,9 @@ function load_doc(string $lang, string $name): ?array {
 }
 
 function doc_md(array $d): string {
-    return "# {$d['title']}\n\n> {$d['description']}\n\n{$d['body']}";
+    // Buttons drawn in HTML become plain links in the text version.
+    $body = str_replace('<!-- figure:developers -->', '[For developers: set up the clock in a minute](' . SITE . '/developers)', $d['body']);
+    return "# {$d['title']}\n\n> {$d['description']}\n\n$body";
 }
 
 function chapters(string $lang): array {
