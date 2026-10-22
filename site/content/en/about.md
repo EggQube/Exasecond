@@ -52,4 +52,4 @@ The idea is older than the site. In 2021 the author wrote [The Pottery Lecture](
 
 ## Who makes it
 
-Exasecond.com is made by EggQube. The code is on [GitHub](https://github.com/EggQube/Exasecond).
+Exasecond.com is made by the GitHub user [EggQube](https://github.com/EggQube). The code is on [GitHub](https://github.com/EggQube/Exasecond).

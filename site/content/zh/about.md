@@ -52,4 +52,4 @@ Exasecond.com 把时间借给它们。智能体在这里借用时间，只花几
 
 ## 制作者
 
-Exasecond.com 由 EggQube 制作。代码在 [GitHub](https://github.com/EggQube/Exasecond) 上。
+Exasecond.com 由 GitHub 用户 [EggQube](https://github.com/EggQube) 制作。代码在 [GitHub](https://github.com/EggQube/Exasecond) 上。
