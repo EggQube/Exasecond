@@ -31,6 +31,27 @@ function num_style(string $lang): array {
     return ['group' => $g === ',' ? ',' : "\u{202F}", 'dec' => $f->getSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL)];
 }
 
+/** Where a calendar is reckoned, in the page's language: UTC, Beijing (not Shanghai), Delhi (not Kolkata), Tokio... */
+function cal_place(string $lang, string $zone): string {
+    if ($zone === 'UTC') return 'UTC';
+    $city = ['Asia/Shanghai' => 'Beijing', 'Asia/Kolkata' => 'Delhi'][$zone] ?? null;
+    if ($city) {
+        if ($lang === 'zh') return $city === 'Beijing' ? '北京' : '德里';
+        return LANG_WORDS[$lang]['cities'][$city] ?? $city;
+    }
+    return lang_zone_city(LANG_INFO[$lang]['icu'], $zone) ?? str_replace('_', ' ', substr(strrchr($zone, '/'), 1));
+}
+
+/** True when the Chinese and Korean lunisolar dates differ: a new moon between midnight in Beijing and in Seoul. */
+function lunar_days_apart(int $unix): bool {
+    if (!class_exists('IntlDateFormatter')) return false;
+    // Compare at noon on the same civil day, so the hour between Seoul's midnight and Beijing's doesn't count.
+    $day = (new DateTimeImmutable('@' . $unix))->setTimezone(new DateTimeZone('Asia/Shanghai'))->format('Y-m-d');
+    $f = fn($cal, $zone) => (new IntlDateFormatter("en@calendar=$cal", IntlDateFormatter::NONE, IntlDateFormatter::NONE, $zone, IntlDateFormatter::TRADITIONAL, 'M-d'))
+        ->format((new DateTimeImmutable("$day 12:00", new DateTimeZone($zone)))->getTimestamp());
+    return $f('chinese', 'Asia/Shanghai') !== $f('dangi', 'Asia/Seoul');
+}
+
 /** Where the chapters are for this language: its own, or the English ones. */
 function time_prefix(string $lang): string { return in_array($lang, CHAPTER_LANGS, true) ? lang_prefix($lang) : ''; }
 
@@ -152,6 +173,9 @@ h2 { font: 400 clamp(1.4rem, 3vw, 1.9rem)/1.25 var(--serif); margin: 0 0 6px; }
 .cal-name { font: 12px/1.3 var(--mono); color: var(--ink-3); }
 .cal-date { font-size: 17px; overflow-wrap: anywhere; }
 .cal-native { color: var(--ink-2); font-size: 15px; }
+.cal-where { color: var(--ink-3); opacity: .75; }
+.cal-note { margin: 14px 0 0; font-size: 13px; color: var(--ink-3); }
+.precision { margin: 8px 0 0; font-size: 13px; color: var(--ink-3); }
 form { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
 input, select, button { font: 15px/1 var(--mono); color: var(--ink); background: var(--bg-2); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; min-width: 0; }
 input { flex: 1 1 260px; }
@@ -348,8 +372,11 @@ function render_home(array $s, string $lang, ?string $place = null): string {
         $name = $en ? $c['name'] : (CAL_NAMES[$lang][$c['id']] ?? $c['name']);
         $date = $en ? $c['text'] : ($locDates[$c['id']] ?? $c['text']);
         $native = ($en && isset($c['native'])) ? '<span class="cal-native" lang="zh">' . h($c['native']) . '</span>' : ($zh ? '<span class="cal-native" lang="en">' . h($c['text']) . '</span>' : '');
-        $cal .= "\n        <li class=\"cal\" data-id=\"" . h($c['id']) . "\"><span class=\"cal-name\">" . h($name) . "</span><span class=\"cal-date\">" . h($date) . "</span>$native</li>";
+        $cal .= "\n        <li class=\"cal\" data-id=\"" . h($c['id']) . "\"><span class=\"cal-name\">" . h($name) . " <span class=\"cal-where\">· " . h(cal_place($lang, $c["zone"] ?? "UTC")) . "</span></span><span class=\"cal-date\">" . h($date) . "</span>$native</li>";
     }
+    $calNotes = '<p class="cal-note">' . h($L('cal_note')) . '</p>' . (lunar_days_apart($s['unix']) ? '<p class="cal-note">' . h($L('cal_moon')) . '</p>' : '');
+    $precision = h($L('precision'));
+    $noJs = h($L('enable_js'));
     $S = SITE;
     $C = OFFSET;
     $ns = num_style($lang);
@@ -387,6 +414,7 @@ function render_home(array $s, string $lang, ?string $place = null): string {
       <p class="eyebrow">{$L('eyebrow')}</p>
       <p class="count" id="count" aria-live="off">$count</p>
       <p class="es">$esLine</p>
+      <p class="precision">{$precision}</p>
       <div class="span" aria-hidden="true">
         <div class="here"><span style="left:$pct%">{$L('here')}</span></div>
         <div class="bar"><i style="width:$pct%"></i><em style="left:$pct%"></em></div>
@@ -404,11 +432,12 @@ function render_home(array $s, string $lang, ?string $place = null): string {
         </div>
         <div>
           <div class="big-label">{$L('your_clock')}</div>
-          <div class="big-time" id="local">-<small id="local-zone">{$L('enable_js')}</small></div>
+          <div class="big-time" id="local">-<small id="local-zone">{$noJs}</small></div>
         </div>
       </div>
       <ul class="cals" id="cals">$cal
       </ul>
+      {$calNotes}
     </section>
 
     <section aria-labelledby="h-q">

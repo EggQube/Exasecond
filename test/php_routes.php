@@ -154,6 +154,9 @@ check('no long dashes in translated text', !preg_match('/[\x{2013}\x{2014}]/u', 
 check('number style: thin space and decimal comma in German, comma in English and Chinese', (fn($de, $en, $zh) => str_contains($de, "\u{202F}") && str_contains($de, '<span id="es">0,') && preg_match('/\d,\d{3},\d{3}/', $en) && str_contains($en, '<span id="es">0.') && str_contains($zh, '<span id="es">0.'))(get('/de/', 'text/html')[2], get('/', 'text/html')[2], get('/zh/', 'text/html')[2]));
 check('?lang=sv/ja/ko sentences', str_starts_with(get('/stockholm?lang=sv')[2], 'Stockholm: Klockan är ') && str_starts_with(get('/tokyo?lang=ja')[2], '東京：') && str_starts_with(get('/seoul?lang=ko')[2], '서울: '));
 check('/shanghai?lang=zh is 上海, /beijing?lang=zh is 北京', str_starts_with(get('/shanghai?lang=zh')[2], '上海') && str_starts_with(get('/beijing?lang=zh')[2], '北京'));
+check('/now?tz= starts with the sentence; without tz unchanged', str_starts_with(get('/now?tz=Oslo')[2], "It's ") && str_starts_with(get('/now')[2], 'UTC: ') && str_starts_with(json_decode(get('/now?tz=Oslo', 'application/json')[2], true)['text'], "It's "));
+check('lunar note: 2026-10-22 yes (new moon between midnights), 2026-10-05 no', lunar_days_apart(1792687749) && !lunar_days_apart(1791190000));
+check('front page: calendar places, precision, no-JS hint escaped', (fn($b) => str_contains($b, 'class="cal-where">· Tokyo') && str_contains($b, 'class="precision"') && str_contains($b, 'exasecond.com/&lt;your city&gt;'))(get('/', 'text/html')[2]));
 check('agent bar points to the short address', str_contains(get('/', 'text/html')[2], 'exasecond.com/stockholm</a>'));
 
 echo $fails ? "$fails failed\n" : "all passed\n";

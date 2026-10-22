@@ -38,6 +38,7 @@ function now_md(array $s, string $title = 'Current time'): string {
     }
     array_push($o, '## Calendars', '', '| Calendar | Date | Reckoned in |', '|---|---|---|');
     foreach ($s['calendars'] as $c) $o[] = "| {$c['name']} | {$c['text']}" . (isset($c['native']) ? " ({$c['native']})" : '') . " | {$c['zone']} |";
+    array_push($o, '', '_' . t('en', 'cal_note') . (lunar_days_apart($s['unix']) ? ' ' . t('en', 'cal_moon') : '') . '_');
     array_push($o, '', '## World clocks', '', '| Zone | Local time | Weekday |', '|---|---|---|');
     foreach ($s['world'] as $w) $o[] = "| {$w['zone']} | {$w['iso']} | {$w['weekday']} |";
     array_push($o, '', '## Technical', '');

@@ -163,11 +163,14 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
 
         switch ($path) {
             case '/now':
+                // With ?tz= the spoken sentence comes first: /now?tz= is where agents reach for the time, so it gives the best answer.
                 $s = snap(null, $q);
+                $o = opts($q);
+                $line = $s['local'] ? local_sentence($s, $o['tz_res'], in_array(q_lang($q), SENTENCE_LANGS, true) ? q_lang($q) : 'en') : null;
                 $want = negotiate($accept, 'text');
-                if ($want === 'md') return send(now_md($s), 'md', ['Vary' => 'Accept']);
-                if ($want === 'json') return json_resp($s);
-                return send(now_text($s), 'text', ['Vary' => 'Accept']);
+                if ($want === 'md') return send(($line ? "$line\n\n" : '') . now_md($s), 'md', ['Vary' => 'Accept']);
+                if ($want === 'json') return json_resp(($line ? ['text' => $line] : []) + $s);
+                return send(($line ? "$line\n" : '') . now_text($s), 'text', ['Vary' => 'Accept']);
             case '/now.md': case '/index.md': return send(now_md(snap(null, $q)), 'md');
             case '/now.json': case '/api/now': return json_resp(snap(null, $q));
             case '/now.txt': return send(now_text(snap(null, $q)), 'text');
