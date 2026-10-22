@@ -113,6 +113,10 @@ For Ollama and other local models used through Open WebUI: download [/dev/openwe
 
 `tz` accepts a city (Oslo, Beijing, 北京), a country (Norway, 挪威), an IANA name (Europe/Oslo), an abbreviation (CET, JST) or an offset (+02:00). If it can't be read, the time is still returned, with a note. The full description is in [/llms.txt](/llms.txt) and [/openapi.json](/openapi.json).
 
+## License
+
+The snippets on this page and the files under `/dev/` are under the [MIT License](/dev/LICENSE): free to use, copy and modify, also in commercial work, as long as the notice "(c) 2026 EggQube, exasecond.com" is kept. The license covers only these developer snippets and files, not the rest of the site.
+
 ## Good to know
 
 - Answers are generated at the moment of the request and never cached. The time comes from a server clock synchronised with national time standards.

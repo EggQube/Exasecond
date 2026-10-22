@@ -3,6 +3,7 @@ title: Exasecond time
 author: EggQube
 author_url: https://exasecond.com
 version: 0.1.0
+license: MIT, (c) 2026 EggQube, exasecond.com. Free to use, copy and modify; keep this notice. https://exasecond.com/dev/LICENSE
 description: Gives the model the current date, local time and part of day for any place, from https://exasecond.com. About 30 tokens per call, no key.
 """
 
