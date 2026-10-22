@@ -65,6 +65,11 @@ sup { font-size: .7em; line-height: 0; }
 .ans-fact { font: 16px/1.55 var(--serif); color: var(--ink-2); max-width: 62ch; }
 .ans-fact a { font: 13px/1 var(--mono); color: var(--accent); text-decoration: none; white-space: nowrap; }
 @media (max-width: 640px) { .ans-row { grid-template-columns: 1fr; } }
+.devbtn { display: inline-block; margin: 6px 0 4px; padding: 12px 18px; border: 1px solid var(--accent); border-radius: 8px; font: 14px/1.4 var(--mono); color: var(--ink); text-decoration: none; }
+.devbtn b { color: var(--accent); font-weight: 600; }
+.devbtn:hover { background: var(--accent-2); }
+.prose .devbtn { font-size: 14px; }
+.dev-cta { margin-top: 26px; }
 .about-fact { margin: 0 0 40px; padding: 14px 18px; border: 1px solid var(--line); border-radius: 8px; }
 .about-fact b { display: block; font: 12px/1.4 var(--mono); color: var(--ink-3); text-transform: uppercase; letter-spacing: .14em; margin-bottom: 6px; font-weight: 400; }
 .eyebrow { font: 13px/1.4 var(--mono); color: var(--ink-2); letter-spacing: .04em; margin: 0 0 18px; }
@@ -315,6 +320,7 @@ function render_home(array $s, string $lang): string {
         : $nowD->format('l j F Y, H:i:s') . ' UTC';
     $world = implode('', array_map(fn($l) => '<li>' . h($l) . '</li>', world_now_lines($s['unix'], $lang)));
     $fact = pick_fact($s['unix'], null, $lang);
+    $devBtn = dev_button($lang);
     $answer = '<section class="answer" aria-label="' . h($L('ans_label')) . '">'
         . '<div class="ans-row"><span class="ans-k">' . h($L('ans_now')) . '</span><p class="ans-v ans-now" id="ans-now">' . h($nowLine) . '</p></div>'
         . '<div class="ans-row"><span class="ans-k">' . h($L('ans_you')) . '</span><div class="ans-v" id="ans-you"><p class="ans-intro">' . h($L('ans_you_intro')) . '</p><ul class="ans-world">' . $world . '</ul></div></div>'
@@ -392,6 +398,7 @@ $S/mcp</pre>
         <a href="/llms.txt">/llms.txt</a><a href="/llms-full.txt">/llms-full.txt</a><a href="/now.md">/now.md</a>
         <a href="/now.json">/now.json</a><a href="/openapi.json">/openapi.json</a><a href="/spec.md">/spec.md</a><a href="$p/time.md">$p/time.md</a>
       </div>
+      <div class="dev-cta">{$devBtn}</div>
     </section>
   </main>
 
@@ -576,7 +583,7 @@ function render_about(array $d, string $lang, array $s): string {
 })();
 JS;
     $body = '<main class="read"><p class="kicker"><a href="' . $p . '/">Exasecond</a></p><h1>' . h($d['title']) . '</h1><p class="lede">' . h($d['description']) . '</p>'
-        . $factHtml . '<article class="prose">' . md_render($d['body']) . '</article></main>'
+        . $factHtml . '<article class="prose">' . md_render($d['body'], fn($name) => $name === 'developers' ? dev_button($lang) : '') . '</article></main>'
         . read_footer($lang, $s, $p . '/about.md') . "\n<script>const ABOUT = $lq;\n$js</script>";
     return layout($lang, [
         'title' => $d['title'] . ' · Exasecond', 'desc' => $d['description'], 'path' => '/about', 'md' => $p . '/about.md', 'active' => 'about',
@@ -585,6 +592,11 @@ JS;
 }
 
 /** A plain document page (e.g. /developers). English only, so no language switch. */
+/** The button to the developer page (English page, so the Chinese label says so). */
+function dev_button(string $lang): string {
+    return '<p><a class="devbtn" href="/developers"><b>' . h(t($lang, 'dev_btn_who')) . '</b> <span>' . h(t($lang, 'dev_btn_what')) . ' →</span></a></p>';
+}
+
 function render_doc(array $d, string $path, array $s): string {
     $body = '<main class="read"><p class="kicker"><a href="/">Exasecond</a></p><h1>' . h($d['title']) . '</h1><p class="lede">' . h($d['description']) . '</p>'
         . '<article class="prose">' . md_render($d['body']) . '</article></main>' . read_footer('en', $s, $path . '.md');

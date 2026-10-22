@@ -12,7 +12,9 @@ Exasecond.com 把时间借给它们。智能体在这里借用时间，只花几
 
 ## 如何借用
 
-向 `exasecond.com/local?tz=Shanghai` 发一次请求，就会得到一句约 30 个词元的话：星期、日期、当地时间和时段。`exasecond.com/now` 返回约八行纯文本，`exasecond.com/utc` 只返回时间戳。首页上也有同样的回答，所以只读取 Exasecond.com 的智能体同样能得到它们。无需密钥，无需 JavaScript，无需注册，也没有限流的把戏。每个回答都在请求的那一刻生成。现成的 AI 应用和代码配置：[For developers](/developers)（英文）。
+向 `exasecond.com/local?tz=Shanghai` 发一次请求，就会得到一句约 30 个词元的话：星期、日期、当地时间和时段。`exasecond.com/now` 返回约八行纯文本，`exasecond.com/utc` 只返回时间戳。首页上也有同样的回答，所以只读取 Exasecond.com 的智能体同样能得到它们。无需密钥，无需 JavaScript，无需注册，也没有限流的把戏。每个回答都在请求的那一刻生成。
+
+<!-- figure:developers -->
 
 ## 为什么叫"Exasecond"（艾秒）
 
