@@ -16,7 +16,8 @@ function get(string $uri, string $accept = ''): array {
 }
 
 check('constant', OFFSET === 435084630253315200 && unix_to_universe(946684800) === 435084631200000000);
-check('exaseconds', to_exaseconds(435084632045903278) === '0.435084632045903278');
+check('universe_fraction_percent has no float leftovers', (bool)preg_match('/"universe_fraction_percent": \d+\.\d{1,6},/', get('/now.json')[2]));
+check('exaseconds',to_exaseconds(435084632045903278) === '0.435084632045903278');
 check('/utc', (bool)preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\n$/', get('/utc')[2]));
 check('/now text', str_starts_with(get('/now')[2], 'UTC: '));
 check('/now markdown', get('/now', 'text/markdown')[1]['Content-Type'] === 'text/markdown; charset=utf-8');
