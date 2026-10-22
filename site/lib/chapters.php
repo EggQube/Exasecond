@@ -7,7 +7,7 @@ const CHAPTERS = [
     'scale', 'second', 'clocks', 'timescales', 'zones', 'dst', 'relativity', 'arrow', 'history',
     'age', 'beginning', 'future', 'calendars', 'nature', 'machines',
 ];
-const LANGS = ['en', 'zh', 'de', 'fr', 'es', 'pt', 'ru'];
+const LANGS = ['en', 'zh', 'de', 'fr', 'es', 'pt', 'ru', 'sv', 'ja', 'ko'];
 // The chapters (/time) exist in these only; other languages link to the English ones.
 const CHAPTER_LANGS = ['en', 'zh'];
 

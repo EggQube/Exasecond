@@ -370,7 +370,13 @@ function local_sentence(array $s, ?array $res, string $lang = 'en'): string {
     if ($lang === 'zh' && $l && function_exists('fact_day')) {
         $d = (new DateTimeImmutable('@' . $s['unix']))->setTimezone(new DateTimeZone($l['zone']));
         $place = place_name($l['zone'], $res);
-        foreach (PLACES as [$pz, , $pzh]) if ($pz === $l['zone'] && (!$res || $res['how'] !== 'country')) $place = $pzh;   // Chinese city name when we have one
+        // Chinese names: our own list for the front page's cities (北京 for Beijing), else ICU for countries and zone cities
+        // (/shanghai is 上海, not 北京, though both are Asia/Shanghai); anything else as typed.
+        $known = false;
+        foreach (PLACES as [$pz, $pen, $pzh]) if ($pz === $l['zone'] && $place === $pen) { $place = $pzh; $known = true; }
+        $zp = explode('/', $l['zone']);
+        if (!$known && ($res['how'] ?? '') === 'country' && isset($res['cc'])) $place = lang_region('zh_Hans', $res['cc']);
+        elseif (!$known && $place === str_replace('_', ' ', end($zp))) $place = lang_zone_city('zh_Hans', $l['zone']) ?? $place;
         $off = short_offset($l['offset']);
         $inner = [$d->format('Y') . '年' . $d->format('n') . '月' . $d->format('j') . '日'];
         if ($l['abbreviation'] && $l['abbreviation'] !== $off) $inner[] = $l['abbreviation'];

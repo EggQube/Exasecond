@@ -114,7 +114,7 @@ def get_local_time(place: str = "") -> str:
 | `/shanghai?lang=zh`、`/北京?lang=zh` | 一句按口语顺序的话：地点、星期、时段和本地时间，括号里是日期和时区，以及即将到来的调钟。地址可以是任何城市、地区、岛屿、国家、时区或偏移 | ~25-40 |
 | `/oslo`、`/new-york`、`/sweden` | 同一句话，英文 | ~30 |
 | `/local?tz=Oslo&lang=zh` | 同一句话 | ~25-40 |
-| `/berlin?lang=de` | 同一句话，德语；也支持 `fr`、`es`、`pt` 和 `ru` | ~35-45 |
+| `/berlin?lang=de` | 同一句话，德语；也支持 `fr`、`es`、`pt`、`ru`、`sv`、`ja` 和 `ko` | ~25-60 |
 | `/utc` | 只有 ISO 8601 UTC 时间戳 | ~5 |
 | `/now` | 大约八行：UTC、星期、Unix 时间、宇宙秒 | ~80 |
 | `/now?tz=Oslo&cutoff=2025-06` | 加上本地时间，以及训练截止日期距今多久 | ~150 |

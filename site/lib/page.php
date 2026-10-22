@@ -14,6 +14,9 @@ const LANG_INFO = [
     'es' => ['name' => 'Español', 'short' => 'ES', 'tag' => 'es', 'icu' => 'es_ES', 'js' => 'es-ES'],
     'pt' => ['name' => 'Português', 'short' => 'PT', 'tag' => 'pt', 'icu' => 'pt_BR', 'js' => 'pt-BR'],
     'ru' => ['name' => 'Русский', 'short' => 'RU', 'tag' => 'ru', 'icu' => 'ru_RU', 'js' => 'ru-RU'],
+    'sv' => ['name' => 'Svenska', 'short' => 'SV', 'tag' => 'sv', 'icu' => 'sv_SE', 'js' => 'sv-SE'],
+    'ja' => ['name' => '日本語', 'short' => '日本語', 'tag' => 'ja', 'icu' => 'ja_JP', 'js' => 'ja-JP'],
+    'ko' => ['name' => '한국어', 'short' => '한국어', 'tag' => 'ko', 'icu' => 'ko_KR', 'js' => 'ko-KR'],
 ];
 
 /**
@@ -60,6 +63,9 @@ function site_css(): string {
   :root { --bg: #f4f1e9; --bg-2: #ebe6da; --line: #d6d0c2; --ink: #16171c; --ink-2: #55545a; --ink-3: #7c7a73; --accent: #a8590f; --accent-2: #a8590f1a; }
 }
 :lang(zh) { --read: var(--sans); }
+/* Japanese and Korean need their own fonts: Chinese fonts draw shared characters in Chinese forms. */
+:lang(ja) { --sans: ui-sans-serif, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI", Meiryo, "Noto Sans JP", sans-serif; --serif: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif; --read: var(--sans); }
+:lang(ko) { --sans: ui-sans-serif, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif; --serif: "AppleMyungjo", "Batang", "Noto Serif KR", serif; --read: var(--sans); }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); }
 body { font: 16px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
@@ -174,7 +180,7 @@ pre.agents .c { color: var(--ink-3); }
 .read h1 { font: 400 clamp(2rem, 6vw, 3.1rem)/1.12 var(--serif); margin: 0 0 18px; letter-spacing: -.01em; }
 .lede { font: clamp(1.1rem, 2.4vw, 1.3rem)/1.5 var(--serif); color: var(--ink-2); margin: 0 0 40px; }
 .prose { font: 18.5px/1.72 var(--read); }
-.prose:lang(zh) { font-size: 17px; line-height: 1.9; }
+.prose:lang(zh), .prose:lang(ja), .prose:lang(ko) { font-size: 17px; line-height: 1.9; }
 .prose p, .prose ul, .prose ol { margin: 0 0 1.05em; }
 .prose ul, .prose ol { padding-left: 1.3em; }
 .prose li { margin-bottom: .4em; }
@@ -364,7 +370,7 @@ function render_home(array $s, string $lang, ?string $place = null): string {
     $nowD = dt_utc($s['unix']);
     if ($zh) $nowLine = $nowD->format('Y') . '年' . $nowD->format('n') . '月' . $nowD->format('j') . '日 ' . WEEKDAYS_ZH[$nowD->format('l')] . ' ' . $nowD->format('H:i:s') . ' UTC';
     elseif ($en) $nowLine = $nowD->format('l j F Y, H:i:s') . ' UTC';
-    else $nowLine = (new IntlDateFormatter(LANG_INFO[$lang]['icu'], IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC'))->format($s['unix']) . ', ' . $nowD->format('H:i:s') . ' UTC';
+    else $nowLine = (new IntlDateFormatter(LANG_INFO[$lang]['icu'], IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC'))->format($s['unix']) . (in_array($lang, ['ja', 'ko'], true) ? ' ' : ', ') . $nowD->format('H:i:s') . ' UTC';
     $world = implode('', array_map(fn($l) => '<li>' . htmlspecialchars($l, ENT_NOQUOTES, 'UTF-8') . '</li>', world_now_lines($s['unix'], $lang)));
     $fact = pick_fact($s['unix'], null, $lang);
     $devBtn = dev_button($lang);
@@ -497,7 +503,7 @@ function home_js(): string {
     const d = new Date(Date.now() + skew);
     const hms = d.toISOString().slice(11, 19);
     const day = nowFmt.format(d);
-    $("ans-now").textContent = EXA.lang === "zh" ? day.replace("星期", " 星期") + " " + hms + " UTC" : (EXA.lang === "en" ? day.replace(/^(\p{L}+),/u, "$1") : day) + ", " + hms + " UTC";
+    $("ans-now").textContent = EXA.lang === "zh" ? day.replace("星期", " 星期") + " " + hms + " UTC" : (EXA.lang === "en" ? day.replace(/^(\p{L}+),/u, "$1") : day) + (["ja", "ko"].includes(EXA.lang) ? " " : ", ") + hms + " UTC";
     setTimeout(tickNow, 1000 - ((Date.now() + skew) % 1000) + 5);
   }
   tickNow();
@@ -547,7 +553,7 @@ function home_js(): string {
       const r = await fetch("/api/convert?" + kind + "=" + encodeURIComponent(v) + "&tz=" + encodeURIComponent(tz) + q);
       const s = await r.json();
       if (!r.ok) throw new Error(s.error || L.fail);
-      const pad = (t) => t + " ".repeat(Math.max(1, 18 - [...t].length * (EXA.lang === "zh" ? 2 : 1)));
+      const pad = (t) => t + " ".repeat(Math.max(1, 18 - [...t].length * (["zh", "ja", "ko"].includes(EXA.lang) ? 2 : 1)));
       const lines = [
         pad(L.universe) + group(s.universe_seconds),
         pad(L.es) + s.exaseconds.replace(".", EXA.dec),

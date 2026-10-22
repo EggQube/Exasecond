@@ -114,7 +114,7 @@ Für Ollama und andere lokale Modelle in Open WebUI: Laden Sie [/dev/openwebui_e
 | `/berlin?lang=de`, `/new-york?lang=de` | Ein Satz in Sprechreihenfolge: Ort, Ortszeit, Tageszeit und Wochentag, in Klammern Datum und Zone, dazu eine anstehende Zeitumstellung. Jede Stadt, Region, Insel, jedes Land, jede Zone oder Abweichung als Adresse | ~35-45 |
 | `/oslo`, `/new-york`, `/sweden` | Derselbe Satz auf Englisch | ~30 |
 | `/local?tz=Oslo&lang=de` | Derselbe Satz | ~35-45 |
-| `/beijing?lang=zh`, `/paris?lang=fr` | Derselbe Satz auf Chinesisch, Französisch; auch `es`, `pt` und `ru` | ~25-45 |
+| `/beijing?lang=zh`, `/paris?lang=fr` | Derselbe Satz auf Chinesisch, Französisch; auch `es`, `pt`, `ru`, `sv`, `ja` und `ko` | ~25-45 |
 | `/utc` | Nur der ISO-8601-Zeitstempel in UTC | ~5 |
 | `/now` | Etwa acht Zeilen: UTC, Wochentag, Unix-Zeit, Universumssekunden | ~80 |
 | `/now?tz=Oslo&cutoff=2025-06` | Dazu die Ortszeit und wie lange ein Trainingsstichtag zurückliegt | ~150 |

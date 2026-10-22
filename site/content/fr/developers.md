@@ -114,7 +114,7 @@ Pour Ollama et les autres modèles locaux utilisés via Open WebUI : télécharg
 | `/paris?lang=fr`, `/new-york?lang=fr` | Une phrase dans l'ordre parlé : lieu, heure locale, jour et moment de la journée, puis la date et le fuseau entre parenthèses, et un changement d'heure à venir. N'importe quelle ville, région, île, pays, fuseau ou décalage comme adresse | ~35-45 |
 | `/oslo`, `/new-york`, `/sweden` | La même phrase en anglais | ~30 |
 | `/local?tz=Oslo&lang=fr` | La même phrase | ~35-45 |
-| `/beijing?lang=zh`, `/berlin?lang=de` | La même phrase en chinois, en allemand ; aussi `es`, `pt` et `ru` | ~25-45 |
+| `/beijing?lang=zh`, `/berlin?lang=de` | La même phrase en chinois, en allemand ; aussi `es`, `pt`, `ru`, `sv`, `ja` et `ko` | ~25-45 |
 | `/utc` | Seulement l'horodatage UTC ISO 8601 | ~5 |
 | `/now` | Environ huit lignes : UTC, jour de la semaine, temps Unix, secondes d'univers | ~80 |
 | `/now?tz=Oslo&cutoff=2025-06` | Ajoute l'heure locale et l'ancienneté d'une date limite d'entraînement | ~150 |

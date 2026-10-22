@@ -114,7 +114,7 @@ Para Ollama e outros modelos locais usados pelo Open WebUI: baixe [/dev/openwebu
 | `/rio?lang=pt`, `/lisboa?lang=pt` | Uma frase na ordem falada: lugar, dia e período do dia, hora local, e entre parênteses a data e o fuso, mais uma mudança de horário próxima. Qualquer cidade, região, ilha, país, fuso ou diferença como endereço | ~30-45 |
 | `/oslo`, `/new-york`, `/sweden` | A mesma frase em inglês | ~30 |
 | `/local?tz=Oslo&lang=pt` | A mesma frase | ~30-45 |
-| `/beijing?lang=zh`, `/berlin?lang=de` | A mesma frase em chinês, em alemão; também `fr`, `es` e `ru` | ~25-45 |
+| `/beijing?lang=zh`, `/berlin?lang=de` | A mesma frase em chinês, em alemão; também `fr`, `es`, `ru`, `sv`, `ja` e `ko` | ~25-45 |
 | `/utc` | Só o carimbo de tempo UTC ISO 8601 | ~5 |
 | `/now` | Cerca de oito linhas: UTC, dia da semana, tempo Unix, segundos do universo | ~80 |
 | `/now?tz=Oslo&cutoff=2025-06` | Acrescenta a hora local e há quanto tempo foi uma data de corte de treinamento | ~150 |
