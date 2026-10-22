@@ -48,7 +48,7 @@ Before railways and the telegraph, every town kept its own local solar time. Rai
 
 Most time zones today are whole hours from UTC, but not all: India uses UTC+5:30, Nepal UTC+5:45. Since 1949 all of China has used a single zone, Beijing Time (UTC+8), although the country spans more than four hours of solar time; in Kashgar, in far western Xinjiang, the Sun is at its highest around 3 in the afternoon, Beijing Time.
 
-Time zone rules change often, by government decision. The IANA time zone database (also called the tz or Olson database, after Arthur David Olson, who started it in 1986) records every rule since 1970, and many before. Every major operating system, programming language and this website use it. Names such as `Asia/Shanghai` or `Europe/Oslo` come from it.
+Time zone rules change often, by government decision. The IANA time zone database (also called the tz or Olson database, after Arthur David Olson, who started it in 1986) records every rule since 1970, and many before. Every major operating system, programming language and this website use it. Names such as `Asia/Shanghai` or `Europe/Oslo` come from it. The history and the oddities of time zones have their own chapter, [Time zones](/time/zones), and so do the twice-yearly clock changes: [Daylight saving time](/time/dst).
 
 ## Unix time
 

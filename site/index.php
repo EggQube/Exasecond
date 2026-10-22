@@ -15,6 +15,7 @@ require __DIR__ . '/lib/content.php';
 require __DIR__ . '/lib/markdown.php';
 require __DIR__ . '/lib/figures.php';
 require __DIR__ . '/lib/i18n.php';
+require __DIR__ . '/lib/facts.php';
 require __DIR__ . '/lib/page.php';
 require __DIR__ . '/lib/mcp.php';
 
@@ -142,9 +143,16 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
             case '/local': case '/local.txt':
                 $o = opts($q);
                 $s = snapshot(null, $o);
-                $line = local_sentence($s, $o['tz_res']);
+                $line = local_sentence($s, $o['tz_res'], ($q['lang'] ?? '') === 'zh' ? 'zh' : 'en');
                 if ($path === '/local' && negotiate($accept, 'text') === 'json') return json_resp(['text' => $line, 'utc' => $s['utc'], 'local' => $s['local']] + (isset($s['tz_note']) ? ['tz_note' => $s['tz_note']] : []));
                 return send($line . "\n", 'text', ['Vary' => 'Accept']);
+            case '/fact': case '/fact.txt': case '/fact.json':
+                // General fact without a place; with ?tz= a place-specific one when there is one. ?lang=zh for Chinese.
+                $o = opts($q);
+                $f = pick_fact(time(), $o['tz'], ($q['lang'] ?? '') === 'zh' ? 'zh' : 'en');
+                if ($path === '/fact.json' || negotiate($accept, 'text') === 'json') return json_resp($f + ['url' => SITE . $f['href']]);
+                $zhF = ($q['lang'] ?? '') === 'zh';
+                return send(($zhF ? '你知道吗？' : 'Did you know? ') . $f['text'] . "\n" . ($zhF ? '详见：' : 'More: ') . SITE . $f['href'] . "\n", 'text', ['Vary' => 'Accept']);
             case '/zones': case '/zones.txt':
                 $zq = isset($q['q']) && is_string($q['q']) ? $q['q'] : null;
                 if ($path === '/zones' && negotiate($accept, 'text') === 'json') return json_resp(zones_list(time(), $zq));

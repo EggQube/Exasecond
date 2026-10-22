@@ -282,9 +282,24 @@ function place_name(string $zone, ?array $res): string {
     return str_replace('_', ' ', end($p));
 }
 
-/** One sentence for talking to a person (/local). About 30 tokens. */
-function local_sentence(array $s, ?array $res): string {
+/** One sentence for talking to a person (/local). About 30 tokens. $lang 'zh' is used by the Chinese home page. */
+function local_sentence(array $s, ?array $res, string $lang = 'en'): string {
     $l = $s['local'];
+    if ($lang === 'zh' && $l && function_exists('fact_day')) {
+        $d = (new DateTimeImmutable('@' . $s['unix']))->setTimezone(new DateTimeZone($l['zone']));
+        $place = place_name($l['zone'], $res);
+        foreach (PLACES as [$pz, , $pzh]) if ($pz === $l['zone'] && (!$res || $res['how'] !== 'country')) $place = $pzh;   // Chinese city name when we have one
+        $off = short_offset($l['offset']);
+        $inner = [PARTS_ZH[$l['part_of_day']]];
+        if ($l['abbreviation'] && $l['abbreviation'] !== $off) $inner[] = $l['abbreviation'];
+        if ($place !== $off) $inner[] = $off;
+        $out = $d->format('Y') . '年' . $d->format('n') . '月' . $d->format('j') . '日 ' . WEEKDAYS_ZH[$d->format('l')] . ' ' . $d->format('H:i') . '，' . $place . '（' . implode('，', $inner) . '）。';
+        $c = $l['next_change'] ?? null;
+        if ($c && strtotime($c['utc']) - $s['unix'] <= 14 * 86400) {
+            $out .= fact_day($c['local_before'], 'zh') . '时钟' . ($c['direction'] === 'back' ? '拨回' : '拨快') . ' ' . str_replace([' hours', ' hour', ' minutes'], [' 小时', ' 小时', ' 分钟'], $c['amount']) . '。';
+        }
+        return $out;
+    }
     if (!$l) {
         $d = dt_utc($s['unix']);
         $base = $d->format('l j F Y, H:i') . ' UTC.';
