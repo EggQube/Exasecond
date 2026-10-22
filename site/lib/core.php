@@ -200,7 +200,7 @@ function snapshot(?array $instant = null, array $opts = []): array {
         'unix' => $unix,
         'universe_seconds' => (string)$u,
         'exaseconds' => to_exaseconds($u, 12),
-        'universe_fraction_percent' => (float)to_exaseconds($u, 8) * 100,
+        'universe_fraction_percent' => round((float)to_exaseconds($u, 8) * 100, 6),   // 6 decimals, without float leftovers like ...000006
         'local' => $tz ? zone_time($unix, $tz) : null,
         'staleness' => staleness($unix, $ms, $opts['cutoff'] ?? null),
         'calendars' => calendars($unix),
