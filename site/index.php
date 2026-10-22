@@ -17,6 +17,7 @@ require __DIR__ . '/lib/markdown.php';
 require __DIR__ . '/lib/figures.php';
 require __DIR__ . '/lib/i18n.php';
 require __DIR__ . '/lib/facts.php';
+require __DIR__ . '/lib/facts_tr.php';
 require __DIR__ . '/lib/page.php';
 require __DIR__ . '/lib/mcp.php';
 
@@ -70,10 +71,20 @@ function opts(array $q): array {
     return tz_opts($str('tz'), $str('cutoff'));
 }
 
-/** Snapshot plus, for the Chinese pages' own scripts, calendar dates written in Chinese (?lang=zh). */
+/** A page language from ?lang= (zh, de, ...), or 'en'. */
+function q_lang(array $q): string {
+    $l = $q['lang'] ?? 'en';
+    return is_string($l) && in_array($l, LANGS, true) ? $l : 'en';
+}
+
+/** Snapshot plus, for the translated pages' own scripts, calendar dates written in that language (?lang=zh, ?lang=de). */
 function snap(?array $instant, array $q): array {
     $s = snapshot($instant, opts($q));
-    if (($q['lang'] ?? null) === 'zh' && extension_loaded('intl')) $s['calendars_zh'] = calendars_zh($s['unix']);
+    $l = q_lang($q);
+    if ($l !== 'en' && extension_loaded('intl')) {
+        $s['calendars_local'] = calendars_local($s['unix'], LANG_INFO[$l]['icu']);
+        if ($l === 'zh') $s['calendars_zh'] = $s['calendars_local'];   // the older name, kept for existing users
+    }
     return $s;
 }
 
@@ -105,9 +116,12 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
     try {
         $lang = 'en';
         $p = $path;
-        if ($p === '/zh' || str_starts_with($p, '/zh/')) { $lang = 'zh'; $p = substr($p, 3) ?: '/'; }
+        foreach (LANGS as $l) {
+            if ($l !== 'en' && ($p === "/$l" || str_starts_with($p, "/$l/"))) { $lang = $l; $p = substr($p, strlen($l) + 1) ?: '/'; break; }
+        }
+        $chapters = in_array($lang, CHAPTER_LANGS, true);
 
-        // Human pages that exist in both languages
+        // Human pages that exist in several languages
         if ($p === '/') {
             // ?tz= puts that place's sentence first, on the page for people and the markdown for agents.
             $o = opts($q);
@@ -119,12 +133,12 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
             }
             return send(render_home(snapshot(), $lang, $place), 'html', ['Vary' => 'Accept', 'Link' => '</llms.txt>; rel="describedby"; type="text/plain"']);
         }
-        if ($p === '/time') {
+        if ($p === '/time' && $chapters) {
             // Browsers get the contents page; agents keep the old meaning of /time (an alias of /now).
-            if ($lang === 'zh' || negotiate($accept, 'text') === 'html') return send(render_time_index($lang, snapshot()), 'html', ['Vary' => 'Accept']);
+            if ($lang !== 'en' || negotiate($accept, 'text') === 'html') return send(render_time_index($lang, snapshot()), 'html', ['Vary' => 'Accept']);
             $path = '/now';
         }
-        if ($p === '/time.md') return send(time_index_md($lang), 'md');
+        if ($p === '/time.md' && $chapters) return send(time_index_md($lang), 'md');
         if (preg_match('#^/time/([a-z]+)(\.md)?$#', $p, $m) && ($c = chapter($lang, $m[1]))) {
             if (!empty($m[2]) || negotiate($accept, 'html') === 'md') return send(chapter_md($c, $lang), 'md', ['Vary' => 'Accept']);
             return send(render_chapter($c, $lang, snapshot()), 'html', ['Vary' => 'Accept']);
@@ -137,7 +151,7 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
             if ($p === '/developers.md' || negotiate($accept, 'html') === 'md') return send(doc_md($d, $lang), 'md', ['Vary' => 'Accept']);
             return send(render_doc($d, $lang, '/developers', snapshot()), 'html', ['Vary' => 'Accept']);
         }
-        if ($lang === 'zh') return send(render_not_found('zh', $path), 'html', [], 404);
+        if ($lang !== 'en') return send(render_not_found($lang, $path), 'html', [], 404);
 
         // Downloadable developer files: a fixed list, never a path from the request.
         $devFiles = ['LICENSE' => 'text', 'openwebui_exasecond.py' => 'text', 'exasecond.py' => 'text', 'exasecond.js' => 'js', 'openai-tool.json' => 'json', 'anthropic-tool.json' => 'json', 'mcp.json' => 'json'];
@@ -175,12 +189,13 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
             case '/local': case '/local.txt':
                 return local_answer(opts($q), $q, $path === '/local' ? $accept : '');
             case '/fact': case '/fact.txt': case '/fact.json':
-                // General fact without a place; with ?tz= a place-specific one when there is one. ?lang=zh for Chinese.
+                // General fact without a place; with ?tz= a place-specific one when there is one. ?lang=zh, ?lang=de, ...
                 $o = opts($q);
-                $f = pick_fact(time(), $o['tz'], ($q['lang'] ?? '') === 'zh' ? 'zh' : 'en');
+                $fl = q_lang($q);
+                $f = pick_fact(time(), $o['tz'], $fl);
                 if ($path === '/fact.json' || negotiate($accept, 'text') === 'json') return json_resp($f + ['url' => SITE . $f['href']]);
-                $zhF = ($q['lang'] ?? '') === 'zh';
-                return send(($zhF ? '你知道吗？' : 'Did you know? ') . $f['text'] . "\n" . ($zhF ? '详见：' : 'More: ') . SITE . $f['href'] . "\n", 'text', ['Vary' => 'Accept']);
+                [$sp, $colon] = $fl === 'zh' ? ['', '：'] : [' ', ': '];
+                return send(t($fl, 'ans_fact') . $sp . $f['text'] . "\n" . t($fl, 'ans_more') . $colon . SITE . $f['href'] . "\n", 'text', ['Vary' => 'Accept']);
             case '/zones': case '/zones.txt':
                 $zq = isset($q['q']) && is_string($q['q']) ? $q['q'] : null;
                 if ($path === '/zones' && negotiate($accept, 'text') === 'json') return json_resp(zones_list(time(), $zq));

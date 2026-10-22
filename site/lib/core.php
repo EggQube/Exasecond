@@ -122,11 +122,14 @@ function calendars(int $unix): array {
 }
 
 /** Calendar dates written natively in Simplified Chinese (for the /zh pages). Keyed by calendar id. */
-function calendars_zh(int $unix): array {
+function calendars_zh(int $unix): array { return calendars_local($unix, 'zh_Hans'); }
+
+/** Every calendar date written in a language by ICU (zh_Hans, de_DE, ...). */
+function calendars_local(int $unix, string $icu): array {
     if (!extension_loaded('intl')) return [];
     $out = [];
     foreach (CALENDARS as [$id, $cal, , $zone]) {
-        $f = new IntlDateFormatter('zh_Hans@calendar=' . $cal, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $zone, IntlDateFormatter::TRADITIONAL);
+        $f = new IntlDateFormatter($icu . '@calendar=' . $cal, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $zone, IntlDateFormatter::TRADITIONAL);
         $out[$id] = (string)$f->format($unix);
     }
     return $out;

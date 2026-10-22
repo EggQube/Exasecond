@@ -7,7 +7,9 @@ const CHAPTERS = [
     'scale', 'second', 'clocks', 'timescales', 'zones', 'dst', 'relativity', 'arrow', 'history',
     'age', 'beginning', 'future', 'calendars', 'nature', 'machines',
 ];
-const LANGS = ['en', 'zh'];
+const LANGS = ['en', 'zh', 'de'];
+// The chapters (/time) exist in these only; other languages link to the English ones.
+const CHAPTER_LANGS = ['en', 'zh'];
 
 function content_path(string ...$parts): string {
     return __DIR__ . '/../content/' . implode('/', $parts);
@@ -17,7 +19,7 @@ function content_path(string ...$parts): string {
 function chapter(string $lang, string $slug): ?array {
     static $cache = [];
     $i = array_search($slug, CHAPTERS, true);
-    if ($i === false || !in_array($lang, LANGS, true)) return null;
+    if ($i === false || !in_array($lang, CHAPTER_LANGS, true)) return null;
     $key = "$lang/$slug";
     if (isset($cache[$key])) return $cache[$key];
     $file = content_path($lang, 'time', $slug . '.md');

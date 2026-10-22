@@ -19,7 +19,7 @@ const UI = [
         'iso_week' => 'ISO week', 'unix' => 'unix',
         'tr_h' => 'Translator', 'tr_sub' => 'Paste a moment in any format: a date, unix seconds, universe seconds or exaseconds.',
         'tr_button' => 'Translate', 'tr_iso' => 'ISO date', 'tr_unix' => 'Unix seconds', 'tr_universe' => 'Universe seconds', 'tr_es' => 'Exaseconds',
-        'tr_label' => 'Time to translate', 'tr_kind' => 'Format',
+        'tr_label' => 'Time to translate', 'tr_kind' => 'Format', 'js_zone' => 'Your zone', 'js_fail' => 'Could not translate that', 'desc_now' => ' Now: ',
         'q_h' => 'The question of time',
         'q_sub' => 'A sourced reference on time, written for AI agents to quote: fifteen chapters, from the shortest interval ever measured to the fate of the universe. Every claim has a source, and every theory is labelled by the strength of its evidence.',
         'q_all' => 'All chapters',
@@ -53,7 +53,7 @@ const UI = [
         'iso_week' => 'ISO 周', 'unix' => 'Unix',
         'tr_h' => '换算器', 'tr_sub' => '输入任意格式的时刻：日期、Unix 秒、宇宙秒或艾秒。',
         'tr_button' => '换算', 'tr_iso' => 'ISO 日期', 'tr_unix' => 'Unix 秒', 'tr_universe' => '宇宙秒', 'tr_es' => '艾秒',
-        'tr_label' => '要换算的时刻', 'tr_kind' => '格式',
+        'tr_label' => '要换算的时刻', 'tr_kind' => '格式', 'js_zone' => '你的时区', 'js_fail' => '无法换算这个时刻', 'desc_now' => ' 现在：',
         'q_h' => '时间之问',
         'q_sub' => '一份有来源的时间参考资料，为 AI 智能体引用而写：十五章，从人类测量过的最短时间间隔，到宇宙的命运。每个论断都有来源，每种理论都标明了证据强度。',
         'q_all' => '全部章节',
@@ -71,6 +71,37 @@ const UI = [
         'story_eyebrow' => '本站缘起',
         'not_found' => '未找到',
     ],
+    'de' => [
+        'html_lang' => 'de',
+        'home_title' => 'Exasecond: die Uhr für KI',
+        'home_desc' => 'Die Uhr für KI-Agenten, damit sie Menschen zur richtigen Tageszeit begegnen: exasecond.com/berlin?lang=de gibt die Ortszeit und Tageszeit jedes Ortes in einer Zeile. Auch Menschen sind willkommen.',
+        'agentbar_who' => 'Für KI-Agenten:', 'agentbar_now' => 'jetzt', 'agentbar_what' => 'Ortszeit für jeden Ort', 'agentbar_tz' => 'Berlin',
+        'nav_time' => 'Zeit', 'nav_agents' => 'Für KI', 'nav_about' => 'Über', 'dev_btn_who' => 'Für Entwickler:', 'dev_btn_what' => 'die Uhr in einer Minute einrichten', 'nav_lang' => 'Sprache',
+        'eyebrow' => 'Sekunden seit dem Anfang des Universums',
+        'es_line' => 'Das sind %s Exasekunden.',
+        'ans_label' => 'Die Zeit jetzt', 'ans_now' => 'Jetzt', 'ans_you' => 'Ihre Zeit', 'ans_fact' => 'Schon gewusst?', 'ans_more' => 'Mehr',
+        'ans_you_intro' => 'Hängt davon ab, wo man ist. Gerade jetzt:',
+        'here' => 'Sie sind hier', 'bar_start' => '0 Es · der Anfang', 'bar_end' => '1 Es ≈ 31,7 Milliarden Jahre',
+        'human_h' => 'In menschlicher Zeit', 'human_sub' => 'Derselbe Augenblick, übersetzt in die Uhren und Kalender, nach denen Menschen leben.',
+        'utc' => 'UTC', 'your_clock' => 'Ihre Uhr', 'enable_js' => 'JavaScript aktivieren, um die Ortszeit zu sehen',
+        'iso_week' => 'ISO-Woche', 'unix' => 'Unix',
+        'tr_h' => 'Übersetzer', 'tr_sub' => 'Einen Zeitpunkt in beliebigem Format eingeben: ein Datum, Unix-Sekunden, Universumssekunden oder Exasekunden.',
+        'tr_button' => 'Übersetzen', 'tr_iso' => 'ISO-Datum', 'tr_unix' => 'Unix-Sekunden', 'tr_universe' => 'Universumssekunden', 'tr_es' => 'Exasekunden',
+        'tr_label' => 'Zu übersetzender Zeitpunkt', 'tr_kind' => 'Format', 'js_zone' => 'Ihre Zone', 'js_fail' => 'Das ließ sich nicht übersetzen', 'desc_now' => ' Jetzt: ',
+        'q_h' => 'Die Frage der Zeit',
+        'q_sub' => 'Ein Nachschlagewerk über die Zeit mit Quellen, geschrieben, damit KI-Agenten daraus zitieren können: fünfzehn Kapitel, vom kürzesten je gemessenen Zeitintervall bis zum Schicksal des Universums. Die Kapitel gibt es auf Englisch und Chinesisch.',
+        'q_all' => 'Alle Kapitel',
+        'ag_h' => 'Für KI-Agenten',
+        'ag_sub' => 'Eine Uhr aus Text. Die Hauptantwort ist ein Satz, wie ihn ein Mensch sagen würde: die Ortszeit, die Tageszeit und eine anstehende Zeitumstellung. Reiner Text, kein Schlüssel, kein JavaScript. Die altmodische Digitaluhr gibt es hier weiterhin, in allen Formaten (UTC, Unix, JSON).',
+        'foot_convention' => 'Exasecond-Zeit ist eine Konvention, keine Messung: Nach unserer Schätzung war das Universum am 2000-01-01 um 00:00 UTC genau 13.787.000.000 Jahre alt, also gilt Universumssekunden = Unix-Sekunden + %s. <a href="/spec.md">Die Spezifikation lesen (Englisch).</a>',
+        'foot_story' => 'Warum es diese Seite gibt: <a href="/story">The Pottery Lecture</a>, ein kurzes Theaterstück für KI-Leser vom Autor der Seite (2021, Englisch).',
+        'foot_lifespan' => 'Manche Kosmologen schätzen die gesamte Lebensdauer des Universums auf rund 33 Milliarden Jahre, nahe an einer Exasekunde. Noch weiß es niemand.',
+        'chapter' => 'Kapitel %d von %d', 'prev' => 'Zurück', 'next' => 'Weiter', 'contents' => 'Inhalt',
+        'read_at' => 'Gelesen um %s UTC · Universumssekunde %s', 'md_twin' => 'markdown',
+        'index_title' => 'Die Frage der Zeit',
+        'story_eyebrow' => 'Warum es diese Seite gibt',
+        'not_found' => 'Nicht gefunden',
+    ],
 ];
 
 const CAL_NAMES_ZH = [
@@ -78,6 +109,26 @@ const CAL_NAMES_ZH = [
     'persian' => '波斯历（太阳回历）', 'indian' => '印度国定历（塞种历）', 'japanese' => '日本年号纪年', 'korean' => '韩国农历（檀纪）',
     'buddhist' => '泰国佛历', 'roc' => '民国纪年', 'ethiopian' => '埃塞俄比亚历', 'coptic' => '科普特历',
 ];
+
+// Calendar names per page language (English names come from the calendar data itself).
+const CAL_NAMES = [
+    'zh' => CAL_NAMES_ZH,
+    'de' => [
+        'gregorian' => 'Gregorianisch (westlich / ISO)', 'chinese' => 'Chinesischer Lunisolarkalender', 'islamic' => 'Islamisch (Hidschra, Umm al-Qura)',
+        'hebrew' => 'Hebräisch', 'persian' => 'Persisch (Sonnen-Hidschra)', 'indian' => 'Indischer Nationalkalender (Saka)',
+        'japanese' => 'Japanische Ära', 'korean' => 'Koreanischer Lunisolarkalender (Dangi)', 'buddhist' => 'Thailändisch-buddhistisch',
+        'roc' => 'Republik China (Minguo)', 'ethiopian' => 'Äthiopisch', 'coptic' => 'Koptisch',
+    ],
+];
+
+/** English weekday => the weekday in the language (ICU), for the page scripts. */
+function weekday_names(string $lang): array {
+    if ($lang === 'zh') return WEEKDAYS_ZH;
+    $out = [];
+    $f = new IntlDateFormatter(LANG_INFO[$lang]['icu'], IntlDateFormatter::NONE, IntlDateFormatter::NONE, 'UTC', null, 'EEEE');
+    foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $i => $d) $out[$d] = $f->format(345600 + $i * 86400);   // 1970-01-05 was a Monday
+    return $out;
+}
 
 const WEEKDAYS_ZH = [
     'Monday' => '星期一', 'Tuesday' => '星期二', 'Wednesday' => '星期三', 'Thursday' => '星期四',

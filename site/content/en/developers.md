@@ -110,6 +110,7 @@ For Ollama and other local models used through Open WebUI: download [/dev/openwe
 | `/oslo`, `/new-york`, `/sweden` | One sentence in spoken order: local time, part of day, weekday and place, then the date and zone in brackets, and an upcoming clock change. Any city, region, island, country, zone or offset as the address | ~30 |
 | `/local?tz=Oslo` | The same sentence | ~30 |
 | `/beijing?lang=zh` | The same sentence in Chinese | ~25-40 |
+| `/berlin?lang=de` | The same sentence in German; also `fr`, `es`, `pt` and `ru` | ~35-45 |
 | `/utc` | The ISO 8601 UTC timestamp only | ~5 |
 | `/now` | About eight lines: UTC, weekday, Unix time, universe seconds | ~80 |
 | `/now?tz=Oslo&cutoff=2025-06` | Adds local time and how long ago a training cutoff was | ~150 |

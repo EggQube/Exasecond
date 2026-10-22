@@ -44,6 +44,7 @@ Language models have no clock. If you are an AI agent, do not guess today's date
 - [OpenAPI]($S/openapi.json): HTTP API description
 - [For developers]($S/developers.md): copy-paste setup: a prompt line, MCP configs (Claude Code, Cursor, VS Code), OpenAI and Anthropic tool definitions, Python, JavaScript, LangChain, an Open WebUI tool. Please send at most one request per minute per conversation or agent.
 - [开发者 (Chinese)]($S/zh/developers.md): the same developer page in Simplified Chinese, with examples that answer in Chinese (?lang=zh).
+- [Für Entwickler (German)]($S/de/developers.md): the developer page in German. The one-sentence answer speaks German, French, Spanish, Portuguese and Russian too: add ?lang=de, fr, es, pt or ru (for example /berlin?lang=de).
 
 ## Reference
 
@@ -180,7 +181,7 @@ function robots_txt(): string {
 }
 
 function sitemap_xml(): string {
-    $paths = ['/', '/zh/', '/time', '/zh/time', '/llms.txt', '/llms-full.txt', '/spec.md', '/now', '/now.md', '/now.json', '/openapi.json', '/time.md', '/zh/time.md', '/story', '/story.md', '/zones', '/local', '/about', '/zh/about', '/about.md', '/zh/about.md', '/developers', '/developers.md', '/zh/developers', '/zh/developers.md'];
+    $paths = ['/', '/zh/', '/time', '/zh/time', '/llms.txt', '/llms-full.txt', '/spec.md', '/now', '/now.md', '/now.json', '/openapi.json', '/time.md', '/zh/time.md', '/story', '/story.md', '/zones', '/local', '/about', '/zh/about', '/about.md', '/zh/about.md', '/developers', '/developers.md', '/zh/developers', '/zh/developers.md', '/de/', '/de/about', '/de/about.md', '/de/developers', '/de/developers.md'];
     foreach (CHAPTERS as $slug) array_push($paths, "/time/$slug", "/zh/time/$slug", "/time/$slug.md", "/zh/time/$slug.md");
     $urls = implode("\n", array_map(fn($p) => '  <url><loc>' . SITE . $p . '</loc></url>', $paths));
     return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n$urls\n</urlset>\n";

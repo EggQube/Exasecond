@@ -5,11 +5,18 @@ defined('EXA') or exit;
 
 function lang_prefix(string $lang): string { return $lang === 'en' ? '' : '/' . $lang; }
 
-// Each language in its own name; 'tag' is the hreflang/lang code.
+// Each language in its own name; 'tag' is the hreflang/lang code, 'icu' and 'js' the locales for dates.
 const LANG_INFO = [
-    'en' => ['name' => 'English', 'short' => 'EN', 'tag' => 'en'],
-    'zh' => ['name' => '中文', 'short' => '中文', 'tag' => 'zh-Hans'],
+    'en' => ['name' => 'English', 'short' => 'EN', 'tag' => 'en', 'icu' => 'en_GB', 'js' => 'en-GB'],
+    'zh' => ['name' => '中文', 'short' => '中文', 'tag' => 'zh-Hans', 'icu' => 'zh_Hans', 'js' => 'zh-CN'],
+    'de' => ['name' => 'Deutsch', 'short' => 'DE', 'tag' => 'de', 'icu' => 'de_DE', 'js' => 'de-DE'],
 ];
+
+/** Where the chapters are for this language: its own, or the English ones. */
+function time_prefix(string $lang): string { return in_array($lang, CHAPTER_LANGS, true) ? lang_prefix($lang) : ''; }
+
+/** The languages a page exists in: the home page in all, chapters in CHAPTER_LANGS, a document where its file is. */
+function doc_langs(string $name): array { return array_values(array_filter(LANGS, fn($l) => is_file(content_path($l, $name . '.md')))); }
 
 /** The language dropdown: plain HTML (<details>), so it works without JavaScript and agents see ordinary links.
  *  Each language links to this page when it exists in that language, otherwise to that language's front page. */
@@ -239,7 +246,7 @@ function layout(string $lang, array $o, string $body): string {
     $head .= $o['head'] ?? '';
     $p = lang_prefix($lang);
     $cur = fn($k) => ($o['active'] ?? '') === $k ? ' aria-current="page"' : '';
-    $nav = '<a href="' . $p . '/time"' . $cur('time') . '>' . h($L('nav_time')) . '</a>'
+    $nav = '<a href="' . time_prefix($lang) . '/time"' . $cur('time') . '>' . h($L('nav_time')) . '</a>'
         . '<a href="' . $p . '/about"' . $cur('about') . '>' . h($L('nav_about')) . '</a>'
         . lang_menu($lang, $here, $url);
     // Styling lives in /site.css (cached by browsers), so the page itself starts with the content: raw-HTML readers reach the time first.
@@ -253,8 +260,9 @@ function layout(string $lang, array $o, string $body): string {
     // Visible, quiet, first in the page: the time itself, then where to get the rest. On every page, since agents can land anywhere.
     $ex = $L('agentbar_tz');
     $iso = iso_utc(time());
+    $lq = $lang === 'en' ? '' : '?lang=' . $lang;   // the answer in the page's language
     $agentbar = '<b>' . h($L('agentbar_who')) . '</b> ' . h($L('agentbar_now')) . ' <time datetime="' . $iso . '">' . $iso . '</time> (UTC) · '
-        . h($L('agentbar_what')) . ' → <a href="/' . h(strtolower($ex)) . '">exasecond.com/' . h(strtolower($ex)) . '</a>';
+        . h($L('agentbar_what')) . ' → <a href="/' . h(strtolower($ex) . $lq) . '">exasecond.com/' . h(strtolower($ex) . $lq) . '</a>';
     return <<<HTML
 <!doctype html>
 <html lang="$htmlLang">
@@ -310,34 +318,35 @@ function render_home(array $s, string $lang, ?string $place = null): string {
     $L = fn($k) => t($lang, $k);
     $pct = number_format($s['universe_fraction_percent'], 4, '.', '');
     $zh = $lang === 'zh';
-    $zhDates = $zh ? calendars_zh($s['unix']) : [];
+    $en = $lang === 'en';
+    $locDates = $en ? [] : calendars_local($s['unix'], LANG_INFO[$lang]['icu']);
+    $days = $en ? null : weekday_names($lang);
     $cal = '';
     foreach ($s['calendars'] as $c) {
-        $name = $zh ? (CAL_NAMES_ZH[$c['id']] ?? $c['name']) : $c['name'];
-        $date = $zh ? ($zhDates[$c['id']] ?? $c['text']) : $c['text'];
-        $native = (!$zh && isset($c['native'])) ? '<span class="cal-native" lang="zh">' . h($c['native']) . '</span>' : ($zh ? '<span class="cal-native" lang="en">' . h($c['text']) . '</span>' : '');
+        $name = $en ? $c['name'] : (CAL_NAMES[$lang][$c['id']] ?? $c['name']);
+        $date = $en ? $c['text'] : ($locDates[$c['id']] ?? $c['text']);
+        $native = ($en && isset($c['native'])) ? '<span class="cal-native" lang="zh">' . h($c['native']) . '</span>' : ($zh ? '<span class="cal-native" lang="en">' . h($c['text']) . '</span>' : '');
         $cal .= "\n        <li class=\"cal\" data-id=\"" . h($c['id']) . "\"><span class=\"cal-name\">" . h($name) . "</span><span class=\"cal-date\">" . h($date) . "</span>$native</li>";
     }
     $S = SITE;
     $C = OFFSET;
     $count = group_digits($s['universe_seconds']);
-    $weekday = $zh ? (WEEKDAYS_ZH[$s['technical']['weekday']] ?? $s['technical']['weekday']) : $s['technical']['weekday'];
+    $weekday = $days[$s['technical']['weekday']] ?? $s['technical']['weekday'];
     $esLine = sprintf(h($L('es_line')), '<span id="es">' . h($s['exaseconds']) . '</span>');
     $p = lang_prefix($lang);
+    $tp = time_prefix($lang);
     $cfg = json_encode([
-        'offset' => (string)OFFSET, 'serverMs' => $s['unix'] * 1000, 'lang' => $lang,
-        'calNames' => $zh ? CAL_NAMES_ZH : null,
-        'days' => $zh ? WEEKDAYS_ZH : null,
-        'labels' => $zh
-            ? ['universe' => '宇宙秒', 'es' => '艾秒', 'utc' => 'UTC', 'zone' => '你的时区', 'unix' => 'Unix', 'fail' => '无法换算这个时刻']
-            : ['universe' => 'Universe seconds', 'es' => 'Exaseconds', 'utc' => 'UTC', 'zone' => 'Your zone', 'unix' => 'Unix', 'fail' => 'Could not translate that'],
+        'offset' => (string)OFFSET, 'serverMs' => $s['unix'] * 1000, 'lang' => $lang, 'locale' => $en ? null : LANG_INFO[$lang]['js'],
+        'calNames' => $en ? null : (CAL_NAMES[$lang] ?? null),
+        'days' => $days,
+        'labels' => ['universe' => $L('tr_universe'), 'es' => $L('tr_es'), 'utc' => 'UTC', 'zone' => $L('js_zone'), 'unix' => 'Unix', 'fail' => $L('js_fail')],
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG);
     $js = home_js();
     // The answer comes first: the time now, the reader's time, one fact. The counter is the visual that follows.
     $nowD = dt_utc($s['unix']);
-    $nowLine = $zh
-        ? $nowD->format('Y') . '年' . $nowD->format('n') . '月' . $nowD->format('j') . '日 ' . WEEKDAYS_ZH[$nowD->format('l')] . ' ' . $nowD->format('H:i:s') . ' UTC'
-        : $nowD->format('l j F Y, H:i:s') . ' UTC';
+    if ($zh) $nowLine = $nowD->format('Y') . '年' . $nowD->format('n') . '月' . $nowD->format('j') . '日 ' . WEEKDAYS_ZH[$nowD->format('l')] . ' ' . $nowD->format('H:i:s') . ' UTC';
+    elseif ($en) $nowLine = $nowD->format('l j F Y, H:i:s') . ' UTC';
+    else $nowLine = (new IntlDateFormatter(LANG_INFO[$lang]['icu'], IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC'))->format($s['unix']) . ', ' . $nowD->format('H:i:s') . ' UTC';
     $world = implode('', array_map(fn($l) => '<li>' . htmlspecialchars($l, ENT_NOQUOTES, 'UTF-8') . '</li>', world_now_lines($s['unix'], $lang)));
     $fact = pick_fact($s['unix'], null, $lang);
     $devBtn = dev_button($lang);
@@ -379,10 +388,10 @@ function render_home(array $s, string $lang, ?string $place = null): string {
     </section>
 
     <section aria-labelledby="h-q">
-      <h2 id="h-q"><a href="$p/time" style="text-decoration:none">{$L('q_h')}</a></h2>
+      <h2 id="h-q"><a href="{$tp}/time" style="text-decoration:none">{$L('q_h')}</a></h2>
       <p class="sub">{$L('q_sub')}</p>
 HTML;
-    $body .= chapter_cards($lang);
+    $body .= chapter_cards($tp === '' ? 'en' : $lang);
     $body .= <<<HTML
 
     </section>
@@ -417,7 +426,7 @@ curl $S/utc
 $S/mcp</pre>
       <div class="agent-links" lang="en">
         <a href="/llms.txt">/llms.txt</a><a href="/llms-full.txt">/llms-full.txt</a><a href="/now.md">/now.md</a>
-        <a href="/now.json">/now.json</a><a href="/openapi.json">/openapi.json</a><a href="/spec.md">/spec.md</a><a href="$p/time.md">$p/time.md</a>
+        <a href="/now.json">/now.json</a><a href="/openapi.json">/openapi.json</a><a href="/spec.md">/spec.md</a><a href="{$tp}/time.md">{$tp}/time.md</a>
       </div>
       <div class="dev-cta">{$devBtn}</div>
     </section>
@@ -431,7 +440,7 @@ HTML;
     $body .= "\n  </footer>\n<script>\nconst EXA = $cfg;\n$js</script>";
     return layout($lang, [
         'title' => $L('home_title'),
-        'desc' => $L('home_desc') . ($zh ? ' 现在：' : ' Now: ') . $s['utc'] . ' UTC.',
+        'desc' => $L('home_desc') . $L('desc_now') . $s['utc'] . ' UTC.',
         'path' => '/', 'md' => '/now.md',
         'head' => '<link rel="alternate" type="application/json" href="/now.json" title="Current time as JSON">' . "\n",
     ], $body);
@@ -445,7 +454,7 @@ function home_js(): string {
   const $ = (id) => document.getElementById(id);
   const group = (s) => s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const loc = EXA.lang === "zh" ? "zh-CN" : undefined;
+  const loc = EXA.locale || undefined;
   const localFmt = new Intl.DateTimeFormat(loc, { dateStyle: "full", timeStyle: "medium" });
 
   function tick() {
@@ -465,15 +474,16 @@ function home_js(): string {
   tick();
 
   // The answer block: "now" ticks; "your time" and the fact become specific to this reader's time zone.
-  const nowFmt = new Intl.DateTimeFormat(EXA.lang === "zh" ? "zh-CN" : "en-GB", { timeZone: "UTC", weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const nowFmt = new Intl.DateTimeFormat(EXA.locale || "en-GB", { timeZone: "UTC", weekday: "long", day: "numeric", month: "long", year: "numeric" });
   function tickNow() {
     const d = new Date(Date.now() + skew);
     const hms = d.toISOString().slice(11, 19);
-    $("ans-now").textContent = EXA.lang === "zh" ? nowFmt.format(d).replace("星期", " 星期") + " " + hms + " UTC" : nowFmt.format(d).replace(/^(\p{L}+),/u, "$1") + ", " + hms + " UTC";
+    const day = nowFmt.format(d);
+    $("ans-now").textContent = EXA.lang === "zh" ? day.replace("星期", " 星期") + " " + hms + " UTC" : (EXA.lang === "en" ? day.replace(/^(\p{L}+),/u, "$1") : day) + ", " + hms + " UTC";
     setTimeout(tickNow, 1000 - ((Date.now() + skew) % 1000) + 5);
   }
   tickNow();
-  const lq = "tz=" + encodeURIComponent(new URLSearchParams(location.search).get("tz") || tz) + (EXA.lang === "zh" ? "&lang=zh" : "");
+  const lq = "tz=" + encodeURIComponent(new URLSearchParams(location.search).get("tz") || tz) + (EXA.lang !== "en" ? "&lang=" + EXA.lang : "");
   async function yourTime() {
     try {
       const r = await fetch("/local?" + lq, { headers: { Accept: "application/json" }, cache: "no-store" });
@@ -494,8 +504,8 @@ function home_js(): string {
   })();
 
   const calName = (c) => (EXA.calNames && EXA.calNames[c.id]) || c.name;
-  const calDate = (s, c) => (s.calendars_zh && s.calendars_zh[c.id]) || c.text;
-  const q = EXA.lang === "zh" ? "&lang=zh" : "";
+  const calDate = (s, c) => (s.calendars_local && s.calendars_local[c.id]) || c.text;
+  const q = EXA.lang !== "en" ? "&lang=" + EXA.lang : "";
 
   async function refreshCalendars() {
     try {
@@ -558,7 +568,7 @@ function render_chapter(array $c, string $lang, array $s): string {
     $body = '<main class="read"><p class="kicker"><a href="' . $p . '/time">' . h($L('q_h')) . '</a> · ' . h(sprintf($L('chapter'), $c['n'], $n)) . '</p>'
         . '<h1>' . h($c['title']) . '</h1><p class="lede">' . h($c['description']) . '</p>'
         . '<article class="prose">' . $prose . '</article>' . $pager . '</main>' . read_footer($lang, $s, $md);
-    return layout($lang, ['title' => $c['title'] . ' · Exasecond', 'desc' => $c['description'], 'path' => '/time/' . $c['slug'], 'md' => $md, 'active' => 'time'], $body);
+    return layout($lang, ['title' => $c['title'] . ' · Exasecond', 'desc' => $c['description'], 'path' => '/time/' . $c['slug'], 'md' => $md, 'active' => 'time', 'langs' => CHAPTER_LANGS], $body);
 }
 
 function render_time_index(string $lang, array $s): string {
@@ -571,7 +581,7 @@ function render_time_index(string $lang, array $s): string {
     $body = '<main class="read"><p class="kicker"><a href="' . $p . '/">Exasecond</a></p><h1>' . h($L('index_title')) . '</h1>'
         . '<p class="lede">' . h($L('index_lede')) . '</p><p class="evidence">' . $L('evidence_key') . '</p>'
         . '<ol class="toc">' . $toc . '</ol></main>' . read_footer($lang, $s, $p . '/time.md');
-    return layout($lang, ['title' => $L('index_title') . ' · Exasecond', 'desc' => $L('index_desc'), 'path' => '/time', 'md' => $p . '/time.md', 'active' => 'time'], $body);
+    return layout($lang, ['title' => $L('index_title') . ' · Exasecond', 'desc' => $L('index_desc'), 'path' => '/time', 'md' => $p . '/time.md', 'active' => 'time', 'langs' => CHAPTER_LANGS], $body);
 }
 
 /** About: for people and crawlers. A "Did you know?" line on top (general in the HTML, specific in the browser) and schema.org data. */
@@ -583,10 +593,10 @@ function render_about(array $d, string $lang, array $s): string {
     $ld = json_encode([
         '@context' => 'https://schema.org',
         '@graph' => [
-            ['@type' => 'WebSite', '@id' => SITE . '/#site', 'url' => SITE . '/', 'name' => 'Exasecond', 'inLanguage' => ['en', 'zh-Hans'],
+            ['@type' => 'WebSite', '@id' => SITE . '/#site', 'url' => SITE . '/', 'name' => 'Exasecond', 'inLanguage' => array_map(fn($l) => LANG_INFO[$l]['tag'], LANGS),
                 'description' => 'The clock for AI agents: the current time in a few tokens, with the local part of day, made to make AI a better tool in conversation with people. Includes a sourced reference on the science of time.',
                 'publisher' => ['@id' => SITE . '/#maker']],
-            ['@type' => 'AboutPage', 'url' => SITE . $p . '/about', 'name' => $d['title'], 'description' => $d['description'], 'isPartOf' => ['@id' => SITE . '/#site'], 'inLanguage' => $lang === 'zh' ? 'zh-Hans' : 'en'],
+            ['@type' => 'AboutPage', 'url' => SITE . $p . '/about', 'name' => $d['title'], 'description' => $d['description'], 'isPartOf' => ['@id' => SITE . '/#site'], 'inLanguage' => LANG_INFO[$lang]['tag']],
             ['@type' => 'Organization', '@id' => SITE . '/#maker', 'name' => 'EggQube', 'url' => SITE . '/', 'sameAs' => ['https://github.com/EggQube/Exasecond']],
         ],
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG);
@@ -595,7 +605,7 @@ function render_about(array $d, string $lang, array $s): string {
 (async () => {
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const f = await (await fetch("/fact.json?tz=" + encodeURIComponent(tz) + (ABOUT.lang === "zh" ? "&lang=zh" : ""), { cache: "no-store" })).json();
+    const f = await (await fetch("/fact.json?tz=" + encodeURIComponent(tz) + (ABOUT.lang !== "en" ? "&lang=" + ABOUT.lang : ""), { cache: "no-store" })).json();
     const el = document.getElementById("ans-fact");
     const esc = (t) => t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
     el.querySelector("span").innerHTML = esc(f.text).replace(/10\^(-?\d+)/g, "10<sup>$1</sup>");
@@ -607,7 +617,7 @@ JS;
         . $factHtml . '<article class="prose">' . md_render($d['body'], fn($name) => $name === 'developers' ? dev_button($lang) : '') . '</article></main>'
         . read_footer($lang, $s, $p . '/about.md') . "\n<script>const ABOUT = $lq;\n$js</script>";
     return layout($lang, [
-        'title' => $d['title'] . ' · Exasecond', 'desc' => $d['description'], 'path' => '/about', 'md' => $p . '/about.md', 'active' => 'about',
+        'title' => $d['title'] . ' · Exasecond', 'desc' => $d['description'], 'path' => '/about', 'md' => $p . '/about.md', 'active' => 'about', 'langs' => doc_langs('about'),
         'head' => '<script type="application/ld+json">' . $ld . '</script>' . "\n",
     ], $body);
 }
@@ -622,7 +632,7 @@ function render_doc(array $d, string $lang, string $path, array $s): string {
     $p = lang_prefix($lang);
     $body = '<main class="read"><p class="kicker"><a href="' . $p . '/">Exasecond</a></p><h1>' . h($d['title']) . '</h1><p class="lede">' . h($d['description']) . '</p>'
         . '<article class="prose">' . md_render($d['body']) . '</article></main>' . read_footer($lang, $s, $p . $path . '.md');
-    return layout($lang, ['title' => $d['title'] . ' · Exasecond', 'desc' => $d['description'], 'path' => $path, 'md' => $p . $path . '.md'], $body);
+    return layout($lang, ['title' => $d['title'] . ' · Exasecond', 'desc' => $d['description'], 'path' => $path, 'md' => $p . $path . '.md', 'langs' => doc_langs(ltrim($path, '/'))], $body);
 }
 
 function render_story_page(array $s): string {
@@ -634,6 +644,6 @@ function render_story_page(array $s): string {
 function render_not_found(string $lang, string $path): string {
     $p = lang_prefix($lang);
     $body = '<main class="read"><h1>' . h(t($lang, 'not_found')) . '</h1><p class="lede"><code>' . h($path) . '</code></p>'
-        . '<p><a href="' . $p . '/">Exasecond</a> · <a href="' . $p . '/time">' . h(t($lang, 'q_h')) . '</a> · <a href="/now">/now</a> · <a href="/llms.txt">/llms.txt</a></p></main>';
+        . '<p><a href="' . $p . '/">Exasecond</a> · <a href="' . time_prefix($lang) . '/time">' . h(t($lang, 'q_h')) . '</a> · <a href="/now">/now</a> · <a href="/llms.txt">/llms.txt</a></p></main>';
     return layout($lang, ['title' => t($lang, 'not_found') . ' · Exasecond', 'path' => '/', 'alt' => false], $body);
 }

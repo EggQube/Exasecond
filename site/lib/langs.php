@@ -10,28 +10,28 @@ const LANG_WORDS = [
     'de' => [
         'days' => ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'],
         'months' => ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
-        'others' => 'Andere Orte mit diesem Namen:',
+        'others' => 'Andere Orte mit diesem Namen:', 'cities' => ['Delhi' => 'Delhi', 'Beijing' => 'Peking'],
     ],
     'fr' => [
         'days' => ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'],
         'months' => ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
-        'others' => 'Autres lieux portant ce nom :',
+        'others' => 'Autres lieux portant ce nom :', 'cities' => ['Delhi' => 'Delhi', 'Beijing' => 'Pékin'],
     ],
     'es' => [
         'days' => ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'],
         'months' => ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
-        'others' => 'Otros lugares con este nombre:',
+        'others' => 'Otros lugares con este nombre:', 'cities' => ['Delhi' => 'Delhi', 'Beijing' => 'Pekín'],
     ],
     'pt' => [
         'days' => ['segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado', 'domingo'],
         'months' => ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'],
-        'others' => 'Outros lugares com este nome:',
+        'others' => 'Outros lugares com este nome:', 'cities' => ['Delhi' => 'Déli', 'Beijing' => 'Pequim'],
     ],
     'ru' => [
         'days' => ['понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота', 'воскресенье'],
         'on_day' => ['в понедельник', 'во вторник', 'в среду', 'в четверг', 'в пятницу', 'в субботу', 'в воскресенье'],
         'months' => ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
-        'others' => 'Другие места с этим названием:',
+        'others' => 'Другие места с этим названием:', 'cities' => ['Delhi' => 'Дели', 'Beijing' => 'Пекин'],
     ],
 ];
 
@@ -115,6 +115,46 @@ function mb_ucfirst_safe(string $s): string {
     return mb_strtoupper(mb_substr($s, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($s, 1, null, 'UTF-8');
 }
 
+/** "Oslo: Es ist 20:38 Uhr am Donnerstagabend (…)." for a place (or several), a local time and its part of day. */
+function lang_line(string $lang, string $place, DateTimeImmutable $d, string $part, string $br): string {
+    $wd = (int)$d->format('N') - 1;
+    $phrase = lang_day_phrase($lang, $part, $wd, ($wd + 6) % 7);
+    $hm = $d->format('H:i');
+    switch ($lang) {
+        case 'de': return "$place: Es ist $hm Uhr $phrase$br.";
+        case 'fr': return "$place : il est " . $d->format('G') . ' h ' . $d->format('i') . ", $phrase$br.";
+        case 'es': return "$place: es $phrase, " . ((int)$d->format('G') === 1 ? 'la ' : 'las ') . "$hm$br.";
+        case 'pt': return "$place: é $phrase, " . $d->format('H') . 'h' . $d->format('i') . "$br.";
+        case 'ru': return "$place: сейчас $phrase, $hm$br.";
+    }
+    return '';
+}
+
+/** The front page's "Your time" list in the language: places grouped by identical local time. */
+function lang_world_lines(int $unix, string $lang): array {
+    $and = ['de' => 'und', 'fr' => 'et', 'es' => 'y', 'pt' => 'e', 'ru' => 'и'][$lang];
+    $groups = [];
+    foreach (PLACES as [$zone, $en]) {
+        $d = (new DateTimeImmutable('@' . $unix))->setTimezone(new DateTimeZone($zone));
+        $det = local_details($unix, $zone);
+        $c = $det['next_change'] && strtotime($det['next_change']['utc']) - $unix <= 14 * 86400 ? $det['next_change'] : null;
+        $key = $d->format('Y-m-d H:i') . '|' . $d->format('P') . '|' . $det['abbreviation'] . '|' . ($c['utc'] ?? '');
+        if (!isset($groups[$key])) $groups[$key] = ['names' => [], 'd' => $d, 'det' => $det, 'c' => $c];
+        $groups[$key]['names'][] = LANG_WORDS[$lang]['cities'][$en] ?? lang_zone_city($lang, $zone) ?? $en;   // Delhi and Beijing are not their zone's own city
+    }
+    $lines = [];
+    foreach ($groups as $g) {
+        $n = $g['names'];
+        $who = count($n) > 1 ? implode(', ', array_slice($n, 0, -1)) . " $and " . end($n) : $n[0];
+        $off = short_offset($g['d']->format('P'));
+        $abbr = $g['det']['abbreviation'] && $g['det']['abbreviation'] !== $off ? $g['det']['abbreviation'] . ', ' : '';
+        $line = lang_line($lang, $who, $g['d'], $g['det']['part_of_day'], " ($abbr$off)");
+        if ($g['c']) $line .= ' ' . lang_change($lang, $g['c'], $unix);
+        $lines[] = $line;
+    }
+    return $lines;
+}
+
 /** The sentence: "Oslo: Es ist 20:38 Uhr am Donnerstagabend (22. Oktober 2026, CEST, UTC+2). Am Sonntag, ..." */
 function lang_sentence(string $lang, array $s, ?array $res): string {
     $l = $s['local'];
@@ -122,21 +162,10 @@ function lang_sentence(string $lang, array $s, ?array $res): string {
     $d = (new DateTimeImmutable('@' . $s['unix']))->setTimezone(new DateTimeZone($l['zone']));
     $place = lang_place($lang, $l['zone'], $res);
     $off = short_offset($l['offset']);
-    $wd = (int)$d->format('N') - 1;
-    $phrase = lang_day_phrase($lang, $l['part_of_day'], $wd, ($wd + 6) % 7);
-    $hm = $d->format('H:i');
     $inner = [lang_date($lang, $d)];
     if ($l['abbreviation'] && $l['abbreviation'] !== $off) $inner[] = $l['abbreviation'];
     if ($place !== $off && $place !== 'UTC') $inner[] = $off;
-    $br = ' (' . implode(', ', $inner) . ')';
-    switch ($lang) {
-        case 'de': $out = "$place: Es ist $hm Uhr $phrase$br."; break;
-        case 'fr': $out = "$place : il est " . $d->format('G') . ' h ' . $d->format('i') . ", $phrase$br."; break;
-        case 'es': $out = "$place: es $phrase, " . ((int)$d->format('G') === 1 ? 'la ' : 'las ') . "$hm$br."; break;
-        case 'pt': $out = "$place: é $phrase, " . $d->format('H') . 'h' . $d->format('i') . "$br."; break;
-        case 'ru': $out = "$place: сейчас $phrase, $hm$br."; break;
-        default: $out = '';
-    }
+    $out = lang_line($lang, $place, $d, $l['part_of_day'], ' (' . implode(', ', $inner) . ')');
     if ($change = lang_change($lang, $l['next_change'] ?? null, $s['unix'])) $out .= " $change";
     $others = [];
     foreach (($res['how'] ?? '') === 'place' ? $res['also'] : [] as $p) {

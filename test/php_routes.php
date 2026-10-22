@@ -140,6 +140,11 @@ check('?lang=es zone city translated', str_starts_with(get('/new-york?lang=es')[
 check('?lang=pt country translated', str_starts_with(get('/sweden?lang=pt')[2], 'Suécia: é '));
 check('?lang=ru Cyrillic city', str_starts_with(get('/moscow?lang=ru')[2], 'Москва: сейчас '));
 check('unknown lang falls back to English', str_starts_with(get('/oslo?lang=xx')[2], "It's "));
+check('/de/ front page in German', (fn($b) => str_contains($b, '<html lang="de"') && str_contains($b, 'Berlin und Paris: Es ist ') && str_contains($b, 'Schon gewusst?') && str_contains($b, 'href="/time"'))(get('/de/', 'text/html')[2]));
+check('/de/about and /de/developers', get('/de/about', 'text/html')[0] === 200 && str_starts_with(get('/de/developers.md')[2], '# Für Entwickler'));
+check('no German chapters: /de/time is 404', get('/de/time', 'text/html')[0] === 404);
+check('German facts match English count', count(FACTS_TR['de']) === count(FACTS));
+check('/fact?lang=de', str_starts_with(get('/fact?lang=de')[2], 'Schon gewusst? '));
 check('agent bar points to the short address', str_contains(get('/', 'text/html')[2], 'exasecond.com/stockholm</a>'));
 
 echo $fails ? "$fails failed\n" : "all passed\n";

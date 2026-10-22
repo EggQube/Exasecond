@@ -96,20 +96,28 @@ function zone_country(string $zone): ?string {
 }
 
 function fact_link(string $slug, string $lang): string {
-    return ($lang === 'zh' ? '/zh' : '') . '/time/' . $slug;
+    return time_prefix($lang) . '/time/' . $slug;   // languages without chapters link to the English ones
+}
+
+/** A random fact from those FACTS keys, in the language. */
+function fact_from(array $keys, string $lang, string $kind): array {
+    $i = $keys[random_int(0, count($keys) - 1)];
+    return ['text' => fact_text($i, $lang), 'href' => fact_link(FACTS[$i][0], $lang), 'kind' => $kind];
 }
 
 /** A random general fact (no country tag). */
 function general_fact(string $lang): array {
-    $pool = array_values(array_filter(FACTS, fn($f) => !$f[3]));
-    $f = $pool[random_int(0, count($pool) - 1)];
-    return ['text' => $lang === 'zh' ? $f[2] : $f[1], 'href' => fact_link($f[0], $lang), 'kind' => 'general'];
+    return fact_from(array_keys(array_filter(FACTS, fn($f) => !$f[3])), $lang, 'general');
 }
 
-/** Date like "Sunday 25 October" / "10月25日（星期日）" from a local wall-clock string. */
+/** Date like "Sunday 25 October" / "10月25日（星期日）" / "Sonntag, 25. Oktober" from a local wall-clock string. */
 function fact_day(string $localBefore, string $lang): string {
     $d = DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $localBefore, new DateTimeZone('UTC'));
     if ($lang === 'zh') return $d->format('n') . '月' . $d->format('j') . '日（' . WEEKDAYS_ZH[$d->format('l')] . '）';
+    if (isset(LANG_WORDS[$lang])) {
+        $sep = in_array($lang, ['fr', 'es'], true) ? ' ' : ', ';
+        return LANG_WORDS[$lang]['days'][(int)$d->format('N') - 1] . $sep . lang_date($lang, $d, false);
+    }
     return $d->format('l j F');
 }
 
@@ -119,6 +127,7 @@ function fact_day(string $localBefore, string $lang): string {
  */
 function live_fact(int $unix, string $zone, string $lang): ?array {
     $zh = $lang === 'zh';
+    $de = $lang === 'de';
     $L = next_clock_change($unix, 'Europe/London', 40);
     $N = next_clock_change($unix, 'America/New_York', 40);
     $offL = (new DateTimeImmutable('@' . $unix))->setTimezone(new DateTimeZone('Europe/London'))->getOffset();
@@ -136,14 +145,16 @@ function live_fact(int $unix, string $zone, string $lang): ?array {
             $euDay = fact_day($L['local_before'], $lang);
             return ['kind' => 'live', 'href' => fact_link('dst', $lang), 'text' => $zh
                 ? "欧洲在{$euDay}把时钟拨回，美国则要等到{$usDay}。在这一周里，纽约比伦敦晚 " . ($gapNow - 1) . " 小时，而不是平常的 {$gapNow} 小时。"
-                : "Europe turns its clocks back on $euDay, but the USA waits until $usDay. For that week, New York is " . ($gapNow - 1) . " hours behind London instead of the usual $gapNow."];
+                : ($de ? "Europa stellt die Uhren am $euDay zurück, die USA erst am $usDay. In dieser Woche liegt New York nur " . ($gapNow - 1) . " Stunden hinter London statt wie sonst $gapNow."
+                : "Europe turns its clocks back on $euDay, but the USA waits until $usDay. For that week, New York is " . ($gapNow - 1) . " hours behind London instead of the usual $gapNow.")];
         }
         if (!$L || strtotime($L['utc']) > $tN) {   // Europe has already changed; the USA hasn't yet
             $gapNow = intdiv($offL - $offN, 3600);
             if ($tN - $unix < 14 * 86400) {
                 return ['kind' => 'live', 'href' => fact_link('dst', $lang), 'text' => $zh
                     ? "欧洲已经把时钟拨回，美国要到{$usDay}才拨。在那之前，纽约只比伦敦晚 {$gapNow} 小时，而不是平常的 " . ($gapNow + 1) . " 小时。"
-                    : "Europe has already turned its clocks back, but the USA waits until $usDay. Until then, New York is only $gapNow hours behind London instead of the usual " . ($gapNow + 1) . '.'];
+                    : ($de ? "Europa hat die Uhren schon zurückgestellt, die USA erst am $usDay. Bis dahin liegt New York nur $gapNow Stunden hinter London statt wie sonst " . ($gapNow + 1) . '.'
+                    : "Europe has already turned its clocks back, but the USA waits until $usDay. Until then, New York is only $gapNow hours behind London instead of the usual " . ($gapNow + 1) . '.')];
             }
         }
     }
@@ -159,6 +170,10 @@ function live_fact(int $unix, string $zone, string $lang): ?array {
             $dir = $c['direction'] === 'back' ? '拨回' : '拨快';
             return ['kind' => 'live', 'href' => fact_link('dst', $lang), 'text' => "{$place}将在{$day}把时钟{$dir} " . str_replace([' hours', ' hour', ' minutes'], [' 小时', ' 小时', ' 分钟'], $amount) . '。'];
         }
+        if ($de) {
+            $place = lang_zone_city('de', $zone) ?? $place;
+            return ['kind' => 'live', 'href' => fact_link('dst', $lang), 'text' => "$place stellt die Uhren am $day um " . lang_amount('de', $amount) . ' ' . ($c['direction'] === 'back' ? 'zurück' : 'vor') . '.'];
+        }
         return ['kind' => 'live', 'href' => fact_link('dst', $lang), 'text' => "$place turns its clocks {$c['direction']} " . amount_words($amount) . " on $day."];
     }
     return null;
@@ -170,11 +185,8 @@ function pick_fact(int $unix, ?string $zone, string $lang): array {
     if ($f = live_fact($unix, $zone, $lang)) return $f;
     $cc = zone_country($zone);
     if ($cc) {
-        $pool = array_values(array_filter(FACTS, fn($f) => in_array($cc, $f[3], true)));
-        if ($pool) {
-            $f = $pool[random_int(0, count($pool) - 1)];
-            return ['text' => $lang === 'zh' ? $f[2] : $f[1], 'href' => fact_link($f[0], $lang), 'kind' => 'regional'];
-        }
+        $keys = array_keys(array_filter(FACTS, fn($f) => in_array($cc, $f[3], true)));
+        if ($keys) return fact_from($keys, $lang, 'regional');
     }
     return general_fact($lang);
 }
@@ -196,6 +208,7 @@ const PLACES = [
  * Pass $changes (English) to get the clock changes back as "sentence => [places]" instead of on each line.
  */
 function world_now_lines(int $unix, string $lang, ?array &$changes = null): array {
+    if (isset(LANG_WORDS[$lang])) return lang_world_lines($unix, $lang);
     $zh = $lang === 'zh';
     $groups = [];
     foreach (PLACES as [$zone, $en, $zhName]) {
