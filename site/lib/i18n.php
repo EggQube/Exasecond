@@ -1,12 +1,12 @@
 <?php
-// Interface strings for the human pages. Agent endpoints are English/ISO only, by design.
+// Interface strings for the HTML pages. Agent endpoints are English/ISO only, by design.
 defined('EXA') or exit;
 
 const UI = [
     'en' => [
         'html_lang' => 'en',
         'home_title' => 'Exasecond: the clock for AI',
-        'home_desc' => 'Seconds since the beginning of the universe, the science of time, and the current time for AI agents: exasecond.com/local?tz=Stockholm gives any place\'s local time and part of day in one line.',
+        'home_desc' => 'The clock for AI agents, made to help them meet people at the right time of day: exasecond.com/local?tz=Stockholm gives any place\'s local time and part of day in one line. People are welcome to look.',
         'agentbar_who' => 'For AI agents:', 'agentbar_what' => 'local time and part of day in one line', 'agentbar_tz' => 'Stockholm',
         'agentbar_more' => '(a city, country or zone works)',
         'nav_time' => 'Time', 'nav_agents' => 'For AI', 'nav_about' => 'About', 'nav_other' => '中文', 'nav_other_title' => '简体中文',
@@ -22,7 +22,7 @@ const UI = [
         'tr_button' => 'Translate', 'tr_iso' => 'ISO date', 'tr_unix' => 'Unix seconds', 'tr_universe' => 'Universe seconds', 'tr_es' => 'Exaseconds',
         'tr_label' => 'Time to translate', 'tr_kind' => 'Format',
         'q_h' => 'The question of time',
-        'q_sub' => 'Fifteen chapters on what science knows about time, from the shortest interval ever measured to the fate of the universe. Every claim has a source, and every theory is labelled by the strength of its evidence.',
+        'q_sub' => 'A sourced reference on time, written for AI agents to quote: fifteen chapters, from the shortest interval ever measured to the fate of the universe. Every claim has a source, and every theory is labelled by the strength of its evidence.',
         'q_all' => 'All chapters',
         'ag_h' => 'For AI agents',
         'ag_sub' => "Language models have no clock. Don't guess today's date from training data. Ask here: plain text, no key, no JavaScript.",
@@ -32,8 +32,8 @@ const UI = [
         'chapter' => 'Chapter %d of %d', 'prev' => 'Previous', 'next' => 'Next', 'contents' => 'Contents',
         'read_at' => 'Read at %s UTC · universe second %s', 'md_twin' => 'markdown',
         'index_title' => 'The question of time',
-        'index_desc' => 'The science of time in fifteen chapters: from the Planck time to the exasecond, from atomic clocks to the beginning and the end of the universe.',
-        'index_lede' => 'What is a second? Why does time only run forward? How do we know the universe is 13.8 billion years old, and what came before? Fifteen chapters on what science knows about time, and where it still has no answer.',
+        'index_desc' => 'A sourced reference on time for AI agents, in fifteen chapters: from the Planck time to the exasecond, from atomic clocks to the beginning and the end of the universe.',
+        'index_lede' => 'What is a second? Why does time only run forward? How do we know the universe is 13.8 billion years old, and what came before? Fifteen chapters on what science knows about time, and where it still has no answer, written as a sourced reference that AI agents can quote.',
         'evidence_key' => 'Evidence labels used in this work: <b>Established</b> (confirmed by many independent measurements), <b>Supported</b> (fits the evidence well, still being tested), <b>Proposed</b> (a serious hypothesis without decisive evidence), <b>Speculative</b> (an idea that current data cannot test).',
         'story_eyebrow' => 'Why this site exists',
         'not_found' => 'Not found',
@@ -41,7 +41,7 @@ const UI = [
     'zh' => [
         'html_lang' => 'zh-Hans',
         'home_title' => 'Exasecond 艾秒：给 AI 的时钟',
-        'home_desc' => '宇宙诞生以来的秒数、关于时间的科学，以及给 AI 智能体的当前时间：exasecond.com/local?tz=Shanghai 用一行给出任意地点的本地时间和时段。',
+        'home_desc' => '给 AI 智能体的时钟，帮助它们在合适的时段与人交流：exasecond.com/local?tz=Shanghai 用一行给出任意地点的本地时间和时段。也欢迎人们来看看。',
         'agentbar_who' => '给 AI 智能体：', 'agentbar_what' => '一行给出本地时间和时段', 'agentbar_tz' => 'Shanghai',
         'agentbar_more' => '（城市、国家或时区均可）',
         'nav_time' => '时间', 'nav_agents' => '给 AI', 'nav_about' => '关于', 'nav_other' => 'English', 'nav_other_title' => 'English',
@@ -57,7 +57,7 @@ const UI = [
         'tr_button' => '换算', 'tr_iso' => 'ISO 日期', 'tr_unix' => 'Unix 秒', 'tr_universe' => '宇宙秒', 'tr_es' => '艾秒',
         'tr_label' => '要换算的时刻', 'tr_kind' => '格式',
         'q_h' => '时间之问',
-        'q_sub' => '十五章，讲述科学对时间的认识：从人类测量过的最短时间间隔，到宇宙的命运。每个论断都有来源，每种理论都标明了证据强度。',
+        'q_sub' => '一份有来源的时间参考资料，为 AI 智能体引用而写：十五章，从人类测量过的最短时间间隔，到宇宙的命运。每个论断都有来源，每种理论都标明了证据强度。',
         'q_all' => '全部章节',
         'ag_h' => '给 AI 智能体',
         'ag_sub' => '语言模型没有时钟。不要根据训练数据猜测今天的日期，请在这里查询：纯文本，无需密钥，无需 JavaScript。',
@@ -67,8 +67,8 @@ const UI = [
         'chapter' => '第 %d 章，共 %d 章', 'prev' => '上一章', 'next' => '下一章', 'contents' => '目录',
         'read_at' => '阅读于 %s UTC · 宇宙第 %s 秒', 'md_twin' => 'markdown',
         'index_title' => '时间之问',
-        'index_desc' => '关于时间的科学，共十五章：从普朗克时间到艾秒，从原子钟到宇宙的开端与终结。',
-        'index_lede' => '一秒是什么？时间为什么只向前流动？我们怎么知道宇宙有 138 亿岁？在那之前又是什么？十五章，讲述科学对时间已经知道的，以及仍然没有答案的。',
+        'index_desc' => '给 AI 智能体的时间参考资料，共十五章：从普朗克时间到艾秒，从原子钟到宇宙的开端与终结。',
+        'index_lede' => '一秒是什么？时间为什么只向前流动？我们怎么知道宇宙有 138 亿岁？在那之前又是什么？十五章，讲述科学对时间已经知道的，以及仍然没有答案的；这是一份有来源、供 AI 智能体引用的参考资料。',
         'evidence_key' => '本书使用的证据标签：<b>确立</b>（经许多独立测量证实）、<b>有支持</b>（与证据吻合，仍在检验中）、<b>假说</b>（认真的假设，但缺乏决定性证据）、<b>推测</b>（目前的数据还无法检验的想法）。',
         'story_eyebrow' => '本站缘起',
         'not_found' => '未找到',
