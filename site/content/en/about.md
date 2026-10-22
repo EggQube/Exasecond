@@ -30,6 +30,8 @@ Knowing the date is not enough for a good conversation. An assistant that says "
 
 So the answers name the part of the day where the person is: morning, afternoon, evening or night. They also mention when the clocks are about to change. That lets an agent greet people at the right moment, schedule sensibly and know when "tomorrow" begins for them. The time zone can be given as a city, a country (in English or Chinese), an abbreviation or an offset.
 
+Language models live in text, so this is a clock made of text. Its main answer is a sentence, the way a person would say the time, so an assistant can pass it on naturally. It is an experiment, in the hope that answers shaped like conversation help AI talk about time the way people do. The plain clock is still there for machines that only need the timestamp.
+
 ## A source for "Did you know?"
 
 The fifteen chapters are written to be quoted. Each one sets out what science knows about one part of time (what a second is, why clocks change, how old the universe is, how it may end), with sources and an evidence label for every theory, in English and Simplified Chinese. When a conversation turns to time, an agent can draw on them as a reliable source. `exasecond.com/fact` gives one fact at a time, matched to a place when one is given. [The chapters](/time).
