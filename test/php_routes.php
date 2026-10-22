@@ -80,6 +80,11 @@ foreach (['LICENSE', 'openwebui_exasecond.py', 'exasecond.py', 'exasecond.js', '
 }
 check('/dev/ only serves the listed files', get('/dev/../index.php')[0] === 404 && get('/dev/core.php')[0] === 404);
 check('city name as given (Beijing, not Shanghai)', str_contains(local_sentence(snapshot([1792648273, 0], tz_opts('Beijing', null)), tz_opts('Beijing', null)['tz_res']), ' in Beijing ('));
+// Styling in /site.css, so pages start with the content
+[$st, $hd, $b] = get('/site.css');
+check('/site.css served and cacheable', $st === 200 && str_starts_with($hd['Content-Type'], 'text/css') && str_contains($hd['Cache-Control'], 'max-age') && str_contains($b, '.agentbar'));
+$h1 = get('/', 'text/html')[2];
+check('pages link the stylesheet, no inline CSS, time within the first 3 KB', str_contains($h1, '<link rel="stylesheet" href="/site.css?v=') && !str_contains($h1, '<style>') && strpos($h1, 'now <time') < 3000);
 check('/now without tz unchanged', !str_contains(get('/now')[2], 'Time zone') && str_contains(get('/now')[2], 'Tip: add ?tz='));
 check('/time stays a clock for agents', str_starts_with(get('/time')[2], 'UTC: '));
 check('/time is the contents page for browsers', str_contains(get('/time', 'text/html')[2], 'The question of time'));
