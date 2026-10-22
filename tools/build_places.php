@@ -1,14 +1,18 @@
 <?php
 // Build site/data/places/ from GeoNames (https://download.geonames.org/export/dump/, CC BY 4.0):
 //   cities1000.txt (every place with 1,000 or more people) and admin1CodesASCII.txt (states, provinces, regions).
-// Usage: php tools/build_places.php path/to/cities1000.txt path/to/admin1CodesASCII.txt
+//   islands.txt: the islands (feature class T, codes ISL, ISLS, ATOL) taken from allCountries.txt, e.g.
+//   unzip -p allCountries.zip | awk -F'\t' '$7=="T" && ($8=="ISL" || $8=="ISLS" || $8=="ATOL")' > islands.txt
+//   Only islands known in 5 or more names count (175,000 islands, most of them rocks called Long Island); they weigh
+//   20,000 per name, up to 1,000,000, so Tenerife the island beats Tenerife the small town.
+// Usage: php tools/build_places.php path/to/cities1000.txt path/to/admin1CodesASCII.txt path/to/islands.txt
 // Output: 256 shard files, key (lower case name) => up to 5 places "Name|CC|Zone|Weight", best first.
 // Order: places whose own name matches (cities by population; regions by half the population of their biggest
 // city, so Washington is the city and Ontario the province), then places that only have it as an alternate name.
 // Keys are normalised like place_lookup(): lower case, '_' and '-' to space, '.' removed, spaces collapsed.
 
-[$src, $adm] = [$argv[1] ?? null, $argv[2] ?? null];
-if (!$src || !$adm) exit("Usage: php tools/build_places.php cities1000.txt admin1CodesASCII.txt\n");
+[$src, $adm, $isl] = [$argv[1] ?? null, $argv[2] ?? null, $argv[3] ?? null];
+if (!$src || !$adm || !$isl) exit("Usage: php tools/build_places.php cities1000.txt admin1CodesASCII.txt islands.txt\n");
 $out = __DIR__ . '/../site/data/places';
 if (!is_dir($out)) mkdir($out, 0777, true);
 foreach (glob("$out/*.php") as $f) unlink($f);
@@ -55,6 +59,20 @@ while (($line = fgets($fh)) !== false) {
     $cc = explode('.', $c[0])[0];
     $entry = str_replace('|', ' ', $c[1]) . "|$cc|$zone|" . intdiv($pop, 2);
     foreach (array_unique([place_key($c[1]), place_key($c[2])]) as $k) $add($k, 1, intdiv($pop, 2), $entry);
+}
+fclose($fh);
+
+$fh = fopen($isl, 'r');
+while (($line = fgets($fh)) !== false) {
+    $c = explode("\t", rtrim($line, "\r\n"));
+    if (count($c) < 18 || !isset($valid[$c[17]])) continue;
+    $alts = array_values(array_filter(array_map('trim', explode(',', $c[3])), fn($a) => $a !== '' && mb_strlen($a) >= 2 && !preg_match('/\d|http|[\/@]/', $a) && !preg_match('/^[A-Z]{2,5}$/', $a)));
+    if (count($alts) < 5) continue;
+    $w = 20000 * min(count($alts), 50);
+    $entry = str_replace('|', ' ', $c[1]) . "|$c[8]|$c[17]|$w";
+    $own = array_unique([place_key($c[1]), place_key($c[2])]);
+    foreach ($own as $k) $add($k, 1, $w, $entry);
+    foreach (array_diff(array_unique(array_map('place_key', $alts)), $own) as $k) $add($k, 0, $w, $entry);
 }
 fclose($fh);
 

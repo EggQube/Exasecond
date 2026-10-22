@@ -119,6 +119,7 @@ check('/kiruna (GeoNames place)', str_contains(get('/kiruna')[2], 'in Kiruna (')
 check('/krakow gets its own spelling', str_contains(get('/krakow')[2], 'Kraków'));
 check('/new-york', str_contains(get('/new-york')[2], ' in New York ('));
 check('/sweden', str_contains(get('/sweden')[2], ' in Sweden ('));
+check('/tenerife is the island', str_contains(get('/tenerife')[2], 'Tenerife, Spain'));
 check('/bali is Indonesia', str_contains(get('/bali')[2], 'Bali, Indonesia'));
 check('/washington is the city', str_contains(get('/washington')[2], 'EDT') || str_contains(get('/washington')[2], 'EST'));
 check('/utc+2 offset', str_contains(get('/utc+2')[2], 'UTC+2'));
