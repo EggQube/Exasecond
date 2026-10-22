@@ -51,7 +51,20 @@ sup { font-size: .7em; line-height: 0; }
 .top nav a:hover, .top nav a[aria-current] { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent); }
 
 /* clock */
-.hero { padding: 9vh 0 6vh; }
+.hero { padding: 6vh 0 6vh; border-top: 1px solid var(--line); }
+
+/* the answer: first read */
+.answer { padding: 5vh 0 4vh; display: grid; gap: 22px; }
+.ans-row { display: grid; grid-template-columns: 9.5em 1fr; gap: 6px 24px; align-items: baseline; }
+.ans-k { font: 12px/1.4 var(--mono); color: var(--ink-3); text-transform: uppercase; letter-spacing: .14em; }
+.ans-v { margin: 0; min-width: 0; }
+.ans-now { font: 500 clamp(1.15rem, 2.6vw, 1.6rem)/1.3 var(--mono); font-variant-numeric: tabular-nums; }
+.ans-mine { margin: 0; font: clamp(1.1rem, 2.3vw, 1.45rem)/1.4 var(--serif); }
+.ans-intro { margin: 0 0 6px; color: var(--ink-2); font-size: 15px; }
+.ans-world { list-style: none; margin: 0; padding: 0; font: 13.5px/1.6 var(--mono); color: var(--ink-2); }
+.ans-fact { font: clamp(1rem, 2vw, 1.2rem)/1.5 var(--serif); color: var(--ink); max-width: 62ch; }
+.ans-fact a { font: 13px/1 var(--mono); color: var(--accent); text-decoration: none; white-space: nowrap; }
+@media (max-width: 640px) { .ans-row { grid-template-columns: 1fr; } }
 .eyebrow { font: 13px/1.4 var(--mono); color: var(--ink-2); letter-spacing: .04em; margin: 0 0 18px; }
 .count { font: 500 clamp(1.4rem, 5.6vw, 4.6rem)/1 var(--mono); letter-spacing: -.035em; font-variant-numeric: tabular-nums; margin: 0; white-space: nowrap; }
 .count .tick { color: var(--accent); }
@@ -291,8 +304,21 @@ function render_home(array $s, string $lang): string {
             : ['universe' => 'Universe seconds', 'es' => 'Exaseconds', 'utc' => 'UTC', 'zone' => 'Your zone', 'unix' => 'Unix', 'fail' => 'Could not translate that'],
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG);
     $js = home_js();
+    // The answer comes first: the time now, the reader's time, one fact. The counter is the visual that follows.
+    $nowD = dt_utc($s['unix']);
+    $nowLine = $zh
+        ? $nowD->format('Y') . '年' . $nowD->format('n') . '月' . $nowD->format('j') . '日 ' . WEEKDAYS_ZH[$nowD->format('l')] . ' ' . $nowD->format('H:i:s') . ' UTC'
+        : $nowD->format('l j F Y, H:i:s') . ' UTC';
+    $world = implode('', array_map(fn($l) => '<li>' . h($l) . '</li>', world_now_lines($s['unix'], $lang)));
+    $fact = pick_fact($s['unix'], null, $lang);
+    $answer = '<section class="answer" aria-label="' . h($L('ans_label')) . '">'
+        . '<div class="ans-row"><span class="ans-k">' . h($L('ans_now')) . '</span><p class="ans-v ans-now" id="ans-now">' . h($nowLine) . '</p></div>'
+        . '<div class="ans-row"><span class="ans-k">' . h($L('ans_you')) . '</span><div class="ans-v" id="ans-you"><p class="ans-intro">' . h($L('ans_you_intro')) . '</p><ul class="ans-world">' . $world . '</ul></div></div>'
+        . '<div class="ans-row"><span class="ans-k">' . h($L('ans_fact')) . '</span><p class="ans-v ans-fact" id="ans-fact"><span>' . md_inline($fact['text']) . '</span> <a href="' . h($fact['href']) . '">' . h($L('ans_more')) . ' →</a></p></div>'
+        . '</section>';
     $body = <<<HTML
   <main>
+    $answer
     <div class="hero">
       <p class="eyebrow">{$L('eyebrow')}</p>
       <p class="count" id="count" aria-live="off">$count</p>
@@ -405,6 +431,35 @@ function home_js(): string {
     setTimeout(tick, 1000 - ((Date.now() + skew) % 1000) + 5);
   }
   tick();
+
+  // The answer block: "now" ticks; "your time" and the fact become specific to this reader's time zone.
+  const nowFmt = new Intl.DateTimeFormat(EXA.lang === "zh" ? "zh-CN" : "en-GB", { timeZone: "UTC", weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  function tickNow() {
+    const d = new Date(Date.now() + skew);
+    const hms = d.toISOString().slice(11, 19);
+    $("ans-now").textContent = EXA.lang === "zh" ? nowFmt.format(d).replace("星期", " 星期") + " " + hms + " UTC" : nowFmt.format(d).replace(/^(\p{L}+),/u, "$1") + ", " + hms + " UTC";
+    setTimeout(tickNow, 1000 - ((Date.now() + skew) % 1000) + 5);
+  }
+  tickNow();
+  const lq = "tz=" + encodeURIComponent(tz) + (EXA.lang === "zh" ? "&lang=zh" : "");
+  async function yourTime() {
+    try {
+      const r = await fetch("/local?" + lq, { headers: { Accept: "application/json" }, cache: "no-store" });
+      const j = await r.json();
+      if (j.local) { const p = document.createElement("p"); p.className = "ans-mine"; p.textContent = j.text; $("ans-you").replaceChildren(p); }
+    } catch {}
+  }
+  yourTime();
+  setInterval(yourTime, 60000);
+  (async () => {
+    try {
+      const f = await (await fetch("/fact.json?" + lq, { cache: "no-store" })).json();
+      const el = $("ans-fact");
+      const esc = (t) => t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+      el.firstElementChild.innerHTML = esc(f.text).replace(/10\^(-?\d+)/g, "10<sup>$1</sup>");
+      el.querySelector("a").href = f.href;
+    } catch {}
+  })();
 
   const calName = (c) => (EXA.calNames && EXA.calNames[c.id]) || c.name;
   const calDate = (s, c) => (s.calendars_zh && s.calendars_zh[c.id]) || c.text;

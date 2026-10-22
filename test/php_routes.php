@@ -52,6 +52,20 @@ check('/local bad tz keeps the time', str_contains(get('/local?tz=IST')[2], ' UT
 check('/local is short', strlen(get('/local?tz=Oslo')[2]) < 160);
 [$st, , $b] = route('POST', '/mcp', [], [], '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"get_time","arguments":{"tz":"Oslo","detail":"local"}}}');
 check('mcp get_time detail=local', str_contains(json_decode($b, true)['result']['content'][0]['text'], ' in Oslo ('));
+// "Did you know?" facts and the answer block on the home page
+check('every fact links to a real chapter', count(array_filter(FACTS, fn($f) => in_array($f[0], CHAPTERS, true) && $f[1] !== '' && $f[2] !== '')) === count(FACTS));
+check('/fact without place is general', pick_fact(time(), null, 'en')['kind'] === 'general' && str_starts_with(get('/fact')[2], 'Did you know? '));
+$oct = 1792648273;   // Thursday 22 October 2026: Europe changes on the 25th, the USA on 1 November
+check('live fact: Europe and USA out of step (Oslo)', str_contains(pick_fact($oct, 'Europe/Oslo', 'en')['text'], 'New York is 4 hours behind London instead of the usual 5'));
+check('live fact: also for New York', pick_fact($oct, 'America/New_York', 'en')['kind'] === 'live');
+check('live fact after Europe changed (27 Oct)', str_contains(pick_fact(1792900000, 'Europe/London', 'en')['text'], 'only 4 hours behind London'));
+check('no clock-change fact for Moscow', pick_fact($oct, 'Europe/Moscow', 'en')['kind'] !== 'live');
+check('regional fact for Nepal', str_contains(pick_fact($oct, 'Asia/Kathmandu', 'en')['text'], '45 minutes'));
+check('Chinese fact', str_starts_with(get('/fact?tz=Tokyo&lang=zh')[2], '你知道吗？'));
+check('/local in Chinese', str_contains(local_sentence(snapshot([$oct, 0], tz_opts('Oslo', null)), tz_opts('Oslo', null)['tz_res'], 'zh'), '07:51，奥斯陆（早上，CEST，UTC+2）'));
+$home = get('/', 'text/html')[2];
+check('home: answer block comes before the counter', strpos($home, 'id="ans-now"') < strpos($home, 'id="count"') && strpos($home, 'id="ans-you"') < strpos($home, 'id="count"'));
+check('home: world list for readers without a place', str_contains($home, 'Oslo, Stockholm, Berlin, Paris: ') && str_contains($home, 'Beijing: '));
 check('/now without tz unchanged', !str_contains(get('/now')[2], 'Time zone') && str_contains(get('/now')[2], 'Tip: add ?tz='));
 check('/time stays a clock for agents', str_starts_with(get('/time')[2], 'UTC: '));
 check('/time is the contents page for browsers', str_contains(get('/time', 'text/html')[2], 'The question of time'));

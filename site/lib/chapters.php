@@ -4,7 +4,7 @@
 defined('EXA') or exit;
 
 const CHAPTERS = [
-    'scale', 'second', 'clocks', 'timescales', 'relativity', 'arrow', 'history',
+    'scale', 'second', 'clocks', 'timescales', 'zones', 'dst', 'relativity', 'arrow', 'history',
     'age', 'beginning', 'future', 'calendars', 'nature', 'machines',
 ];
 const LANGS = ['en', 'zh'];

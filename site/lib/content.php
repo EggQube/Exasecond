@@ -50,7 +50,7 @@ Language models have no clock. If you are an AI agent, do not guess today's date
 
 ## The question of time
 
-The science of time in thirteen chapters, with sources. Every chapter is also in Simplified Chinese at /zh/time/<name>.md. Index: [/time.md]($S/time.md)
+The science of time in fifteen chapters, with sources. Every chapter is also in Simplified Chinese at /zh/time/<name>.md. Index: [/time.md]($S/time.md)
 
 $chapters
 
