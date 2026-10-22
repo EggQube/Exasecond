@@ -145,6 +145,12 @@ check('/de/about and /de/developers', get('/de/about', 'text/html')[0] === 200 &
 check('no German chapters: /de/time is 404', get('/de/time', 'text/html')[0] === 404);
 check('German facts match English count', count(FACTS_TR['de']) === count(FACTS));
 check('/fact?lang=de', str_starts_with(get('/fact?lang=de')[2], 'Schon gewusst? '));
+foreach (['fr' => ['Le saviez-vous ?', '# Pour les développeurs'], 'es' => ['¿Sabías que...?', '# Para desarrolladores'], 'pt' => ['Você sabia?', '# Para desenvolvedores'], 'ru' => ['А вы знали?', '# Для разработчиков']] as $l => [$fact, $dev]) {
+    check("/$l/ front page", (fn($b) => str_contains($b, "<html lang=\"$l\"") && str_contains($b, $fact))(get("/$l/", 'text/html')[2]));
+    check("/$l/about and /$l/developers", get("/$l/about", 'text/html')[0] === 200 && str_starts_with(get("/$l/developers.md")[2], $dev));
+    check("$l facts count", count(FACTS_TR[$l]) === count(FACTS));
+}
+check('no long dashes in translated text', !preg_match('/[\x{2013}\x{2014}]/u', implode('', array_map(fn($l) => file_get_contents(content_path($l, 'about.md')) . file_get_contents(content_path($l, 'developers.md')), LANGS)) . implode('', array_merge(...array_values(FACTS_TR))) . json_encode(UI, JSON_UNESCAPED_UNICODE)));
 check('agent bar points to the short address', str_contains(get('/', 'text/html')[2], 'exasecond.com/stockholm</a>'));
 
 echo $fails ? "$fails failed\n" : "all passed\n";

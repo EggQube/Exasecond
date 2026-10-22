@@ -68,7 +68,8 @@ function lang_date(string $lang, DateTimeImmutable $d, bool $year = true): strin
     switch ($lang) {
         case 'de': return "$j. $m" . ($year ? " $y" : '');
         case 'fr': return ($j === '1' ? '1er' : $j) . " $m" . ($year ? " $y" : '');
-        case 'es': case 'pt': return "$j de $m" . ($year ? " de $y" : '');
+        case 'es': return "$j de $m" . ($year ? " de $y" : '');
+        case 'pt': return ($j === '1' ? '1º' : $j) . " de $m" . ($year ? " de $y" : '');
         case 'ru': return "$j $m" . ($year ? " $y г." : '');
     }
     return '';
@@ -203,4 +204,21 @@ function lang_place(string $lang, string $zone, ?array $res): string {
     }
     $base = place_name($zone, $res);
     return $base === $zoneCity ? (lang_zone_city($lang, $zone) ?? $base) : $base;
+}
+
+/** A day with its preposition, from a local wall-clock string: "am Sonntag, 25. Oktober", "le dimanche 25 octobre",
+ *  "el domingo 25 de octubre", "no domingo, 25 de outubro", "в воскресенье, 25 октября". */
+function lang_on_day(string $lang, string $localBefore): string {
+    $d = DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $localBefore, new DateTimeZone('UTC'));
+    $wd = (int)$d->format('N') - 1;
+    $W = LANG_WORDS[$lang]['days'][$wd];
+    $date = lang_date($lang, $d, false);
+    switch ($lang) {
+        case 'de': return "am $W, $date";
+        case 'fr': return "le $W $date";
+        case 'es': return "el $W $date";
+        case 'pt': return ($wd >= 5 ? 'no' : 'na') . " $W, $date";
+        case 'ru': return LANG_WORDS['ru']['on_day'][$wd] . ", $date";
+    }
+    return $date;
 }

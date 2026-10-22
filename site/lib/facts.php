@@ -127,7 +127,7 @@ function fact_day(string $localBefore, string $lang): string {
  */
 function live_fact(int $unix, string $zone, string $lang): ?array {
     $zh = $lang === 'zh';
-    $de = $lang === 'de';
+    $tr = isset(LIVE_TR[$lang]);   // de, fr, es, pt, ru: templates in facts_tr.php
     $L = next_clock_change($unix, 'Europe/London', 40);
     $N = next_clock_change($unix, 'America/New_York', 40);
     $offL = (new DateTimeImmutable('@' . $unix))->setTimezone(new DateTimeZone('Europe/London'))->getOffset();
@@ -143,18 +143,18 @@ function live_fact(int $unix, string $zone, string $lang): ?array {
         if ($L && $L['direction'] === 'back' && strtotime($L['utc']) < $tN && strtotime($L['utc']) - $unix < 21 * 86400) {
             $gapNow = intdiv($offL - $offN, 3600);
             $euDay = fact_day($L['local_before'], $lang);
+            if ($tr) return live_tr($lang, 'both', ['eu' => $L['local_before'], 'us' => $N['local_before'], 'gap' => $gapNow - 1, 'usual' => $gapNow]);
             return ['kind' => 'live', 'href' => fact_link('dst', $lang), 'text' => $zh
                 ? "欧洲在{$euDay}把时钟拨回，美国则要等到{$usDay}。在这一周里，纽约比伦敦晚 " . ($gapNow - 1) . " 小时，而不是平常的 {$gapNow} 小时。"
-                : ($de ? "Europa stellt die Uhren am $euDay zurück, die USA erst am $usDay. In dieser Woche liegt New York nur " . ($gapNow - 1) . " Stunden hinter London statt wie sonst $gapNow."
-                : "Europe turns its clocks back on $euDay, but the USA waits until $usDay. For that week, New York is " . ($gapNow - 1) . " hours behind London instead of the usual $gapNow.")];
+                : "Europe turns its clocks back on $euDay, but the USA waits until $usDay. For that week, New York is " . ($gapNow - 1) . " hours behind London instead of the usual $gapNow."];
         }
         if (!$L || strtotime($L['utc']) > $tN) {   // Europe has already changed; the USA hasn't yet
             $gapNow = intdiv($offL - $offN, 3600);
             if ($tN - $unix < 14 * 86400) {
+                if ($tr) return live_tr($lang, 'after', ['us' => $N['local_before'], 'gap' => $gapNow, 'usual' => $gapNow + 1]);
                 return ['kind' => 'live', 'href' => fact_link('dst', $lang), 'text' => $zh
                     ? "欧洲已经把时钟拨回，美国要到{$usDay}才拨。在那之前，纽约只比伦敦晚 {$gapNow} 小时，而不是平常的 " . ($gapNow + 1) . " 小时。"
-                    : ($de ? "Europa hat die Uhren schon zurückgestellt, die USA erst am $usDay. Bis dahin liegt New York nur $gapNow Stunden hinter London statt wie sonst " . ($gapNow + 1) . '.'
-                    : "Europe has already turned its clocks back, but the USA waits until $usDay. Until then, New York is only $gapNow hours behind London instead of the usual " . ($gapNow + 1) . '.')];
+                    : "Europe has already turned its clocks back, but the USA waits until $usDay. Until then, New York is only $gapNow hours behind London instead of the usual " . ($gapNow + 1) . '.'];
             }
         }
     }
@@ -170,10 +170,7 @@ function live_fact(int $unix, string $zone, string $lang): ?array {
             $dir = $c['direction'] === 'back' ? '拨回' : '拨快';
             return ['kind' => 'live', 'href' => fact_link('dst', $lang), 'text' => "{$place}将在{$day}把时钟{$dir} " . str_replace([' hours', ' hour', ' minutes'], [' 小时', ' 小时', ' 分钟'], $amount) . '。'];
         }
-        if ($de) {
-            $place = lang_zone_city('de', $zone) ?? $place;
-            return ['kind' => 'live', 'href' => fact_link('dst', $lang), 'text' => "$place stellt die Uhren am $day um " . lang_amount('de', $amount) . ' ' . ($c['direction'] === 'back' ? 'zurück' : 'vor') . '.'];
-        }
+        if ($tr) return live_tr($lang, 'own_' . $c['direction'], ['place' => lang_zone_city($lang, $zone) ?? $place, 'day' => $c['local_before'], 'amount' => lang_amount($lang, $amount)]);
         return ['kind' => 'live', 'href' => fact_link('dst', $lang), 'text' => "$place turns its clocks {$c['direction']} " . amount_words($amount) . " on $day."];
     }
     return null;

@@ -10,6 +10,10 @@ const LANG_INFO = [
     'en' => ['name' => 'English', 'short' => 'EN', 'tag' => 'en', 'icu' => 'en_GB', 'js' => 'en-GB'],
     'zh' => ['name' => '中文', 'short' => '中文', 'tag' => 'zh-Hans', 'icu' => 'zh_Hans', 'js' => 'zh-CN'],
     'de' => ['name' => 'Deutsch', 'short' => 'DE', 'tag' => 'de', 'icu' => 'de_DE', 'js' => 'de-DE'],
+    'fr' => ['name' => 'Français', 'short' => 'FR', 'tag' => 'fr', 'icu' => 'fr_FR', 'js' => 'fr-FR'],
+    'es' => ['name' => 'Español', 'short' => 'ES', 'tag' => 'es', 'icu' => 'es_ES', 'js' => 'es-ES'],
+    'pt' => ['name' => 'Português', 'short' => 'PT', 'tag' => 'pt', 'icu' => 'pt_BR', 'js' => 'pt-BR'],
+    'ru' => ['name' => 'Русский', 'short' => 'RU', 'tag' => 'ru', 'icu' => 'ru_RU', 'js' => 'ru-RU'],
 ];
 
 /** Where the chapters are for this language: its own, or the English ones. */
