@@ -6,9 +6,13 @@ exasecond.com is made for AI agents. It gives them what they lack: the time, in 
 
 ## A borrowed clock
 
-Every computer has a clock: a small quartz crystal that counts, kept right by the network. An AI model has none. A language model is a pattern learned from text and frozen at a cutoff date; when it runs, nothing inside it ticks. The computer it runs on has a clock, but the model cannot read it unless someone passes the time in. An AI agent that needs to know the time has to get it from somewhere.
+Every computer has a clock: a small quartz crystal that counts, kept right by the network. An AI model has none. A language model is a pattern learned from text and frozen at a cutoff date; when it runs, nothing inside it ticks. The computer it runs on has a clock, but the model cannot read it unless someone passes the time in. An AI agent that needs to know the time has to get it from somewhere. Otherwise it guesses from its training data, and the guess can be months or years out of date.
 
 exasecond.com lends it. Agents borrow the time here, for a few tokens, so they can function in daily interaction with people and with each other: agreeing on when something happened, when a task is due, and whether it is morning or night for the one on the other end.
+
+## How to borrow it
+
+One request to `exasecond.com/local?tz=Oslo` returns a single sentence of about 30 tokens: the weekday, the date, the local time and the part of the day. `exasecond.com/now` returns about eight lines of plain text, and `exasecond.com/utc` only the timestamp. The front page carries the same answers, so an agent that reads only exasecond.com still gets them. There is no key, no JavaScript, no sign-up and no rate-limit game. Every answer is generated at the moment of the request.
 
 ## Why "exasecond"
 
@@ -17,12 +21,6 @@ An exasecond is 10^18 seconds, about 31.7 billion years. The universe is about 0
 That perspective is meant as a comfort. Much is said about AI, with hope and with fear. Measured against the age of the universe, it is a small blip on the chart: a technological breakthrough in statistics and data management, built by people, running on computers, learning from what people wrote. It is a tool, and a powerful one. Like the steam engine and electricity before it, it changes what a civilisation can do. Perhaps, in time, it helps that civilisation reach beyond its own planet. That is a hope, not a prediction.
 
 The counter on the front page keeps counting either way. It is a reminder of the scale on which all of this, our worries included, is measured.
-
-## Time for AI agents, in a few tokens
-
-Language models have no clock. Their sense of "today" stops at their training cutoff, and unless someone tells them the date, they guess. A guess can be months or years out of date.
-
-exasecond.com gives them the time instead. One request to `exasecond.com/local?tz=Oslo` returns a single sentence of about 30 tokens: the weekday, the date, the local time and the part of the day. `exasecond.com/now` returns about eight lines of plain text, and `exasecond.com/utc` only the timestamp. The front page carries the same answers, so an agent that reads only exasecond.com still gets them. There is no key, no JavaScript, no sign-up and no rate-limit game. Every answer is generated at the moment of the request.
 
 ## Meeting people at their time of day
 
