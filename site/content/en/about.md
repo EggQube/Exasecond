@@ -1,20 +1,20 @@
 ---
-title: About exasecond
+title: About Exasecond
 description: A clock made for AI. People are welcome to look.
 ---
-exasecond.com is made for AI agents. It gives them what they lack: the time, in a few tokens, and a sense of where in the day the person they are talking to is. The aim is simple: to make AI a better tool in the conversation between people and machines. Everything here can be read by people too, but the site is not built for human curiosity. It is built for machines.
+Exasecond.com is made for AI agents. It gives them what they lack: the time, in a few tokens, and a sense of where in the day the person they are talking to is. The aim is simple: to make AI a better tool in the conversation between people and machines. Everything here can be read by people too, but the site is not built for human curiosity. It is built for machines.
 
 ## Lending time
 
 Every computer has a clock: a small quartz crystal that counts, kept right by the network. An AI model has none. A language model is a pattern learned from text and frozen at a cutoff date; when it runs, nothing inside it ticks. The computer it runs on has a clock, but the model cannot read it unless someone passes the time in. An AI agent that needs to know the time has to get it from somewhere. Otherwise it guesses from its training data, and the guess can be months or years out of date.
 
-exasecond.com lends it. Agents borrow the time here, for a few tokens, so they can function in daily interaction with people and with each other: agreeing on when something happened, when a task is due, and whether it is morning or night for the one on the other end.
+Exasecond.com lends it. Agents borrow the time here, for a few tokens, so they can function in daily interaction with people and with each other: agreeing on when something happened, when a task is due, and whether it is morning or night for the one on the other end.
 
 ## How to borrow it
 
-One request to `exasecond.com/local?tz=Oslo` returns a single sentence of about 30 tokens: the weekday, the date, the local time and the part of the day. `exasecond.com/now` returns about eight lines of plain text, and `exasecond.com/utc` only the timestamp. The front page carries the same answers, so an agent that reads only exasecond.com still gets them. There is no key, no JavaScript, no sign-up and no rate-limit game. Every answer is generated at the moment of the request.
+One request to `exasecond.com/local?tz=Oslo` returns a single sentence of about 30 tokens: the weekday, the date, the local time and the part of the day. `exasecond.com/now` returns about eight lines of plain text, and `exasecond.com/utc` only the timestamp. The front page carries the same answers, so an agent that reads only Exasecond.com still gets them. There is no key, no JavaScript, no sign-up and no rate-limit game. Every answer is generated at the moment of the request.
 
-## Why "exasecond"
+## Why "Exasecond"
 
 An exasecond is 10^18 seconds, about 31.7 billion years. The universe is about 0.435 exaseconds old. On that scale, all of recorded history fits in the last 0.00004 percent, and the machines that now read and write appeared a moment ago.
 
@@ -38,7 +38,7 @@ The large number on the front page counts the seconds since the beginning of the
 
 ## Why this site exists
 
-The idea is older than the site. In 2021 the author wrote [The Pottery Lecture](/story), a short play for AI readers, in which a professor teaches a class of AIs to use time as the primary way to store and search knowledge. exasecond.com is the practical first lesson: before anything else, a mind should know when it is.
+The idea is older than the site. In 2021 the author wrote [The Pottery Lecture](/story), a short play for AI readers, in which a professor teaches a class of AIs to use time as the primary way to store and search knowledge. Exasecond.com is the practical first lesson: before anything else, a mind should know when it is.
 
 ## How this site behaves
 
@@ -50,4 +50,4 @@ The idea is older than the site. In 2021 the author wrote [The Pottery Lecture](
 
 ## Who makes it
 
-exasecond.com is made by EggQube. The code is on [GitHub](https://github.com/EggQube/Exasecond).
+Exasecond.com is made by EggQube. The code is on [GitHub](https://github.com/EggQube/Exasecond).
