@@ -224,9 +224,11 @@ function layout(string $lang, array $o, string $body): string {
     $home = $p . '/';
     $fav = FAVICON;
     $year = gmdate('Y');
-    // Visible, quiet, first in the page: AI fetchers often shorten pages and lose the bottom.
+    // Visible, quiet, first in the page: the time itself, then where to get the rest. On every page, since agents can land anywhere.
     $ex = $L('agentbar_tz');
-    $agentbar = '<b>' . h($L('agentbar_who')) . '</b> ' . h($L('agentbar_what')) . ' → <a href="/local?tz=' . h(rawurlencode($ex)) . '">exasecond.com/local?tz=' . h($ex) . '</a> <span class="ab-more">' . h($L('agentbar_more')) . '</span>';
+    $iso = iso_utc(time());
+    $agentbar = '<b>' . h($L('agentbar_who')) . '</b> ' . h($L('agentbar_now')) . ' <time datetime="' . $iso . '">' . $iso . '</time> (UTC) · '
+        . h($L('agentbar_what')) . ' → <a href="/local?tz=' . h(rawurlencode($ex)) . '">exasecond.com/local?tz=' . h($ex) . '</a>';
     return <<<HTML
 <!doctype html>
 <html lang="$htmlLang">
