@@ -25,6 +25,7 @@ const TYPES = [
     'json' => 'application/json; charset=utf-8',
     'html' => 'text/html; charset=utf-8',
     'xml' => 'application/xml; charset=utf-8',
+    'css' => 'text/css; charset=utf-8',
 ];
 
 /** A response is [status, headers, body]. Kept as data so tests can call route() directly. */
@@ -88,6 +89,8 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
         return send((string)json_encode($obj, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 'json', [], $st);
     }
     if (!in_array($method, ['GET', 'HEAD'], true)) return send("Method not allowed\n", 'text', ['Allow' => 'GET, HEAD'], 405);
+    // The stylesheet is the one thing that may be cached: it holds no time. Pages link it with ?v=<hash>, so changes reach browsers at once.
+    if ($path === '/site.css') return send(site_css(), 'css', ['Cache-Control' => 'public, max-age=86400']);
 
     try {
         $lang = 'en';
