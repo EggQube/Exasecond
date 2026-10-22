@@ -584,6 +584,13 @@ JS;
     ], $body);
 }
 
+/** A plain document page (e.g. /developers). English only, so no language switch. */
+function render_doc(array $d, string $path, array $s): string {
+    $body = '<main class="read"><p class="kicker"><a href="/">Exasecond</a></p><h1>' . h($d['title']) . '</h1><p class="lede">' . h($d['description']) . '</p>'
+        . '<article class="prose">' . md_render($d['body']) . '</article></main>' . read_footer('en', $s, $path . '.md');
+    return layout('en', ['title' => $d['title'] . ' · Exasecond', 'desc' => $d['description'], 'path' => $path, 'alt' => false, 'md' => $path . '.md'], $body);
+}
+
 function render_story_page(array $s): string {
     $body = '<main class="read"><p class="kicker">' . h(t('en', 'story_eyebrow')) . '</p><article class="play">' . story_html_body(story_md()) . '</article></main>'
         . '<footer class="site"><p>' . h(sprintf(t('en', 'read_at'), $s['utc'], $s['universe_seconds'])) . '</p><p><a href="/story.md">story.md</a></p></footer>';

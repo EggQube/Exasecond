@@ -72,6 +72,14 @@ check('/about page', str_contains($ab, '<h1>About Exasecond</h1>') && str_contai
 check('/zh/about page', str_contains(get('/zh/about', 'text/html')[2], '<h1>关于 Exasecond</h1>'));
 check('/about.md', str_starts_with(get('/about.md')[2], '# About Exasecond'));
 check('About in menu, llms.txt and sitemap', str_contains(get('/', 'text/html')[2], 'href="/about"') && str_contains(get('/llms.txt')[2], '/about.md') && str_contains(get('/sitemap.xml')[2], '/zh/about'));
+// Developers
+check('/developers page', str_contains(get('/developers', 'text/html')[2], '<h1>For developers</h1>') && str_starts_with(get('/developers.md')[2], '# For developers'));
+foreach (['openwebui_exasecond.py', 'exasecond.py', 'exasecond.js', 'openai-tool.json', 'anthropic-tool.json', 'mcp.json'] as $f) {
+    [$st, $hd, $b] = get("/dev/$f");
+    check("/dev/$f", $st === 200 && strlen($b) > 50 && (!str_ends_with($f, '.json') || json_decode($b) !== null));
+}
+check('/dev/ only serves the listed files', get('/dev/../index.php')[0] === 404 && get('/dev/core.php')[0] === 404);
+check('city name as given (Beijing, not Shanghai)', str_contains(local_sentence(snapshot([1792648273, 0], tz_opts('Beijing', null)), tz_opts('Beijing', null)['tz_res']), ' in Beijing ('));
 check('/now without tz unchanged', !str_contains(get('/now')[2], 'Time zone') && str_contains(get('/now')[2], 'Tip: add ?tz='));
 check('/time stays a clock for agents', str_starts_with(get('/time')[2], 'UTC: '));
 check('/time is the contents page for browsers', str_contains(get('/time', 'text/html')[2], 'The question of time'));
