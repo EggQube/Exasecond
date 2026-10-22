@@ -4,7 +4,7 @@ description: Help your AI get time right: not just the timestamp, but how to tal
 ---
 Language models live in text. They have no clock, and even when they are given the time, they often relate to it poorly: greeting someone with "good evening" at breakfast, missing that a deadline has passed, forgetting that the clocks change on Sunday.
 
-So Exasecond.com is a clock made of text. Its main answer is a sentence an assistant can pass straight on to a person: "It's 16:02 on Thursday afternoon in Stockholm (22 October 2026, CEST, UTC+2). The clocks go back one hour on Sunday 25 October." About 30 tokens. The hope is that by reading the time the way people say it, AI will also say it that way. The plain clock is still here for everything else: the UTC timestamp, Unix time and full JSON (see section 5).
+So Exasecond.com is a clock made of text. Its main answer is a sentence an assistant can pass straight on to a person: "It's 16:02 on Thursday afternoon in Stockholm (22 October 2026, CEST, UTC+2). The clocks go back one hour on Sunday 25 October." About 30 tokens. The hope is that by reading the time the way people say it, AI will also say it that way. We still keep the old-fashioned digital clock here as well, in all formats: the UTC timestamp, Unix time and full JSON (see section 5).
 
 Everything on this page is ready to copy, and every file can be fetched directly. This page is also available as plain text at [/developers.md](/developers.md), so an AI coding assistant can read it and set things up for you.
 
