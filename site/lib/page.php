@@ -214,7 +214,6 @@ function layout(string $lang, array $o, string $body): string {
     $p = lang_prefix($lang);
     $cur = fn($k) => ($o['active'] ?? '') === $k ? ' aria-current="page"' : '';
     $nav = '<a href="' . $p . '/time"' . $cur('time') . '>' . h($L('nav_time')) . '</a>'
-        . '<a href="' . ($p ?: '') . '/#agents">' . h($L('nav_agents')) . '</a>'
         . '<a href="' . $p . '/about"' . $cur('about') . '>' . h($L('nav_about')) . '</a>'
         . ($hasAlt ? '<a href="' . h($otherHref) . '" hreflang="' . ($other === 'zh' ? 'zh-Hans' : 'en') . '" lang="' . ($other === 'zh' ? 'zh-Hans' : 'en') . '" title="' . h($L('nav_other_title')) . '">' . h($L('nav_other')) . '</a>' : '');
     $css = site_css();
