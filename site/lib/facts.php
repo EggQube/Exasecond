@@ -159,7 +159,7 @@ function live_fact(int $unix, string $zone, string $lang): ?array {
             $dir = $c['direction'] === 'back' ? '拨回' : '拨快';
             return ['kind' => 'live', 'href' => fact_link('dst', $lang), 'text' => "{$place}将在{$day}把时钟{$dir} " . str_replace([' hours', ' hour', ' minutes'], [' 小时', ' 小时', ' 分钟'], $amount) . '。'];
         }
-        return ['kind' => 'live', 'href' => fact_link('dst', $lang), 'text' => "$place turns its clocks {$c['direction']} $amount on $day."];
+        return ['kind' => 'live', 'href' => fact_link('dst', $lang), 'text' => "$place turns its clocks {$c['direction']} " . amount_words($amount) . " on $day."];
     }
     return null;
 }
@@ -209,12 +209,15 @@ function world_now_lines(int $unix, string $lang): array {
         $off = short_offset($d->format('P'));
         $abbr = $g['det']['abbreviation'] && $g['det']['abbreviation'] !== $off ? $g['det']['abbreviation'] . ', ' : '';
         $part = $g['det']['part_of_day'];
+        // Spoken order, so AIs can pass it on naturally: "In Oslo and Paris it's 16:02 on Thursday afternoon (CEST, UTC+2)."
         if ($zh) {
-            $line = implode('、', $g['names']) . '：' . WEEKDAYS_ZH[$d->format('l')] . ' ' . $d->format('H:i') . '，' . PARTS_ZH[$part] . '（' . str_replace(', ', '，', $abbr) . $off . '）';
-            if ($g['c']) $line .= '。' . fact_day($g['c']['local_before'], 'zh') . '时钟' . ($g['c']['direction'] === 'back' ? '拨回' : '拨快') . ' ' . str_replace([' hours', ' hour', ' minutes'], [' 小时', ' 小时', ' 分钟'], $g['c']['amount']);
+            $line = implode('、', $g['names']) . '现在是' . WEEKDAYS_ZH[$d->format('l')] . PARTS_ZH[$part] . ' ' . $d->format('H:i') . '（' . str_replace(', ', '，', $abbr) . $off . '）。'
+                . clock_change_sentence($g['c'], $unix, 'zh');
         } else {
-            $line = implode(', ', $g['names']) . ': ' . $d->format('l H:i') . ", $part ($abbr$off)";
-            if ($g['c']) $line .= '. Clocks go ' . $g['c']['direction'] . ' ' . $g['c']['amount'] . ' on ' . fact_day($g['c']['local_before'], 'en');
+            $n = $g['names'];
+            $who = count($n) > 1 ? implode(', ', array_slice($n, 0, -1)) . ' and ' . end($n) : $n[0];
+            $line = "In $who it's " . $d->format('H:i') . ' ' . day_phrase($d->format('l'), $part) . " ($abbr$off).";
+            if ($g['c']) $line .= ' ' . clock_change_sentence($g['c'], $unix);
         }
         $lines[] = $line;
     }

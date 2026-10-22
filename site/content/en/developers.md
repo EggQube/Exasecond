@@ -18,7 +18,7 @@ https://exasecond.com/local?tz=<their city> and use that time.
 The agent needs a tool that can fetch web pages. The answer looks like this:
 
 ```
-Thursday 22 October 2026, 08:15 in Oslo (early morning, CEST, UTC+2). Clocks go back 1 hour on Sunday 25 October.
+It's 08:15 early on Thursday morning in Oslo (22 October 2026, CEST, UTC+2). The clocks go back one hour on Sunday 25 October.
 ```
 
 ## 2. MCP: connect an AI app

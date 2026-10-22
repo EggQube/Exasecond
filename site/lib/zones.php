@@ -288,7 +288,36 @@ function place_name(string $zone, ?array $res): string {
     return $zoneCity;
 }
 
-/** One sentence for talking to a person (/local). About 30 tokens. $lang 'zh' is used by the Chinese home page. */
+/** "on Thursday afternoon", "early on Thursday morning", "in the early hours of Thursday": the time of day as people say it. */
+function day_phrase(string $weekday, string $part): string {
+    switch ($part) {
+        case 'night': return "in the early hours of $weekday";
+        case 'early morning': return "early on $weekday morning";
+        case 'midday': return "around midday on $weekday";
+        case 'late evening': return "late on $weekday evening";
+        default: return "on $weekday $part";
+    }
+}
+
+/** "one hour", "two hours", "30 minutes". */
+function amount_words(string $amount): string {
+    return strtr($amount, ['1 hour' => 'one hour', '2 hours' => 'two hours']);
+}
+
+/** "The clocks go back one hour on Sunday 25 October." when a change is due within 14 days, else ''. */
+function clock_change_sentence(?array $c, int $unix, string $lang = 'en'): string {
+    if (!$c || strtotime($c['utc']) - $unix > 14 * 86400) return '';
+    if ($lang === 'zh') {
+        return fact_day($c['local_before'], 'zh') . '时钟' . ($c['direction'] === 'back' ? '拨回' : '拨快') . ' ' . str_replace([' hours', ' hour', ' minutes'], [' 小时', ' 小时', ' 分钟'], $c['amount']) . '。';
+    }
+    $when = DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $c['local_before'], new DateTimeZone('UTC'));
+    return 'The clocks go ' . $c['direction'] . ' ' . amount_words($c['amount']) . ' on ' . $when->format('l j F') . '.';
+}
+
+/**
+ * One sentence for talking to a person (/local), in spoken order: time, part of day, place; details in brackets.
+ * "It's 16:02 on Thursday afternoon in Stockholm (22 October 2026, CEST, UTC+2). The clocks go back one hour on Sunday 25 October."
+ */
 function local_sentence(array $s, ?array $res, string $lang = 'en'): string {
     $l = $s['local'];
     if ($lang === 'zh' && $l && function_exists('fact_day')) {
@@ -296,35 +325,28 @@ function local_sentence(array $s, ?array $res, string $lang = 'en'): string {
         $place = place_name($l['zone'], $res);
         foreach (PLACES as [$pz, , $pzh]) if ($pz === $l['zone'] && (!$res || $res['how'] !== 'country')) $place = $pzh;   // Chinese city name when we have one
         $off = short_offset($l['offset']);
-        $inner = [PARTS_ZH[$l['part_of_day']]];
+        $inner = [$d->format('Y') . '年' . $d->format('n') . '月' . $d->format('j') . '日'];
         if ($l['abbreviation'] && $l['abbreviation'] !== $off) $inner[] = $l['abbreviation'];
         if ($place !== $off) $inner[] = $off;
-        $out = $d->format('Y') . '年' . $d->format('n') . '月' . $d->format('j') . '日 ' . WEEKDAYS_ZH[$d->format('l')] . ' ' . $d->format('H:i') . '，' . $place . '（' . implode('，', $inner) . '）。';
-        $c = $l['next_change'] ?? null;
-        if ($c && strtotime($c['utc']) - $s['unix'] <= 14 * 86400) {
-            $out .= fact_day($c['local_before'], 'zh') . '时钟' . ($c['direction'] === 'back' ? '拨回' : '拨快') . ' ' . str_replace([' hours', ' hour', ' minutes'], [' 小时', ' 小时', ' 分钟'], $c['amount']) . '。';
-        }
-        return $out;
+        $out = $place . '现在是' . WEEKDAYS_ZH[$d->format('l')] . PARTS_ZH[$l['part_of_day']] . ' ' . $d->format('H:i') . '（' . implode('，', $inner) . '）。';
+        return $out . clock_change_sentence($l['next_change'] ?? null, $s['unix'], 'zh');
     }
     if (!$l) {
         $d = dt_utc($s['unix']);
-        $base = $d->format('l j F Y, H:i') . ' UTC.';
+        $base = "It's " . $d->format('H:i') . ' UTC on ' . $d->format('l j F Y') . '.';
         if (isset($s['tz_note'])) return "$base Time zone: {$s['tz_note']}";
         return "$base For a person's local time and part of day, add ?tz= with their city, country or zone, e.g. /local?tz=Oslo";
     }
     $d = (new DateTimeImmutable('@' . $s['unix']))->setTimezone(new DateTimeZone($l['zone']));
     $place = place_name($l['zone'], $res);
     $off = short_offset($l['offset']);
-    $inner = [$l['part_of_day']];
+    $inner = [$d->format('j F Y')];
     if ($l['abbreviation'] && $l['abbreviation'] !== $off) $inner[] = $l['abbreviation'];
-    if ($place !== $off) $inner[] = $off;
-    $out = $d->format('l j F Y, H:i') . ($place === $off || $place === 'UTC' ? " $place" : " in $place") . ' (' . implode(', ', $inner) . ').';
-    $c = $l['next_change'] ?? null;
-    if ($c && strtotime($c['utc']) - $s['unix'] <= 14 * 86400) {
-        $when = DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $c['local_before'], new DateTimeZone('UTC'));
-        $out .= ' Clocks go ' . $c['direction'] . ' ' . $c['amount'] . ' on ' . $when->format('l j F') . '.';
-    }
-    return $out;
+    if ($place !== $off && $place !== 'UTC') $inner[] = $off;
+    $where = ($place === $off || $place === 'UTC') ? " at $place" : " in $place";
+    $out = "It's " . $d->format('H:i') . ' ' . day_phrase($d->format('l'), $l['part_of_day']) . $where . ' (' . implode(', ', $inner) . ').';
+    $change = clock_change_sentence($l['next_change'] ?? null, $s['unix']);
+    return $change ? "$out $change" : $out;
 }
 
 /** /zones: every canonical zone with its current offset, optionally filtered. */
