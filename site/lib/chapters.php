@@ -37,6 +37,24 @@ function chapter(string $lang, string $slug): ?array {
     ];
 }
 
+/** A standalone page such as content/<lang>/about.md: ['title', 'description', 'body'] or null. Name comes from the router, never the request. */
+function load_doc(string $lang, string $name): ?array {
+    if (!in_array($lang, LANGS, true) || !preg_match('/^[a-z]+$/', $name)) return null;
+    $file = content_path($lang, $name . '.md');
+    if (!is_file($file)) return null;
+    $raw = str_replace("\r\n", "\n", (string)file_get_contents($file));
+    $meta = [];
+    if (preg_match('/^---\n(.*?)\n---\n/s', $raw, $m)) {
+        foreach (explode("\n", $m[1]) as $line) if (preg_match('/^(\w+):\s*(.*)$/', $line, $kv)) $meta[$kv[1]] = $kv[2];
+        $raw = substr($raw, strlen($m[0]));
+    }
+    return ['title' => $meta['title'] ?? $name, 'description' => $meta['description'] ?? '', 'body' => trim($raw) . "\n"];
+}
+
+function doc_md(array $d): string {
+    return "# {$d['title']}\n\n> {$d['description']}\n\n{$d['body']}";
+}
+
 function chapters(string $lang): array {
     return array_values(array_filter(array_map(fn($s) => chapter($lang, $s), CHAPTERS)));
 }
