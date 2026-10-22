@@ -196,14 +196,21 @@ function resolve_zone(?string $in): ?array {
     $cc = $names[$key0] ?? $names[$key] ?? (preg_match('/^[A-Z]{2}$/', $raw) ? $raw : null);
     $zones = $cc ? (tz_country_zones()[$cc] ?? null) : null;
     if ($zones) {
-        if (count($zones) === 1) return $res($zones[0], 'country');
-        if (isset(TZ_COUNTRY_MAIN[$cc])) return $res(TZ_COUNTRY_MAIN[$cc], 'country');
+        if (count($zones) === 1) return $res($zones[0], 'country') + ['cc' => $cc];
+        if (isset(TZ_COUNTRY_MAIN[$cc])) return $res(TZ_COUNTRY_MAIN[$cc], 'country') + ['cc' => $cc];
         return $res(null, 'ambiguous', TZ_COUNTRY_OPTIONS[$cc] ?? $zones);
     }
 
     // Every place with 1,000 or more people (GeoNames). The biggest place with the name wins; the others are named.
-    if ($p = place_lookup($raw)) return $res($p[0]['zone'], 'place') + ['place' => $p[0], 'also' => array_slice($p, 1)];
+    // Others with the name are named only when they are at least a twentieth the size (Springfield yes, São Paulo in Cape Verde no).
+    if ($p = place_lookup($raw)) return $res($p[0]['zone'], 'place') + ['place' => $p[0], 'also' => array_values(array_filter(array_slice($p, 1), fn($o) => $o['pop'] * 20 >= $p[0]['pop'] && name_fold($o['name']) === name_fold($raw)))];
     return $res(null, 'unknown');
+}
+
+/** Lower case, no accents, hyphens as spaces: "São Paulo" and "sao-paulo" fold the same. */
+function name_fold(string $s): string {
+    $s = class_exists('Normalizer') ? preg_replace('/p{Mn}/u', '', Normalizer::normalize($s, Normalizer::FORM_D)) : $s;
+    return trim(preg_replace('/s+/u', ' ', str_replace(['_', '-', '.'], [' ', ' ', ''], mb_strtolower_safe($s))));
 }
 
 /** Places called $name, biggest first: [['name', 'cc', 'country', 'zone', 'pop'], ...]. Reads one small shard of data/places/. */
@@ -358,6 +365,7 @@ function clock_change_sentence(?array $c, int $unix, string $lang = 'en'): strin
  * "It's 16:02 on Thursday afternoon in Stockholm (22 October 2026, CEST, UTC+2). The clocks go back one hour on Sunday 25 October."
  */
 function local_sentence(array $s, ?array $res, string $lang = 'en'): string {
+    if (isset(LANG_WORDS[$lang])) return lang_sentence($lang, $s, $res);   // de, fr, es, pt, ru: lib/langs.php
     $l = $s['local'];
     if ($lang === 'zh' && $l && function_exists('fact_day')) {
         $d = (new DateTimeImmutable('@' . $s['unix']))->setTimezone(new DateTimeZone($l['zone']));

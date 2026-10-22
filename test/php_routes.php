@@ -119,7 +119,7 @@ check('/kiruna (GeoNames place)', str_contains(get('/kiruna')[2], 'in Kiruna (')
 check('/krakow gets its own spelling', str_contains(get('/krakow')[2], 'Kraków'));
 check('/new-york', str_contains(get('/new-york')[2], ' in New York ('));
 check('/sweden', str_contains(get('/sweden')[2], ' in Sweden ('));
-check('/tenerife is the island', str_contains(get('/tenerife')[2], 'Tenerife, Spain'));
+check('/tenerife is the island', str_contains(get('/tenerife')[2], 'in Tenerife (') && !str_contains(get('/tenerife')[2], 'UTC-5'));
 check('/bali is Indonesia', str_contains(get('/bali')[2], 'Bali, Indonesia'));
 check('/washington is the city', str_contains(get('/washington')[2], 'EDT') || str_contains(get('/washington')[2], 'EST'));
 check('/utc+2 offset', str_contains(get('/utc+2')[2], 'UTC+2'));
@@ -134,6 +134,12 @@ check('/developers links to Chinese', str_contains(get('/developers', 'text/html
 check('zh about button goes to /zh/developers', str_contains(get('/zh/about', 'text/html')[2], 'href="/zh/developers"'));
 check('language menu: same page in the other language', str_contains(get('/developers', 'text/html')[2], '<details class="langs"><summary title="Language">EN</summary>') && str_contains(get('/developers', 'text/html')[2], 'href="/zh/developers" hreflang="zh-Hans"'));
 check('language menu: English-only page links to the Chinese front page', str_contains(get('/story', 'text/html')[2], 'href="/zh/" hreflang="zh-Hans"') && !str_contains(get('/story', 'text/html')[2], 'rel="alternate" hreflang'));
+check('?lang=de sentence', str_starts_with(get('/oslo?lang=de')[2], 'Oslo: Es ist '));
+check('?lang=fr sentence', str_starts_with(get('/tokyo?lang=fr')[2], 'Tokyo : il est '));
+check('?lang=es zone city translated', str_starts_with(get('/new-york?lang=es')[2], 'Nueva York: es '));
+check('?lang=pt country translated', str_starts_with(get('/sweden?lang=pt')[2], 'Suécia: é '));
+check('?lang=ru Cyrillic city', str_starts_with(get('/moscow?lang=ru')[2], 'Москва: сейчас '));
+check('unknown lang falls back to English', str_starts_with(get('/oslo?lang=xx')[2], "It's "));
 check('agent bar points to the short address', str_contains(get('/', 'text/html')[2], 'exasecond.com/stockholm</a>'));
 
 echo $fails ? "$fails failed\n" : "all passed\n";

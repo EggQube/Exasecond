@@ -9,6 +9,7 @@ ini_set('display_errors', '0');
 
 require __DIR__ . '/lib/core.php';
 require __DIR__ . '/lib/zones.php';
+require __DIR__ . '/lib/langs.php';
 require __DIR__ . '/lib/formats.php';
 require __DIR__ . '/lib/chapters.php';
 require __DIR__ . '/lib/content.php';
@@ -79,7 +80,8 @@ function snap(?array $instant, array $q): array {
 /** The one-sentence local time (/local and the place addresses); JSON when asked for. */
 function local_answer(array $o, array $q, string $accept): array {
     $s = snapshot(null, $o);
-    $line = local_sentence($s, $o['tz_res'], ($q['lang'] ?? '') === 'zh' ? 'zh' : 'en');
+    $lang = $q['lang'] ?? 'en';
+    $line = local_sentence($s, $o['tz_res'], is_string($lang) && in_array($lang, SENTENCE_LANGS, true) ? $lang : 'en');
     if (negotiate($accept, 'text') === 'json') return json_resp(['text' => $line, 'utc' => $s['utc'], 'local' => $s['local']] + (isset($s['tz_note']) ? ['tz_note' => $s['tz_note']] : []));
     return send($line . "\n", 'text', ['Vary' => 'Accept']);
 }
