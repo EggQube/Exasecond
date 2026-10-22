@@ -66,7 +66,7 @@ check('Chinese fact', str_starts_with(get('/fact?tz=Tokyo&lang=zh')[2], '你知�
 check('/local in Chinese', str_contains(local_sentence(snapshot([$oct, 0], tz_opts('Oslo', null)), tz_opts('Oslo', null)['tz_res'], 'zh'), '奥斯陆现在是星期四早上 07:51（2026年10月22日，CEST，UTC+2）'));
 $home = get('/', 'text/html')[2];
 check('home: answer block comes before the counter', strpos($home, 'id="ans-now"') < strpos($home, 'id="count"') && strpos($home, 'id="ans-you"') < strpos($home, 'id="count"'));
-check('home: world list for readers without a place', str_contains($home, "In Oslo, Stockholm, Berlin and Paris it's ") && str_contains($home, "In Beijing it's "));
+check('home: world list for readers without a place', str_contains(strip_tags($home), "In Oslo, Stockholm, Berlin, Paris, Madrid and Rome it's ") && str_contains(strip_tags($home), "In Beijing, Shanghai, Hong Kong"));
 // About
 $ab = get('/about', 'text/html')[2];
 check('/about page', str_contains($ab, '<h1>About Exasecond</h1>') && str_contains($ab, 'id="ans-fact"') && str_contains($ab, 'application/ld+json') && str_contains($ab, 'Made by EggQube') === false && str_contains($ab, 'made by the GitHub user'));
@@ -140,7 +140,7 @@ check('?lang=es zone city translated', str_starts_with(get('/new-york?lang=es')[
 check('?lang=pt country translated', str_starts_with(get('/sweden?lang=pt')[2], 'Suécia: é '));
 check('?lang=ru Cyrillic city', str_starts_with(get('/moscow?lang=ru')[2], 'Москва: сейчас '));
 check('unknown lang falls back to English', str_starts_with(get('/oslo?lang=xx')[2], "It's "));
-check('/de/ front page in German', (fn($b) => str_contains($b, '<html lang="de"') && str_contains($b, 'Berlin und Paris: Es ist ') && str_contains($b, 'Schon gewusst?') && str_contains($b, 'href="/time"'))(get('/de/', 'text/html')[2]));
+check('/de/ front page in German', (fn($b) => str_contains($b, '<html lang="de"') && str_contains(strip_tags($b), 'Paris, Madrid und Rom: Es ist ') && str_contains($b, 'Schon gewusst?') && str_contains($b, 'href="/time"'))(get('/de/', 'text/html')[2]));
 check('/de/about and /de/developers', get('/de/about', 'text/html')[0] === 200 && str_starts_with(get('/de/developers.md')[2], '# Für Entwickler'));
 check('no German chapters: /de/time is 404', get('/de/time', 'text/html')[0] === 404);
 check('German facts match English count', count(FACTS_TR['de']) === count(FACTS));
@@ -157,6 +157,9 @@ check('/shanghai?lang=zh is 上海, /beijing?lang=zh is 北京', str_starts_with
 check('/now?tz= starts with the sentence; without tz unchanged', str_starts_with(get('/now?tz=Oslo')[2], "It's ") && str_starts_with(get('/now')[2], 'UTC: ') && str_starts_with(json_decode(get('/now?tz=Oslo', 'application/json')[2], true)['text'], "It's "));
 check('lunar note: 2026-10-22 yes (new moon between midnights), 2026-10-05 no', lunar_days_apart(1792687749) && !lunar_days_apart(1791190000));
 check('front page: calendar places, precision, no-JS hint escaped', (fn($b) => str_contains($b, 'class="cal-where">· Tokyo') && str_contains($b, 'class="precision"') && str_contains($b, 'exasecond.com/&lt;your city&gt;'))(get('/', 'text/html')[2]));
+check('cities link to their short address', (fn($b) => str_contains($b, '<a href="/ho-chi-minh-city">Ho Chi Minh City</a>') && str_contains($b, '<a href="/seoul">Seoul</a>'))(get('/', 'text/html')[2]) && str_contains(get('/ja/', 'text/html')[2], '<a href="/tokyo?lang=ja">東京</a>'));
+check('fresh link: a new code on every page', (fn($a, $b) => $a !== $b && $a !== null)(preg_match('#/utc\?r=([0-9a-f]{6})#', get('/', 'text/html')[2], $m1) ? $m1[1] : null, preg_match('#/utc\?r=([0-9a-f]{6})#', get('/', 'text/html')[2], $m2) ? $m2[1] : null));
+check('markdown says generated at the moment of this request', str_contains(get('/', 'text/markdown')[2], 'generated at the moment of this request'));
 check('agent bar points to the short address', str_contains(get('/', 'text/html')[2], 'exasecond.com/stockholm</a>'));
 
 echo $fails ? "$fails failed\n" : "all passed\n";

@@ -118,7 +118,7 @@ def get_local_time(place: str = "") -> str:
 | `/utc` | 只有 ISO 8601 UTC 时间戳 | ~5 |
 | `/now` | 大约八行：UTC、星期、Unix 时间、宇宙秒 | ~80 |
 | `/now?tz=Oslo&cutoff=2025-06` | 加上本地时间，以及训练截止日期距今多久 | ~150 |
-| `exasecond.com`（markdown） | 给智能体的首页：各大城市的时间、调钟、一条知识 | ~440 |
+| `exasecond.com`（markdown） | 给智能体的首页：各大城市的时间、调钟、一条知识 | ~600 |
 | `/now.md` | 全部内容：所有历法、世界时钟 | ~500 |
 | `/now.json` | 全部内容，JSON 格式 | ~1,400 |
 | `/fact?tz=Shanghai&lang=zh` | 一条关于时间的"你知道吗？"，尽可能与该地点相关 | ~30 |

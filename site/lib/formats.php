@@ -79,7 +79,7 @@ function js_num(float $x): string {
 function home_md(array $s, ?string $place = null): string {
     $fact = pick_fact($s['unix'], null, 'en');
     $o = $place !== null ? [$place, ''] : [];
-    array_push($o, "For AI agents: now {$s['utc']} (UTC) · local time for any place → exasecond.com/stockholm",
+    array_push($o, "For AI agents: now {$s['utc']} (UTC), generated at the moment of this request · local time for any place → exasecond.com/stockholm · fresh time → exasecond.com/utc?r=" . bin2hex(random_bytes(3)),
         '', '# Exasecond.com', '', '## Your time', '', 'Depends on where you are. Right now:', '');
     $changes = [];
     foreach (world_now_lines($s['unix'], 'en', $changes) as $l) $o[] = "- $l";

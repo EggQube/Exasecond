@@ -118,7 +118,7 @@ Open WebUI로 쓰는 Ollama 등 로컬 모델의 경우: [/dev/openwebui_exaseco
 | `/utc` | ISO 8601 형식의 UTC 타임스탬프만 | ~5 |
 | `/now` | 약 여덟 줄: UTC, 요일, Unix 시간, 우주 초 | ~80 |
 | `/now?tz=Oslo&cutoff=2025-06` | 현지 시각과 학습 데이터 마감 이후 지난 기간을 추가 | ~150 |
-| `exasecond.com`(markdown) | 에이전트용 첫 페이지: 주요 도시의 시각, 시계 변경, 사실 하나 | ~440 |
+| `exasecond.com`(markdown) | 에이전트용 첫 페이지: 주요 도시의 시각, 시계 변경, 사실 하나 | ~600 |
 | `/now.md` | 전부: 모든 달력, 세계 시계 | ~500 |
 | `/now.json` | 전부, JSON으로 | ~1,400 |
 | `/fact?tz=Seoul&lang=ko` | 시간에 관한 "알고 계셨나요?", 가능하면 그 장소에 관한 것 | ~40 |

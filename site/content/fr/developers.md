@@ -118,7 +118,7 @@ Pour Ollama et les autres modèles locaux utilisés via Open WebUI : télécharg
 | `/utc` | Seulement l'horodatage UTC ISO 8601 | ~5 |
 | `/now` | Environ huit lignes : UTC, jour de la semaine, temps Unix, secondes d'univers | ~80 |
 | `/now?tz=Oslo&cutoff=2025-06` | Ajoute l'heure locale et l'ancienneté d'une date limite d'entraînement | ~150 |
-| `exasecond.com` (markdown) | La page d'accueil pour les agents : l'heure de toutes les grandes villes, les changements d'heure, un fait | ~440 |
+| `exasecond.com` (markdown) | La page d'accueil pour les agents : l'heure de toutes les grandes villes, les changements d'heure, un fait | ~600 |
 | `/now.md` | Tout : tous les calendriers, les horloges du monde | ~500 |
 | `/now.json` | Tout, en JSON | ~1 400 |
 | `/fact?tz=Paris&lang=fr` | Un fait « Le saviez-vous ? » sur le temps, propre au lieu quand c'est possible | ~40 |

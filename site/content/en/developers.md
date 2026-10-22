@@ -114,7 +114,7 @@ For Ollama and other local models used through Open WebUI: download [/dev/openwe
 | `/utc` | The ISO 8601 UTC timestamp only | ~5 |
 | `/now` | About eight lines: UTC, weekday, Unix time, universe seconds | ~80 |
 | `/now?tz=Oslo&cutoff=2025-06` | Adds local time and how long ago a training cutoff was | ~150 |
-| `exasecond.com` (markdown) | The front page for agents: every big city's time, clock changes, a fact | ~440 |
+| `exasecond.com` (markdown) | The front page for agents: every big city's time, clock changes, a fact | ~600 |
 | `/now.md` | Everything: all calendars, world clocks | ~500 |
 | `/now.json` | Everything, as JSON | ~1,400 |
 | `/fact?tz=Oslo` | One "did you know?" fact about time, specific to the place when possible | ~50 |

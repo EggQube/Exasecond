@@ -118,7 +118,7 @@ För Ollama och andra lokala modeller i Open WebUI: ladda ner [/dev/openwebui_ex
 | `/utc` | Bara ISO 8601-tidsstämpeln i UTC | ~5 |
 | `/now` | Ungefär åtta rader: UTC, veckodag, Unix-tid, universumsekunder | ~80 |
 | `/now?tz=Oslo&cutoff=2025-06` | Lägger till lokal tid och hur länge sedan ett träningsslutdatum var | ~150 |
-| `exasecond.com` (markdown) | Startsidan för agenter: tiden i alla stora städer, tidsomställningar, ett faktum | ~440 |
+| `exasecond.com` (markdown) | Startsidan för agenter: tiden i alla stora städer, tidsomställningar, ett faktum | ~600 |
 | `/now.md` | Allt: alla kalendrar, världsklockor | ~500 |
 | `/now.json` | Allt, som JSON | ~1 400 |
 | `/fact?tz=Stockholm&lang=sv` | Ett "Visste du?"-faktum om tid, gärna om platsen | ~40 |

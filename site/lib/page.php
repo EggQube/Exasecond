@@ -307,8 +307,12 @@ function layout(string $lang, array $o, string $body): string {
     $ex = $L('agentbar_tz');
     $iso = iso_utc(time());
     $lq = $lang === 'en' ? '' : '?lang=' . $lang;   // the answer in the page's language
-    $agentbar = '<b>' . h($L('agentbar_who')) . '</b> ' . h($L('agentbar_now')) . ' <time datetime="' . $iso . '">' . $iso . '</time> (UTC) · '
-        . h($L('agentbar_what')) . ' → <a href="/' . h(strtolower($ex) . $lq) . '">exasecond.com/' . h(strtolower($ex) . $lq) . '</a>';
+    // "Generated at the moment of this request" keeps saved copies honest; the fresh link has a new code on every page,
+    // so even a saved copy links to an address no fetch tool has a copy of.
+    $fresh = '/utc?r=' . bin2hex(random_bytes(3));
+    $agentbar = '<b>' . h($L('agentbar_who')) . '</b> ' . h($L('agentbar_now')) . ' <time datetime="' . $iso . '">' . $iso . '</time> (UTC), ' . h($L('agentbar_gen')) . ' · '
+        . h($L('agentbar_what')) . ' → <a href="/' . h(strtolower($ex) . $lq) . '">exasecond.com/' . h(strtolower($ex) . $lq) . '</a>'
+        . ' · ' . h($L('agentbar_fresh')) . ' → <a href="' . $fresh . '">exasecond.com' . $fresh . '</a>';
     return <<<HTML
 <!doctype html>
 <html lang="$htmlLang">
@@ -398,7 +402,14 @@ function render_home(array $s, string $lang, ?string $place = null): string {
     if ($zh) $nowLine = $nowD->format('Y') . '年' . $nowD->format('n') . '月' . $nowD->format('j') . '日 ' . WEEKDAYS_ZH[$nowD->format('l')] . ' ' . $nowD->format('H:i:s') . ' UTC';
     elseif ($en) $nowLine = $nowD->format('l j F Y, H:i:s') . ' UTC';
     else $nowLine = (new IntlDateFormatter(LANG_INFO[$lang]['icu'], IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC'))->format($s['unix']) . (in_array($lang, ['ja', 'ko'], true) ? ' ' : ', ') . $nowD->format('H:i:s') . ' UTC';
-    $world = implode('', array_map(fn($l) => '<li>' . htmlspecialchars($l, ENT_NOQUOTES, 'UTF-8') . '</li>', world_now_lines($s['unix'], $lang)));
+    // Each city links to its short address (exasecond.com/tokyo?lang=ja): a link found on the page, which AI apps
+    // let their models follow without asking the user, unlike an address the model makes up.
+    $links = [];
+    foreach (PLACES as $pl) {
+        $nm = htmlspecialchars(place_display($pl, $lang), ENT_NOQUOTES, 'UTF-8');
+        $links[$nm] = '<a href="/' . place_slug($pl[1]) . ($en ? '' : '?lang=' . $lang) . '">' . $nm . '</a>';
+    }
+    $world = implode('', array_map(fn($l) => '<li>' . strtr(htmlspecialchars($l, ENT_NOQUOTES, 'UTF-8'), $links) . '</li>', world_now_lines($s['unix'], $lang)));
     $fact = pick_fact($s['unix'], null, $lang);
     $devBtn = dev_button($lang);
     $answer = '<section class="answer" aria-label="' . h($L('ans_label')) . '">'

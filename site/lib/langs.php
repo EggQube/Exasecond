@@ -10,41 +10,41 @@ const LANG_WORDS = [
     'de' => [
         'days' => ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'],
         'months' => ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
-        'others' => 'Andere Orte mit diesem Namen:', 'cities' => ['Delhi' => 'Delhi', 'Beijing' => 'Peking'], 'and' => ' und ',
+        'others' => 'Andere Orte mit diesem Namen:', 'cities' => ['Delhi' => 'Delhi', 'Beijing' => 'Peking', 'Mumbai' => 'Mumbai', 'Lahore' => 'Lahore'], 'and' => ' und ',
     ],
     'fr' => [
         'days' => ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'],
         'months' => ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
-        'others' => 'Autres lieux portant ce nom :', 'cities' => ['Delhi' => 'Delhi', 'Beijing' => 'Pékin'], 'and' => ' et ',
+        'others' => 'Autres lieux portant ce nom :', 'cities' => ['Delhi' => 'Delhi', 'Beijing' => 'Pékin', 'Mumbai' => 'Bombay', 'Lahore' => 'Lahore'], 'and' => ' et ',
     ],
     'es' => [
         'days' => ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'],
         'months' => ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
-        'others' => 'Otros lugares con este nombre:', 'cities' => ['Delhi' => 'Delhi', 'Beijing' => 'Pekín'], 'and' => ' y ',
+        'others' => 'Otros lugares con este nombre:', 'cities' => ['Delhi' => 'Delhi', 'Beijing' => 'Pekín', 'Mumbai' => 'Bombay', 'Lahore' => 'Lahore'], 'and' => ' y ',
     ],
     'pt' => [
         'days' => ['segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado', 'domingo'],
         'months' => ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'],
-        'others' => 'Outros lugares com este nome:', 'cities' => ['Delhi' => 'Déli', 'Beijing' => 'Pequim'], 'and' => ' e ',
+        'others' => 'Outros lugares com este nome:', 'cities' => ['Delhi' => 'Déli', 'Beijing' => 'Pequim', 'Mumbai' => 'Mumbai', 'Lahore' => 'Lahore'], 'and' => ' e ',
     ],
     'ru' => [
         'days' => ['понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота', 'воскресенье'],
         'on_day' => ['в понедельник', 'во вторник', 'в среду', 'в четверг', 'в пятницу', 'в субботу', 'в воскресенье'],
         'months' => ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
-        'others' => 'Другие места с этим названием:', 'cities' => ['Delhi' => 'Дели', 'Beijing' => 'Пекин'], 'and' => ' и ',
+        'others' => 'Другие места с этим названием:', 'cities' => ['Delhi' => 'Дели', 'Beijing' => 'Пекин', 'Mumbai' => 'Мумбаи', 'Lahore' => 'Лахор'], 'and' => ' и ',
     ],
     'sv' => [
         'days' => ['måndag', 'tisdag', 'onsdag', 'torsdag', 'fredag', 'lördag', 'söndag'],
         'months' => ['januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli', 'augusti', 'september', 'oktober', 'november', 'december'],
-        'others' => 'Andra platser med samma namn:', 'cities' => ['Delhi' => 'Delhi', 'Beijing' => 'Peking'], 'and' => ' och ',
+        'others' => 'Andra platser med samma namn:', 'cities' => ['Delhi' => 'Delhi', 'Beijing' => 'Peking', 'Mumbai' => 'Mumbai', 'Lahore' => 'Lahore'], 'and' => ' och ',
     ],
     'ja' => [
         'days' => ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日', '日曜日'],
-        'others' => '同じ名前の場所：', 'cities' => ['Delhi' => 'デリー', 'Beijing' => '北京'], 'and' => '、',
+        'others' => '同じ名前の場所：', 'cities' => ['Delhi' => 'デリー', 'Beijing' => '北京', 'Mumbai' => 'ムンバイ', 'Lahore' => 'ラホール'], 'and' => '、',
     ],
     'ko' => [
         'days' => ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'],
-        'others' => '같은 이름의 다른 장소:', 'cities' => ['Delhi' => '델리', 'Beijing' => '베이징'], 'and' => ', ',
+        'others' => '같은 이름의 다른 장소:', 'cities' => ['Delhi' => '델리', 'Beijing' => '베이징', 'Mumbai' => '뭄바이', 'Lahore' => '라호르'], 'and' => ', ',
     ],
 ];
 
@@ -170,24 +170,25 @@ function lang_line(string $lang, string $place, DateTimeImmutable $d, string $pa
     return '';
 }
 
+/** A front-page city (a PLACES row) named in the language. Cities that are not their zone's own city (Beijing, Delhi,
+ *  Mumbai, Lahore) come from the language's list; the rest from ICU (Tokio, Moscou); English and Chinese from PLACES. */
+function place_display(array $p, string $lang): string {
+    if ($lang === 'en') return $p[1];
+    if ($lang === 'zh') return $p[2];
+    $zoneCity = str_replace('_', ' ', substr(strrchr($p[0], '/'), 1));
+    return LANG_WORDS[$lang]['cities'][$p[1]] ?? (name_fold($p[1]) === name_fold($zoneCity) ? lang_zone_city($lang, $p[0]) : null) ?? $p[1];
+}
+
 /** The front page's "Your time" list in the language: places grouped by identical local time. */
 function lang_world_lines(int $unix, string $lang): array {
     $and = LANG_WORDS[$lang]['and'];
-    $groups = [];
-    foreach (PLACES as [$zone, $en]) {
-        $d = (new DateTimeImmutable('@' . $unix))->setTimezone(new DateTimeZone($zone));
-        $det = local_details($unix, $zone);
-        $c = $det['next_change'] && strtotime($det['next_change']['utc']) - $unix <= 14 * 86400 ? $det['next_change'] : null;
-        $key = $d->format('Y-m-d H:i') . '|' . $d->format('P') . '|' . $det['abbreviation'] . '|' . ($c['utc'] ?? '');
-        if (!isset($groups[$key])) $groups[$key] = ['names' => [], 'd' => $d, 'det' => $det, 'c' => $c];
-        $groups[$key]['names'][] = LANG_WORDS[$lang]['cities'][$en] ?? lang_zone_city($lang, $zone) ?? $en;   // Delhi and Beijing are not their zone's own city
-    }
+    $groups = place_groups($unix, fn($p) => place_display($p, $lang));
     $lines = [];
     foreach ($groups as $g) {
         $n = $g['names'];
         $who = count($n) > 1 ? implode(trim($and) === '、' ? '、' : ', ', array_slice($n, 0, -1)) . $and . end($n) : $n[0];
         $off = short_offset($g['d']->format('P'));
-        $inner = $g['det']['abbreviation'] && $g['det']['abbreviation'] !== $off ? [$g['det']['abbreviation'], $off] : [$off];
+        $inner = $g['abbr'] !== '' ? [$g['abbr'], $off] : [$off];
         $line = lang_line($lang, $who, $g['d'], $g['det']['part_of_day'], $inner);
         if ($g['c']) $line .= ($lang === 'ja' ? '' : ' ') . lang_change($lang, $g['c'], $unix);
         $lines[] = $line;

@@ -118,7 +118,7 @@ Für Ollama und andere lokale Modelle in Open WebUI: Laden Sie [/dev/openwebui_e
 | `/utc` | Nur der ISO-8601-Zeitstempel in UTC | ~5 |
 | `/now` | Etwa acht Zeilen: UTC, Wochentag, Unix-Zeit, Universumssekunden | ~80 |
 | `/now?tz=Oslo&cutoff=2025-06` | Dazu die Ortszeit und wie lange ein Trainingsstichtag zurückliegt | ~150 |
-| `exasecond.com` (markdown) | Die Startseite für Agenten: die Zeit aller großen Städte, Zeitumstellungen, eine Tatsache | ~440 |
+| `exasecond.com` (markdown) | Die Startseite für Agenten: die Zeit aller großen Städte, Zeitumstellungen, eine Tatsache | ~600 |
 | `/now.md` | Alles: alle Kalender, Weltuhren | ~500 |
 | `/now.json` | Alles, als JSON | ~1.400 |
 | `/fact?tz=Berlin&lang=de` | Eine "Schon gewusst?"-Tatsache über die Zeit, wenn möglich passend zum Ort | ~40 |

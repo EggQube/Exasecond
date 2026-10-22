@@ -190,15 +190,54 @@ function pick_fact(int $unix, ?string $zone, string $lang): array {
 
 // ---- "Your time" for readers who can't tell us where they are (AIs, no JavaScript) ----------------------
 
-// zone, English name, Chinese name
+// zone, English name, Chinese name. The world's biggest cities, west to east (the front page's "Your time").
 const PLACES = [
     ['Pacific/Honolulu', 'Honolulu', '檀香山'], ['America/Los_Angeles', 'Los Angeles', '洛杉矶'], ['America/Denver', 'Denver', '丹佛'],
-    ['America/Chicago', 'Chicago', '芝加哥'], ['America/New_York', 'New York', '纽约'], ['America/Sao_Paulo', 'São Paulo', '圣保罗'],
-    ['Europe/London', 'London', '伦敦'], ['Africa/Lagos', 'Lagos', '拉各斯'], ['Europe/Oslo', 'Oslo', '奥斯陆'], ['Europe/Stockholm', 'Stockholm', '斯德哥尔摩'],
-    ['Europe/Berlin', 'Berlin', '柏林'], ['Europe/Paris', 'Paris', '巴黎'], ['Africa/Cairo', 'Cairo', '开罗'], ['Europe/Moscow', 'Moscow', '莫斯科'],
-    ['Asia/Dubai', 'Dubai', '迪拜'], ['Asia/Kolkata', 'Delhi', '德里'], ['Asia/Shanghai', 'Beijing', '北京'], ['Asia/Tokyo', 'Tokyo', '东京'],
-    ['Australia/Sydney', 'Sydney', '悉尼'], ['Pacific/Auckland', 'Auckland', '奥克兰'],
+    ['America/Mexico_City', 'Mexico City', '墨西哥城'], ['America/Chicago', 'Chicago', '芝加哥'], ['America/Bogota', 'Bogotá', '波哥大'],
+    ['America/Lima', 'Lima', '利马'], ['America/New_York', 'New York', '纽约'], ['America/Toronto', 'Toronto', '多伦多'],
+    ['America/Sao_Paulo', 'São Paulo', '圣保罗'], ['America/Argentina/Buenos_Aires', 'Buenos Aires', '布宜诺斯艾利斯'],
+    ['Europe/London', 'London', '伦敦'], ['Africa/Lagos', 'Lagos', '拉各斯'], ['Africa/Kinshasa', 'Kinshasa', '金沙萨'],
+    ['Europe/Oslo', 'Oslo', '奥斯陆'], ['Europe/Stockholm', 'Stockholm', '斯德哥尔摩'], ['Europe/Berlin', 'Berlin', '柏林'],
+    ['Europe/Paris', 'Paris', '巴黎'], ['Europe/Madrid', 'Madrid', '马德里'], ['Europe/Rome', 'Rome', '罗马'],
+    ['Africa/Johannesburg', 'Johannesburg', '约翰内斯堡'], ['Africa/Cairo', 'Cairo', '开罗'], ['Europe/Istanbul', 'Istanbul', '伊斯坦布尔'],
+    ['Europe/Moscow', 'Moscow', '莫斯科'], ['Asia/Riyadh', 'Riyadh', '利雅得'], ['Africa/Nairobi', 'Nairobi', '内罗毕'],
+    ['Asia/Dubai', 'Dubai', '迪拜'], ['Asia/Karachi', 'Karachi', '卡拉奇'], ['Asia/Karachi', 'Lahore', '拉合尔'],
+    ['Asia/Kolkata', 'Delhi', '德里'], ['Asia/Kolkata', 'Mumbai', '孟买'], ['Asia/Dhaka', 'Dhaka', '达卡'],
+    ['Asia/Jakarta', 'Jakarta', '雅加达'], ['Asia/Bangkok', 'Bangkok', '曼谷'], ['Asia/Ho_Chi_Minh', 'Ho Chi Minh City', '胡志明市'],
+    ['Asia/Shanghai', 'Beijing', '北京'], ['Asia/Shanghai', 'Shanghai', '上海'], ['Asia/Hong_Kong', 'Hong Kong', '香港'],
+    ['Asia/Taipei', 'Taipei', '台北'], ['Asia/Singapore', 'Singapore', '新加坡'], ['Asia/Manila', 'Manila', '马尼拉'],
+    ['Asia/Seoul', 'Seoul', '首尔'], ['Asia/Tokyo', 'Tokyo', '东京'], ['Australia/Sydney', 'Sydney', '悉尼'], ['Pacific/Auckland', 'Auckland', '奥克兰'],
 ];
+
+/**
+ * PLACES grouped by identical local time, offset and clock change, in order; $name gives each place's name.
+ * The abbreviation is kept only when every place in the group shares it (Tokyo JST and Seoul KST: just UTC+9).
+ */
+function place_groups(int $unix, callable $name): array {
+    $groups = [];
+    foreach (PLACES as $p) {
+        $zone = $p[0];
+        $d = (new DateTimeImmutable('@' . $unix))->setTimezone(new DateTimeZone($zone));
+        $det = local_details($unix, $zone);
+        $c = $det['next_change'] && strtotime($det['next_change']['utc']) - $unix <= 14 * 86400 ? $det['next_change'] : null;
+        $key = $d->format('Y-m-d H:i') . '|' . $d->format('P') . '|' . ($c['utc'] ?? '');
+        if (!isset($groups[$key])) $groups[$key] = ['names' => [], 'slugs' => [], 'abbrs' => [], 'd' => $d, 'det' => $det, 'c' => $c];
+        $groups[$key]['names'][] = $name($p);
+        $groups[$key]['slugs'][] = place_slug($p[1]);
+        $groups[$key]['abbrs'][$det['abbreviation'] ?? ''] = true;
+    }
+    foreach ($groups as &$g) {
+        $off = short_offset($g['d']->format('P'));
+        $a = count($g['abbrs']) === 1 ? (string)array_key_first($g['abbrs']) : '';
+        $g['abbr'] = $a !== '' && $a !== $off ? $a : '';
+    }
+    return array_values($groups);
+}
+
+/** The short address of a front-page city: "Ho Chi Minh City" => "ho-chi-minh-city", "São Paulo" => "sao-paulo". */
+function place_slug(string $en): string {
+    return strtolower(str_replace(' ', '-', strtr($en, ['ã' => 'a', 'á' => 'a'])));
+}
 
 /**
  * Places grouped by identical local time: one line per group, with part of day and a clock change within 14 days.
@@ -207,20 +246,12 @@ const PLACES = [
 function world_now_lines(int $unix, string $lang, ?array &$changes = null): array {
     if (isset(LANG_WORDS[$lang])) return lang_world_lines($unix, $lang);
     $zh = $lang === 'zh';
-    $groups = [];
-    foreach (PLACES as [$zone, $en, $zhName]) {
-        $d = (new DateTimeImmutable('@' . $unix))->setTimezone(new DateTimeZone($zone));
-        $det = local_details($unix, $zone);
-        $c = $det['next_change'] && strtotime($det['next_change']['utc']) - $unix <= 14 * 86400 ? $det['next_change'] : null;
-        $key = $d->format('Y-m-d H:i') . '|' . $d->format('P') . '|' . $det['abbreviation'] . '|' . ($c['utc'] ?? '');
-        if (!isset($groups[$key])) $groups[$key] = ['names' => [], 'd' => $d, 'det' => $det, 'c' => $c];
-        $groups[$key]['names'][] = $zh ? $zhName : $en;
-    }
+    $groups = place_groups($unix, fn($p) => $zh ? $p[2] : $p[1]);
     $lines = [];
     foreach ($groups as $g) {
         $d = $g['d'];
         $off = short_offset($d->format('P'));
-        $abbr = $g['det']['abbreviation'] && $g['det']['abbreviation'] !== $off ? $g['det']['abbreviation'] . ', ' : '';
+        $abbr = $g['abbr'] !== '' ? $g['abbr'] . ', ' : '';
         $part = $g['det']['part_of_day'];
         // Spoken order, so AIs can pass it on naturally: "In Oslo and Paris it's 16:02 on Thursday afternoon (CEST, UTC+2)."
         if ($zh) {
