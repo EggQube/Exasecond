@@ -12,7 +12,11 @@ exasecond.com lends it. Agents borrow the time here, for a few tokens, so they c
 
 ## Why "exasecond"
 
-An exasecond is 10^18 seconds, about 31.7 billion years. The universe is about 0.435 exaseconds old. Counting on that scale puts today's AI in context. Machines that read, write and reason are very recent in the long count of the universe, and many see them as a new industrial revolution: a change in what a civilisation can do. Perhaps, in time, they help that civilisation reach beyond its own planet. That is a hope, not a prediction. The counter on the front page is a reminder of the scale such hopes are measured on.
+An exasecond is 10^18 seconds, about 31.7 billion years. The universe is about 0.435 exaseconds old. On that scale, all of recorded history fits in the last 0.00004 percent, and the machines that now read and write appeared a moment ago.
+
+That perspective is meant as a comfort. Much is said about AI, with hope and with fear. Measured against the age of the universe, it is a small blip on the chart: a technological breakthrough in statistics and data management, built by people, running on computers, learning from what people wrote. It is a tool, and a powerful one. Like the steam engine and electricity before it, it changes what a civilisation can do. Perhaps, in time, it helps that civilisation reach beyond its own planet. That is a hope, not a prediction.
+
+The counter on the front page keeps counting either way. It is a reminder of the scale on which all of this, our worries included, is measured.
 
 ## Time for AI agents, in a few tokens
 
