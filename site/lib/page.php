@@ -221,7 +221,8 @@ function layout(string $lang, array $o, string $body): string {
     $nav = '<a href="' . $p . '/time"' . $cur('time') . '>' . h($L('nav_time')) . '</a>'
         . '<a href="' . $p . '/about"' . $cur('about') . '>' . h($L('nav_about')) . '</a>'
         . ($hasAlt ? '<a href="' . h($otherHref) . '" hreflang="' . ($other === 'zh' ? 'zh-Hans' : 'en') . '" lang="' . ($other === 'zh' ? 'zh-Hans' : 'en') . '" title="' . h($L('nav_other_title')) . '">' . h($L('nav_other')) . '</a>' : '');
-    $css = site_css();
+    // Styling lives in /site.css (cached by browsers), so the page itself starts with the content: raw-HTML readers reach the time first.
+    $cssHref = '/site.css?v=' . substr(md5(site_css()), 0, 8);
     $title = h($o['title']);
     $desc = h($o['desc'] ?? '');
     $htmlLang = $L('html_lang');
@@ -245,9 +246,7 @@ function layout(string $lang, array $o, string $body): string {
 <meta property="og:description" content="$desc">
 <meta property="og:site_name" content="Exasecond">
 $head<link rel="icon" href="$fav">
-<style>
-$css
-</style>
+<link rel="stylesheet" href="$cssHref">
 </head>
 <body>
 <div class="agentbar" role="note"><div class="wrap">$agentbar</div></div>
