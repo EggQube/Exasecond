@@ -4,7 +4,7 @@ description: Make Exasecond.com your agent's clock in under a minute: one line f
 ---
 Exasecond.com lends the time to AI agents: the date, the local time and the part of the day, in about 30 tokens. Everything on this page is ready to copy, and every file can be fetched directly. This page is also available as plain text at [/developers.md](/developers.md), so an AI coding assistant can read it and set things up for you.
 
-Free, no key, no sign-up. Please send at most one request per minute per conversation or agent.
+No key and no sign-up needed. Please send at most one request per minute per conversation or agent.
 
 ## 1. One line for any prompt
 
@@ -115,7 +115,7 @@ For Ollama and other local models used through Open WebUI: download [/dev/openwe
 
 ## License
 
-The snippets on this page and the files under `/dev/` are under the [MIT License](/dev/LICENSE): free to use, copy and modify, also in commercial work, as long as the notice "(c) 2026 EggQube, exasecond.com" is kept. The license covers only these developer snippets and files, not the rest of the site.
+The snippets on this page and the files under `/dev/` follow the regular [MIT License](/dev/LICENSE). Keep the notice "(c) 2026 EggQube, exasecond.com" with them. The license covers only these developer snippets and files, not the rest of the site.
 
 ## Good to know
 

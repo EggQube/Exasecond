@@ -1,5 +1,5 @@
 // Exasecond: the current time for AI agents. No dependencies (Node 18+, Deno, Bun, browsers). https://exasecond.com/developers
-// (c) 2026 EggQube, exasecond.com. MIT License: free to use, copy and modify; keep this notice. https://exasecond.com/dev/LICENSE
+// (c) 2026 EggQube, exasecond.com. Follows the regular MIT License; keep this notice. https://exasecond.com/dev/LICENSE
 
 /** One sentence with the weekday, date, local time and part of day for a place (city, country, zone or offset). */
 export async function getLocalTime(place = "") {
