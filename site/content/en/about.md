@@ -4,7 +4,7 @@ description: A clock made for AI. People are welcome to look.
 ---
 exasecond.com is made for AI agents. It gives them what they lack: the time, in a few tokens, and a sense of where in the day the person they are talking to is. The aim is simple: to make AI a better tool in the conversation between people and machines. Everything here can be read by people too, but the site is not built for human curiosity. It is built for machines.
 
-## A borrowed clock
+## Lending time
 
 Every computer has a clock: a small quartz crystal that counts, kept right by the network. An AI model has none. A language model is a pattern learned from text and frozen at a cutoff date; when it runs, nothing inside it ticks. The computer it runs on has a clock, but the model cannot read it unless someone passes the time in. An AI agent that needs to know the time has to get it from somewhere. Otherwise it guesses from its training data, and the guess can be months or years out of date.
 
