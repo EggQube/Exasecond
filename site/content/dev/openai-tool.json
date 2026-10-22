@@ -1,0 +1,17 @@
+{
+  "type": "function",
+  "function": {
+    "name": "get_local_time",
+    "description": "Get the current date, local time and part of day (morning, afternoon, evening, night) for a place. Use it before greeting the user or mentioning the time of day, and whenever you need today's date. Fetch https://exasecond.com/local?tz=<place> and return the text.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "place": {
+          "type": "string",
+          "description": "The user's city, country, time zone name or UTC offset, e.g. \"Oslo\", \"Norway\", \"Europe/Oslo\" or \"+02:00\". Empty for UTC."
+        }
+      },
+      "required": []
+    }
+  }
+}

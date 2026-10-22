@@ -119,6 +119,18 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
         }
         if ($lang === 'zh') return send(render_not_found('zh', $path), 'html', [], 404);
 
+        if (($path === '/developers' || $path === '/developers.md') && ($d = load_doc('en', 'developers'))) {
+            if ($path === '/developers.md' || negotiate($accept, 'html') === 'md') return send(doc_md($d), 'md', ['Vary' => 'Accept']);
+            return send(render_doc($d, '/developers', snapshot()), 'html', ['Vary' => 'Accept']);
+        }
+        // Downloadable developer files: a fixed list, never a path from the request.
+        $devFiles = ['openwebui_exasecond.py' => 'text', 'exasecond.py' => 'text', 'exasecond.js' => 'js', 'openai-tool.json' => 'json', 'anthropic-tool.json' => 'json', 'mcp.json' => 'json'];
+        if (preg_match('#^/dev/([a-z_.-]+)$#', $path, $m) && isset($devFiles[$m[1]])) {
+            $type = $devFiles[$m[1]] === 'js' ? 'text' : $devFiles[$m[1]];
+            $extra = $devFiles[$m[1]] === 'js' ? ['Content-Type' => 'text/javascript; charset=utf-8'] : [];
+            return send((string)file_get_contents(content_path('dev', $m[1])), $type, $extra);
+        }
+
         switch ($path) {
             case '/now':
                 $s = snap(null, $q);

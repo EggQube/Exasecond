@@ -279,7 +279,13 @@ function place_name(string $zone, ?array $res): string {
     if ($res && $res['how'] === 'country') return $res['input'];
     if ($res && $res['how'] === 'abbreviation') return 'the ' . strtoupper($res['input']) . ' zone';
     $p = explode('/', $zone);
-    return str_replace('_', ' ', end($p));
+    $zoneCity = str_replace('_', ' ', end($p));
+    // A city that isn't the zone's own name (Beijing in Asia/Shanghai, Mumbai in Asia/Kolkata): use the city the person gave.
+    if ($res && $res['how'] === 'city' && mb_strtolower_safe(trim($res['input'])) !== mb_strtolower_safe($zoneCity)) {
+        $in = trim(preg_replace('/\s+/', ' ', $res['input']));
+        return preg_match('/^[\x20-\x7e]+$/', $in) ? ucwords(strtolower($in)) : $in;
+    }
+    return $zoneCity;
 }
 
 /** One sentence for talking to a person (/local). About 30 tokens. $lang 'zh' is used by the Chinese home page. */
