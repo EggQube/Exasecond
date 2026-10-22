@@ -12,7 +12,7 @@ const UI = [
         'eyebrow' => 'Seconds since the beginning of the universe',
         'es_line' => 'That is %s exaseconds.',
         'ans_label' => 'The time now', 'ans_now' => 'Now', 'ans_you' => 'Your time', 'ans_fact' => 'Did you know?', 'ans_more' => 'More',
-        'ans_you_intro' => 'Depends on where you are. Right now it is:',
+        'ans_you_intro' => 'Depends on where you are. Right now:',
         'here' => 'you are here', 'bar_start' => '0 Es · the beginning', 'bar_end' => '1 Es ≈ 31.7 billion years',
         'human_h' => 'In human time', 'human_sub' => 'The same instant, translated into the clocks and calendars people live by.',
         'utc' => 'UTC', 'your_clock' => 'Your clock', 'enable_js' => 'Enable JavaScript to see your local time',

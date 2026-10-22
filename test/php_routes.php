@@ -44,11 +44,11 @@ check('/zones.json', json_decode(get('/zones.json?q=tokyo')[2], true)[0]['zone']
 // /local: one sentence for talking to a person
 check('part of day', part_of_day(7) === 'early morning' && part_of_day(9) === 'morning' && part_of_day(21) === 'evening' && part_of_day(2) === 'night' && part_of_day(23) === 'late evening');
 $o = tz_opts('Oslo', null);
-check('/local sentence (evening, clock change near)', local_sentence(snapshot([1792610508, 0], $o), $o['tz_res']) === 'Wednesday 21 October 2026, 21:21 in Oslo (evening, CEST, UTC+2). Clocks go back 1 hour on Sunday 25 October.');
-check('/local next morning, after the change', local_sentence(snapshot([1792909200, 0], $o), $o['tz_res']) === 'Sunday 25 October 2026, 07:20 in Oslo (early morning, CET, UTC+1).');
-check('/local route', (bool)preg_match('/^\w+day \d+ \w+ \d{4}, \d\d:\d\d in Oslo \((night|early morning|morning|midday|afternoon|evening|late evening), /', get('/local?tz=Oslo')[2]));
-check('/local without tz gives UTC and a hint', str_contains(get('/local')[2], ' UTC. For a person'));
-check('/local bad tz keeps the time', str_contains(get('/local?tz=IST')[2], ' UTC. Time zone: "IST" is ambiguous'));
+check('/local sentence (evening, clock change near)', local_sentence(snapshot([1792610508, 0], $o), $o['tz_res']) === "It's 21:21 on Wednesday evening in Oslo (21 October 2026, CEST, UTC+2). The clocks go back one hour on Sunday 25 October.");
+check('/local next morning, after the change', local_sentence(snapshot([1792909200, 0], $o), $o['tz_res']) === "It's 07:20 early on Sunday morning in Oslo (25 October 2026, CET, UTC+1).");
+check('/local route', (bool)preg_match('/^It\'s \d\d:\d\d (in the early hours of|early on|on|around midday on|late on) \w+day( morning| afternoon| evening)? in Oslo \(\d+ \w+ \d{4}, CES?T, UTC\+[12]\)\./', get('/local?tz=Oslo')[2]));
+check('/local without tz gives UTC and a hint', str_contains(get('/local')[2], ' UTC on ') && str_contains(get('/local')[2], '. For a person'));
+check('/local bad tz keeps the time', str_contains(get('/local?tz=IST')[2], '. Time zone: "IST" is ambiguous'));
 check('/local is short', strlen(get('/local?tz=Oslo')[2]) < 160);
 [$st, , $b] = route('POST', '/mcp', [], [], '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"get_time","arguments":{"tz":"Oslo","detail":"local"}}}');
 check('mcp get_time detail=local', str_contains(json_decode($b, true)['result']['content'][0]['text'], ' in Oslo ('));
@@ -62,10 +62,10 @@ check('live fact after Europe changed (27 Oct)', str_contains(pick_fact(17929000
 check('no clock-change fact for Moscow', pick_fact($oct, 'Europe/Moscow', 'en')['kind'] !== 'live');
 check('regional fact for Nepal', str_contains(pick_fact($oct, 'Asia/Kathmandu', 'en')['text'], '45 minutes'));
 check('Chinese fact', str_starts_with(get('/fact?tz=Tokyo&lang=zh')[2], '你知道吗？'));
-check('/local in Chinese', str_contains(local_sentence(snapshot([$oct, 0], tz_opts('Oslo', null)), tz_opts('Oslo', null)['tz_res'], 'zh'), '07:51，奥斯陆（早上，CEST，UTC+2）'));
+check('/local in Chinese', str_contains(local_sentence(snapshot([$oct, 0], tz_opts('Oslo', null)), tz_opts('Oslo', null)['tz_res'], 'zh'), '奥斯陆现在是星期四早上 07:51（2026年10月22日，CEST，UTC+2）'));
 $home = get('/', 'text/html')[2];
 check('home: answer block comes before the counter', strpos($home, 'id="ans-now"') < strpos($home, 'id="count"') && strpos($home, 'id="ans-you"') < strpos($home, 'id="count"'));
-check('home: world list for readers without a place', str_contains($home, 'Oslo, Stockholm, Berlin, Paris: ') && str_contains($home, 'Beijing: '));
+check('home: world list for readers without a place', str_contains($home, "In Oslo, Stockholm, Berlin and Paris it's ") && str_contains($home, "In Beijing it's "));
 // About
 $ab = get('/about', 'text/html')[2];
 check('/about page', str_contains($ab, '<h1>About Exasecond</h1>') && str_contains($ab, 'id="ans-fact"') && str_contains($ab, 'application/ld+json') && str_contains($ab, 'Made by EggQube') === false && str_contains($ab, 'made by the GitHub user'));

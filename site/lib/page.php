@@ -317,7 +317,7 @@ function render_home(array $s, string $lang): string {
     $nowLine = $zh
         ? $nowD->format('Y') . '年' . $nowD->format('n') . '月' . $nowD->format('j') . '日 ' . WEEKDAYS_ZH[$nowD->format('l')] . ' ' . $nowD->format('H:i:s') . ' UTC'
         : $nowD->format('l j F Y, H:i:s') . ' UTC';
-    $world = implode('', array_map(fn($l) => '<li>' . h($l) . '</li>', world_now_lines($s['unix'], $lang)));
+    $world = implode('', array_map(fn($l) => '<li>' . htmlspecialchars($l, ENT_NOQUOTES, 'UTF-8') . '</li>', world_now_lines($s['unix'], $lang)));
     $fact = pick_fact($s['unix'], null, $lang);
     $devBtn = dev_button($lang);
     $answer = '<section class="answer" aria-label="' . h($L('ans_label')) . '">'

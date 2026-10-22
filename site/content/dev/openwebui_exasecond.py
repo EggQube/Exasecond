@@ -20,7 +20,7 @@ class Tools:
         Get the current date, local time and part of day (morning, afternoon, evening, night) for a place.
         Use it before greeting the user or mentioning the time of day, and whenever you need today's date.
         :param place: The user's city, country, time zone name or UTC offset, for example "Oslo", "Norway", "Europe/Oslo" or "+02:00". Leave empty for UTC.
-        :return: One sentence, for example "Thursday 22 October 2026, 08:15 in Oslo (early morning, CEST, UTC+2)."
+        :return: One sentence, for example "It's 08:15 early on Thursday morning in Oslo (22 October 2026, CEST, UTC+2)."
         """
         url = "https://exasecond.com/local"
         if place:

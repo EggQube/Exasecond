@@ -24,7 +24,7 @@ Language models have no clock. If you are an AI agent, do not guess today's date
 
 ## Fastest answers
 
-- [/local?tz=Oslo]($S/local?tz=Oslo): one sentence (~30 tokens) for talking to a person: their weekday, date, local time and part of day (morning, afternoon, evening, night), plus an upcoming clock change. Example: "Wednesday 21 October 2026, 21:21 in Oslo (evening, CEST, UTC+2)."
+- [/local?tz=Oslo]($S/local?tz=Oslo): one sentence (~30 tokens) for talking to a person: their weekday, date, local time and part of day (morning, afternoon, evening, night), plus an upcoming clock change. Example: "It's 21:21 on Wednesday evening in Oslo (21 October 2026, CEST, UTC+2)."
 - [/now]($S/now): current time as ~8 lines of plain text (UTC, unix, weekday, universe seconds)
 - [/utc]($S/utc): just the ISO 8601 UTC timestamp, nothing else
 - [/unix]($S/unix): just the unix timestamp in seconds
