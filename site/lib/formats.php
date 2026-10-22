@@ -72,3 +72,19 @@ function clock_change_line(array $l, int $unix, int $days): ?string {
 function js_num(float $x): string {
     return (string)json_encode($x);   // relies on serialize_precision = -1 (PHP default), like JSON numbers
 }
+
+/** The front page for agents that ask for markdown: same answer-first order as the HTML page. */
+function home_md(array $s): string {
+    $d = dt_utc($s['unix']);
+    $fact = pick_fact($s['unix'], null, 'en');
+    $o = [
+        "For AI agents: now {$s['utc']} (UTC) · local time and part of day → exasecond.com/local?tz=Stockholm",
+        '', '# Exasecond.com', '',
+        '## Now', '', $d->format('l j F Y, H:i:s') . ' UTC', '',
+        '## Your time', '', 'Depends on where you are. Right now:', '',
+    ];
+    foreach (world_now_lines($s['unix'], 'en') as $l) $o[] = "- $l";
+    array_push($o, '', '## Did you know?', '', $fact['text'] . ' ' . SITE . $fact['href'], '',
+        '## More', '', 'Calendars, universe seconds and world clocks: exasecond.com/now.md · all answers: exasecond.com/llms.txt');
+    return implode("\n", $o) . "\n";
+}

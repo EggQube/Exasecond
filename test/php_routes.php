@@ -21,6 +21,7 @@ check('exaseconds',to_exaseconds(435084632045903278) === '0.435084632045903278')
 check('/utc', (bool)preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\n$/', get('/utc')[2]));
 check('/now text', str_starts_with(get('/now')[2], 'UTC: '));
 check('/now markdown', get('/now', 'text/markdown')[1]['Content-Type'] === 'text/markdown; charset=utf-8');
+check('home markdown: answer first', (fn($b) => str_starts_with($b, 'For AI agents: now ') && str_contains($b, 'exasecond.com/local?tz=Stockholm') && str_contains($b, '## Your time') && str_contains($b, 'Stockholm') && !str_contains($b, '## Calendars'))(get('/', 'text/markdown, text/html;q=0.9')[2]));
 // Time zones: forgiving input, and a bad zone never costs the agent the time
 [$st, , $b] = get('/now?tz=Not/AZone');
 check('/now bad tz: 200, time kept, note given', $st === 200 && str_starts_with($b, 'UTC: ') && str_contains($b, 'Time zone: "Not/AZone" is not a time zone'));

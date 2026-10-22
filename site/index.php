@@ -101,7 +101,7 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
         if ($p === '/') {
             if ($lang === 'en') {
                 $want = negotiate($accept, 'html');
-                if ($want === 'md') return send(now_md(snapshot(), 'Exasecond: current time'), 'md', ['Vary' => 'Accept']);
+                if ($want === 'md') return send(home_md(snapshot()), 'md', ['Vary' => 'Accept']);
                 if ($want === 'json') return json_resp(snapshot());
             }
             return send(render_home(snapshot(), $lang), 'html', ['Vary' => 'Accept', 'Link' => '</llms.txt>; rel="describedby"; type="text/plain"']);
