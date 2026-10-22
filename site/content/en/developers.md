@@ -105,18 +105,20 @@ For Ollama and other local models used through Open WebUI: download [/dev/openwe
 
 ## 5. What you can ask for
 
-| Address | Answer |
-|---|---|
-| `/local?tz=Oslo` | One sentence in spoken order: local time, part of day, weekday and place, then the date and zone in brackets, and an upcoming clock change |
-| `/oslo`, `/new-york`, `/sweden` | The same sentence with the place as the address: any city, region, country, zone or offset |
-| `/utc` | The ISO 8601 UTC timestamp only |
-| `/now` | About eight lines: UTC, weekday, Unix time, universe seconds |
-| `/now?tz=Oslo&cutoff=2025-06` | Adds local time and how long ago a training cutoff was |
-| `/now.json`, `/now.md` | Everything: all calendars, world clocks |
-| `/fact?tz=Oslo` | One "did you know?" fact about time, specific to the place when possible |
-| `/zones?q=oslo` | Time zone names and their current offsets |
+| Address | Answer | Tokens |
+|---|---|---|
+| `/oslo`, `/new-york`, `/sweden` | One sentence in spoken order: local time, part of day, weekday and place, then the date and zone in brackets, and an upcoming clock change. Any city, region, island, country, zone or offset as the address | ~30 |
+| `/local?tz=Oslo` | The same sentence | ~30 |
+| `/utc` | The ISO 8601 UTC timestamp only | ~5 |
+| `/now` | About eight lines: UTC, weekday, Unix time, universe seconds | ~80 |
+| `/now?tz=Oslo&cutoff=2025-06` | Adds local time and how long ago a training cutoff was | ~150 |
+| `exasecond.com` (markdown) | The front page for agents: every big city's time, clock changes, a fact | ~440 |
+| `/now.md` | Everything: all calendars, world clocks | ~500 |
+| `/now.json` | Everything, as JSON | ~1,400 |
+| `/fact?tz=Oslo` | One "did you know?" fact about time, specific to the place when possible | ~50 |
+| `/zones?q=oslo` | Time zone names and their current offsets | ~30, depends on the search |
 
-`tz` accepts a city (Oslo, Beijing, 北京), a country (Norway, 挪威), an IANA name (Europe/Oslo), an abbreviation (CET, JST) or an offset (+02:00). If it can't be read, the time is still returned, with a note. The full description is in [/llms.txt](/llms.txt) and [/openapi.json](/openapi.json).
+`tz` and the short address accept about a million names: every place with 1,000 or more people, states and regions, well-known islands (GeoNames), countries (Norway, 挪威), IANA names (Europe/Oslo), abbreviations (CET, JST) and offsets (+02:00). If it can't be read, the time is still returned, with a note. Tokens are estimates at about 4 characters per token. The full description is in [/llms.txt](/llms.txt) and [/openapi.json](/openapi.json).
 
 ## License
 
