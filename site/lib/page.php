@@ -591,16 +591,17 @@ JS;
     ], $body);
 }
 
-/** A plain document page (e.g. /developers). English only, so no language switch. */
-/** The button to the developer page (English page, so the Chinese label says so). */
+/** The button to the developer page, in the reader's language. */
 function dev_button(string $lang): string {
-    return '<p><a class="devbtn" href="/developers"><b>' . h(t($lang, 'dev_btn_who')) . '</b> <span>' . h(t($lang, 'dev_btn_what')) . ' →</span></a></p>';
+    return '<p><a class="devbtn" href="' . lang_prefix($lang) . '/developers"><b>' . h(t($lang, 'dev_btn_who')) . '</b> <span>' . h(t($lang, 'dev_btn_what')) . ' →</span></a></p>';
 }
 
-function render_doc(array $d, string $path, array $s): string {
-    $body = '<main class="read"><p class="kicker"><a href="/">Exasecond</a></p><h1>' . h($d['title']) . '</h1><p class="lede">' . h($d['description']) . '</p>'
-        . '<article class="prose">' . md_render($d['body']) . '</article></main>' . read_footer('en', $s, $path . '.md');
-    return layout('en', ['title' => $d['title'] . ' · Exasecond', 'desc' => $d['description'], 'path' => $path, 'alt' => false, 'md' => $path . '.md'], $body);
+/** A plain document page (e.g. /developers), in English and Chinese with the language switch. */
+function render_doc(array $d, string $lang, string $path, array $s): string {
+    $p = lang_prefix($lang);
+    $body = '<main class="read"><p class="kicker"><a href="' . $p . '/">Exasecond</a></p><h1>' . h($d['title']) . '</h1><p class="lede">' . h($d['description']) . '</p>'
+        . '<article class="prose">' . md_render($d['body']) . '</article></main>' . read_footer($lang, $s, $p . $path . '.md');
+    return layout($lang, ['title' => $d['title'] . ' · Exasecond', 'desc' => $d['description'], 'path' => $path, 'md' => $p . $path . '.md'], $body);
 }
 
 function render_story_page(array $s): string {

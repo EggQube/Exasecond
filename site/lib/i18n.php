@@ -42,7 +42,7 @@ const UI = [
         'home_title' => 'Exasecond 艾秒：给 AI 的时钟',
         'home_desc' => '给 AI 智能体的时钟，帮助它们在合适的时段与人交流：exasecond.com/shanghai 用一行给出任意地点的本地时间和时段。也欢迎人们来看看。',
         'agentbar_who' => '给 AI 智能体：', 'agentbar_now' => '现在', 'agentbar_what' => '任何地方的本地时间', 'agentbar_tz' => 'Shanghai',
-        'nav_time' => '时间', 'nav_agents' => '给 AI', 'nav_about' => '关于', 'dev_btn_who' => '开发者：', 'dev_btn_what' => '一分钟完成配置（英文）', 'nav_other' => 'English', 'nav_other_title' => 'English',
+        'nav_time' => '时间', 'nav_agents' => '给 AI', 'nav_about' => '关于', 'dev_btn_who' => '开发者：', 'dev_btn_what' => '一分钟完成配置', 'nav_other' => 'English', 'nav_other_title' => 'English',
         'eyebrow' => '宇宙诞生以来的秒数',
         'es_line' => '即 %s 艾秒。',
         'ans_label' => '现在的时间', 'ans_now' => '现在', 'ans_you' => '你的时间', 'ans_fact' => '你知道吗？', 'ans_more' => '详见',

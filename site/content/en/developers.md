@@ -35,7 +35,7 @@ Exasecond.com runs a remote MCP server at `https://exasecond.com/mcp` (streamabl
 claude mcp add --transport http exasecond https://exasecond.com/mcp
 ```
 
-**Cursor** (`~/.cursor/mcp.json`) and other apps that take a server URL. File: [/dev/mcp.json](/dev/mcp.json)
+**Cursor** (`~/.cursor/mcp.json`) and other apps that take a server URL (for example Trae, Cherry Studio). File: [/dev/mcp.json](/dev/mcp.json)
 
 ```
 {
@@ -61,7 +61,7 @@ claude mcp add --transport http exasecond https://exasecond.com/mcp
 
 Give your model a `get_local_time` tool, and when it calls it, fetch `https://exasecond.com/local?tz=<place>` and return the text.
 
-**OpenAI** function calling (and the many APIs compatible with it). File: [/dev/openai-tool.json](/dev/openai-tool.json)
+**OpenAI** function calling (and the many APIs compatible with it, such as DeepSeek, Qwen, Kimi and GLM). File: [/dev/openai-tool.json](/dev/openai-tool.json)
 
 **Anthropic** tool use (Claude API). File: [/dev/anthropic-tool.json](/dev/anthropic-tool.json)
 
@@ -109,6 +109,7 @@ For Ollama and other local models used through Open WebUI: download [/dev/openwe
 |---|---|---|
 | `/oslo`, `/new-york`, `/sweden` | One sentence in spoken order: local time, part of day, weekday and place, then the date and zone in brackets, and an upcoming clock change. Any city, region, island, country, zone or offset as the address | ~30 |
 | `/local?tz=Oslo` | The same sentence | ~30 |
+| `/beijing?lang=zh` | The same sentence in Chinese | ~25-40 |
 | `/utc` | The ISO 8601 UTC timestamp only | ~5 |
 | `/now` | About eight lines: UTC, weekday, Unix time, universe seconds | ~80 |
 | `/now?tz=Oslo&cutoff=2025-06` | Adds local time and how long ago a training cutoff was | ~150 |

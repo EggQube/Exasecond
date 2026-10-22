@@ -128,15 +128,15 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
             return send(render_chapter($c, $lang, snapshot()), 'html', ['Vary' => 'Accept']);
         }
         if (($p === '/about' || $p === '/about.md') && ($d = load_doc($lang, 'about'))) {
-            if ($p === '/about.md' || negotiate($accept, 'html') === 'md') return send(doc_md($d), 'md', ['Vary' => 'Accept']);
+            if ($p === '/about.md' || negotiate($accept, 'html') === 'md') return send(doc_md($d, $lang), 'md', ['Vary' => 'Accept']);
             return send(render_about($d, $lang, snapshot()), 'html', ['Vary' => 'Accept']);
+        }
+        if (($p === '/developers' || $p === '/developers.md') && ($d = load_doc($lang, 'developers'))) {
+            if ($p === '/developers.md' || negotiate($accept, 'html') === 'md') return send(doc_md($d, $lang), 'md', ['Vary' => 'Accept']);
+            return send(render_doc($d, $lang, '/developers', snapshot()), 'html', ['Vary' => 'Accept']);
         }
         if ($lang === 'zh') return send(render_not_found('zh', $path), 'html', [], 404);
 
-        if (($path === '/developers' || $path === '/developers.md') && ($d = load_doc('en', 'developers'))) {
-            if ($path === '/developers.md' || negotiate($accept, 'html') === 'md') return send(doc_md($d), 'md', ['Vary' => 'Accept']);
-            return send(render_doc($d, '/developers', snapshot()), 'html', ['Vary' => 'Accept']);
-        }
         // Downloadable developer files: a fixed list, never a path from the request.
         $devFiles = ['LICENSE' => 'text', 'openwebui_exasecond.py' => 'text', 'exasecond.py' => 'text', 'exasecond.js' => 'js', 'openai-tool.json' => 'json', 'anthropic-tool.json' => 'json', 'mcp.json' => 'json'];
         if (preg_match('#^/dev/([A-Za-z_.-]+)$#', $path, $m) && isset($devFiles[$m[1]])) {

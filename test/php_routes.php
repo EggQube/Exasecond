@@ -128,6 +128,10 @@ check('real pages win over places', str_starts_with(get('/utc')[2], '2') && get(
 check('place as json', isset(json_decode(get('/oslo', 'application/json')[2], true)['local']['zone']));
 check('home ?tz= markdown starts with the place', str_starts_with(get('/?tz=Kiruna', 'text/markdown')[2], "It's "));
 check('home ?tz= html shows the place', str_contains(get('/?tz=Kiruna', 'text/html')[2], 'class="ans-mine">It&#039;s '));
+check('/zh/developers in Chinese with the switch', (fn($b) => str_contains($b, '<h1>开发者</h1>') && str_contains($b, 'href="/developers" hreflang="en"'))(get('/zh/developers', 'text/html')[2]));
+check('/zh/developers.md', str_starts_with(get('/zh/developers.md')[2], '# 开发者'));
+check('/developers links to Chinese', str_contains(get('/developers', 'text/html')[2], 'href="/zh/developers"'));
+check('zh about button goes to /zh/developers', str_contains(get('/zh/about', 'text/html')[2], 'href="/zh/developers"'));
 check('agent bar points to the short address', str_contains(get('/', 'text/html')[2], 'exasecond.com/stockholm</a>'));
 
 echo $fails ? "$fails failed\n" : "all passed\n";

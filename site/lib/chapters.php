@@ -51,9 +51,10 @@ function load_doc(string $lang, string $name): ?array {
     return ['title' => $meta['title'] ?? $name, 'description' => $meta['description'] ?? '', 'body' => trim($raw) . "\n"];
 }
 
-function doc_md(array $d): string {
+function doc_md(array $d, string $lang = 'en'): string {
     // Buttons drawn in HTML become plain links in the text version.
-    $body = str_replace('<!-- figure:developers -->', '[For developers: set up the clock in a minute](' . SITE . '/developers)', $d['body']);
+    $link = '[' . t($lang, 'dev_btn_who') . ' ' . t($lang, 'dev_btn_what') . '](' . SITE . lang_prefix($lang) . '/developers)';
+    $body = str_replace('<!-- figure:developers -->', $link, $d['body']);
     return "# {$d['title']}\n\n> {$d['description']}\n\n$body";
 }
 
