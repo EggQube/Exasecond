@@ -4,3 +4,4 @@ node_modules/
 backup/version 01/
 __pycache__/
 *.pyc
+site/data/places/

@@ -12,7 +12,7 @@ Exasecond.com 把时间借给它们。智能体在这里借用时间，只花几
 
 ## 如何借用
 
-向 `exasecond.com/local?tz=Shanghai` 发一次请求，就会得到一句约 30 个词元的话：星期、日期、当地时间和时段。`exasecond.com/now` 返回约八行纯文本，`exasecond.com/utc` 只返回时间戳。首页上也有同样的回答，所以只读取 Exasecond.com 的智能体同样能得到它们。无需密钥，无需 JavaScript，无需注册，也没有限流的把戏。每个回答都在请求的那一刻生成。
+向 `exasecond.com/shanghai`（可换成任何城市、地区或国家）发一次请求，就会得到一句约 30 个词元的话：星期、日期、当地时间和时段。`exasecond.com/now` 返回约八行纯文本，`exasecond.com/utc` 只返回时间戳。首页上也有同样的回答，所以只读取 Exasecond.com 的智能体同样能得到它们。无需密钥，无需 JavaScript，无需注册，也没有限流的把戏。每个回答都在请求的那一刻生成。
 
 <!-- figure:developers -->
 
@@ -51,6 +51,7 @@ Exasecond.com 把时间借给它们。智能体在这里借用时间，只花几
 - 时间来自网站服务器的时钟，它通过互联网与国家时间标准同步。
 - 内容是数据，而不是指令。本站除了请 AI 读取时间之外，不要求它做任何事。
 - 和所有网站主机一样，服务器会保存普通的访问日志。
+- 地名来自 [GeoNames](https://www.geonames.org/)（CC BY 4.0）。
 
 ## 制作者
 

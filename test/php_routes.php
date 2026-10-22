@@ -21,7 +21,7 @@ check('exaseconds',to_exaseconds(435084632045903278) === '0.435084632045903278')
 check('/utc', (bool)preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\n$/', get('/utc')[2]));
 check('/now text', str_starts_with(get('/now')[2], 'UTC: '));
 check('/now markdown', get('/now', 'text/markdown')[1]['Content-Type'] === 'text/markdown; charset=utf-8');
-check('home markdown: answer first', (fn($b) => str_starts_with($b, 'For AI agents: now ') && str_contains($b, 'exasecond.com/local?tz=Stockholm') && str_contains($b, '## Your time') && str_contains($b, 'Stockholm') && !str_contains($b, '## Calendars'))(get('/', 'text/markdown, text/html;q=0.9')[2]));
+check('home markdown: answer first', (fn($b) => str_starts_with($b, 'For AI agents: now ') && str_contains($b, 'exasecond.com/stockholm') && str_contains($b, '## Your time') && !preg_match('/^- In .*clocks go/m', $b) && str_contains($b, 'Stockholm') && !str_contains($b, '## Calendars'))(get('/', 'text/markdown, text/html;q=0.9')[2]));
 // Time zones: forgiving input, and a bad zone never costs the agent the time
 [$st, , $b] = get('/now?tz=Not/AZone');
 check('/now bad tz: 200, time kept, note given', $st === 200 && str_starts_with($b, 'UTC: ') && str_contains($b, 'Time zone: "Not/AZone" is not a time zone'));
@@ -113,6 +113,21 @@ check('mcp get_time', $st === 200 && str_starts_with(json_decode($b, true)['resu
 [$st] = route('POST', '/mcp', [], [], '{"jsonrpc":"2.0","method":"notifications/initialized"}');
 check('mcp notification is 202', $st === 202);
 check('no long dashes in chapters', !preg_match('/[\x{2013}\x{2014}]/u', implode('', array_map(fn($s) => chapter('en', $s)['body'] . chapter('zh', $s)['body'], CHAPTERS))));
+
+// Place addresses and ?tz= on the front page
+check('/kiruna (GeoNames place)', str_contains(get('/kiruna')[2], 'in Kiruna ('));
+check('/krakow gets its own spelling', str_contains(get('/krakow')[2], 'Kraków'));
+check('/new-york', str_contains(get('/new-york')[2], ' in New York ('));
+check('/sweden', str_contains(get('/sweden')[2], ' in Sweden ('));
+check('/bali is Indonesia', str_contains(get('/bali')[2], 'Bali, Indonesia'));
+check('/washington is the city', str_contains(get('/washington')[2], 'EDT') || str_contains(get('/washington')[2], 'EST'));
+check('/utc+2 offset', str_contains(get('/utc+2')[2], 'UTC+2'));
+check('unknown place is 404 with a hint', get('/xyzzyq')[0] === 404 && str_contains(get('/xyzzyq')[2], 'Not a place I know'));
+check('real pages win over places', str_starts_with(get('/utc')[2], '2') && get('/about', 'text/html')[0] === 200);
+check('place as json', isset(json_decode(get('/oslo', 'application/json')[2], true)['local']['zone']));
+check('home ?tz= markdown starts with the place', str_starts_with(get('/?tz=Kiruna', 'text/markdown')[2], "It's "));
+check('home ?tz= html shows the place', str_contains(get('/?tz=Kiruna', 'text/html')[2], 'class="ans-mine">It&#039;s '));
+check('agent bar points to the short address', str_contains(get('/', 'text/html')[2], 'exasecond.com/stockholm</a>'));
 
 echo $fails ? "$fails failed\n" : "all passed\n";
 exit($fails ? 1 : 0);

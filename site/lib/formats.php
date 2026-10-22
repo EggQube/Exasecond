@@ -74,16 +74,21 @@ function js_num(float $x): string {
 }
 
 /** The front page for agents that ask for markdown: same answer-first order as the HTML page. */
-function home_md(array $s): string {
-    $d = dt_utc($s['unix']);
+/** Kept lean: each clock change is said once, after the places. With ?tz= that place's sentence comes first. */
+function home_md(array $s, ?string $place = null): string {
     $fact = pick_fact($s['unix'], null, 'en');
-    $o = [
-        "For AI agents: now {$s['utc']} (UTC) · local time and part of day → exasecond.com/local?tz=Stockholm",
-        '', '# Exasecond.com', '',
-        '## Now', '', $d->format('l j F Y, H:i:s') . ' UTC', '',
-        '## Your time', '', 'Depends on where you are. Right now:', '',
-    ];
-    foreach (world_now_lines($s['unix'], 'en') as $l) $o[] = "- $l";
+    $o = $place !== null ? [$place, ''] : [];
+    array_push($o, "For AI agents: now {$s['utc']} (UTC) · local time for any place → exasecond.com/stockholm",
+        '', '# Exasecond.com', '', '## Your time', '', 'Depends on where you are. Right now:', '');
+    $changes = [];
+    foreach (world_now_lines($s['unix'], 'en', $changes) as $l) $o[] = "- $l";
+    if ($changes) {
+        array_push($o, '', 'Clock changes:', '');
+        foreach ($changes as $sentence => $n) {
+            $who = count($n) > 1 ? implode(', ', array_slice($n, 0, -1)) . ' and ' . end($n) : $n[0];
+            $o[] = "- $who: " . lcfirst($sentence);
+        }
+    }
     array_push($o, '', '## Did you know?', '', $fact['text'] . ' ' . SITE . $fact['href'], '',
         '## More', '', 'Calendars, universe seconds and world clocks: exasecond.com/now.md · all answers: exasecond.com/llms.txt');
     return implode("\n", $o) . "\n";

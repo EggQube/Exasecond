@@ -233,7 +233,7 @@ function layout(string $lang, array $o, string $body): string {
     $ex = $L('agentbar_tz');
     $iso = iso_utc(time());
     $agentbar = '<b>' . h($L('agentbar_who')) . '</b> ' . h($L('agentbar_now')) . ' <time datetime="' . $iso . '">' . $iso . '</time> (UTC) · '
-        . h($L('agentbar_what')) . ' → <a href="/local?tz=' . h(rawurlencode($ex)) . '">exasecond.com/local?tz=' . h($ex) . '</a>';
+        . h($L('agentbar_what')) . ' → <a href="/' . h(strtolower($ex)) . '">exasecond.com/' . h(strtolower($ex)) . '</a>';
     return <<<HTML
 <!doctype html>
 <html lang="$htmlLang">
@@ -285,7 +285,7 @@ function chapter_cards(string $lang): string {
     return '<ol class="chapters">' . $out . '</ol>';
 }
 
-function render_home(array $s, string $lang): string {
+function render_home(array $s, string $lang, ?string $place = null): string {
     $L = fn($k) => t($lang, $k);
     $pct = number_format($s['universe_fraction_percent'], 4, '.', '');
     $zh = $lang === 'zh';
@@ -322,7 +322,8 @@ function render_home(array $s, string $lang): string {
     $devBtn = dev_button($lang);
     $answer = '<section class="answer" aria-label="' . h($L('ans_label')) . '">'
         . '<div class="ans-row"><span class="ans-k">' . h($L('ans_now')) . '</span><p class="ans-v ans-now" id="ans-now">' . h($nowLine) . '</p></div>'
-        . '<div class="ans-row"><span class="ans-k">' . h($L('ans_you')) . '</span><div class="ans-v" id="ans-you"><p class="ans-intro">' . h($L('ans_you_intro')) . '</p><ul class="ans-world">' . $world . '</ul></div></div>'
+        . '<div class="ans-row"><span class="ans-k">' . h($L('ans_you')) . '</span><div class="ans-v" id="ans-you">'
+        . ($place !== null ? '<p class="ans-mine">' . h($place) . '</p>' : '<p class="ans-intro">' . h($L('ans_you_intro')) . '</p><ul class="ans-world">' . $world . '</ul>') . '</div></div>'
         . '<div class="ans-row"><span class="ans-k">' . h($L('ans_fact')) . '</span><p class="ans-v ans-fact" id="ans-fact"><span>' . md_inline($fact['text']) . '</span> <a href="' . h($fact['href']) . '">' . h($L('ans_more')) . ' →</a></p></div>'
         . '</section>';
     $body = <<<HTML
@@ -451,7 +452,7 @@ function home_js(): string {
     setTimeout(tickNow, 1000 - ((Date.now() + skew) % 1000) + 5);
   }
   tickNow();
-  const lq = "tz=" + encodeURIComponent(tz) + (EXA.lang === "zh" ? "&lang=zh" : "");
+  const lq = "tz=" + encodeURIComponent(new URLSearchParams(location.search).get("tz") || tz) + (EXA.lang === "zh" ? "&lang=zh" : "");
   async function yourTime() {
     try {
       const r = await fetch("/local?" + lq, { headers: { Accept: "application/json" }, cache: "no-store" });

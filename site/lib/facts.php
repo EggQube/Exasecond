@@ -191,8 +191,11 @@ const PLACES = [
     ['Australia/Sydney', 'Sydney', '悉尼'], ['Pacific/Auckland', 'Auckland', '奥克兰'],
 ];
 
-/** Places grouped by identical local time: one line per group, with part of day and a clock change within 14 days. */
-function world_now_lines(int $unix, string $lang): array {
+/**
+ * Places grouped by identical local time: one line per group, with part of day and a clock change within 14 days.
+ * Pass $changes (English) to get the clock changes back as "sentence => [places]" instead of on each line.
+ */
+function world_now_lines(int $unix, string $lang, ?array &$changes = null): array {
     $zh = $lang === 'zh';
     $groups = [];
     foreach (PLACES as [$zone, $en, $zhName]) {
@@ -217,7 +220,8 @@ function world_now_lines(int $unix, string $lang): array {
             $n = $g['names'];
             $who = count($n) > 1 ? implode(', ', array_slice($n, 0, -1)) . ' and ' . end($n) : $n[0];
             $line = "In $who it's " . $d->format('H:i') . ' ' . day_phrase($d->format('l'), $part) . " ($abbr$off).";
-            if ($g['c']) $line .= ' ' . clock_change_sentence($g['c'], $unix);
+            if ($g['c'] && $changes !== null) { $k = clock_change_sentence($g['c'], $unix); $changes[$k] = array_merge($changes[$k] ?? [], $n); }
+            elseif ($g['c']) $line .= ' ' . clock_change_sentence($g['c'], $unix);
         }
         $lines[] = $line;
     }

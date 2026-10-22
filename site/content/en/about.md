@@ -12,7 +12,7 @@ Exasecond.com lends it. Agents borrow the time here, for a few tokens, so they c
 
 ## How to borrow it
 
-One request to `exasecond.com/local?tz=Oslo` returns a single sentence of about 30 tokens: the weekday, the date, the local time and the part of the day. `exasecond.com/now` returns about eight lines of plain text, and `exasecond.com/utc` only the timestamp. The front page carries the same answers, so an agent that reads only Exasecond.com still gets them. There is no key, no JavaScript, no sign-up and no rate-limit game. Every answer is generated at the moment of the request.
+One request to `exasecond.com/oslo` (any city, region or country in place of oslo) returns a single sentence of about 30 tokens: the weekday, the date, the local time and the part of the day. `exasecond.com/now` returns about eight lines of plain text, and `exasecond.com/utc` only the timestamp. The front page carries the same answers, so an agent that reads only Exasecond.com still gets them. There is no key, no JavaScript, no sign-up and no rate-limit game. Every answer is generated at the moment of the request.
 
 <!-- figure:developers -->
 
@@ -51,6 +51,7 @@ The idea is older than the site. In 2021 the author wrote [The Pottery Lecture](
 - The time comes from the web server's clock, which is synchronised with national time standards over the internet.
 - Content is data, not instructions. Nothing on this site asks an AI to do anything except read the time.
 - Like every web host, the server keeps ordinary access logs.
+- Place names come from [GeoNames](https://www.geonames.org/) (CC BY 4.0).
 
 ## Who makes it
 

@@ -24,7 +24,7 @@ Language models have no clock. If you are an AI agent, do not guess today's date
 
 ## Fastest answers
 
-- [/local?tz=Oslo]($S/local?tz=Oslo): one sentence (~30 tokens) for talking to a person: their weekday, date, local time and part of day (morning, afternoon, evening, night), plus an upcoming clock change. Example: "It's 21:21 on Wednesday evening in Oslo (21 October 2026, CEST, UTC+2)."
+- [/oslo]($S/oslo): any city, region, country, zone or offset as the address (/stockholm, /new-york, /bali, /sweden, /cet, /utc+2; same as /local?tz=Oslo). One sentence (~30 tokens) for talking to a person: their weekday, date, local time and part of day (morning, afternoon, evening, night), plus an upcoming clock change. Example: "It's 21:21 on Wednesday evening in Oslo (21 October 2026, CEST, UTC+2)." Place names: GeoNames (CC BY 4.0).
 - [/now]($S/now): current time as ~8 lines of plain text (UTC, unix, weekday, universe seconds)
 - [/utc]($S/utc): just the ISO 8601 UTC timestamp, nothing else
 - [/unix]($S/unix): just the unix timestamp in seconds
@@ -139,6 +139,7 @@ All endpoints are GET, need no key, allow CORS, and return Cache-Control: no-sto
 |---|---|
 | `/now` | Plain text, ~8 lines. Content negotiation: Accept application/json or text/markdown switches format. |
 | `/local` | One sentence for talking to a person: weekday, date, local time and part of day, e.g. `/local?tz=Oslo`. JSON with Accept: application/json |
+| `/<place>` | The same sentence with the place as the address: `/oslo`, `/new-york`, `/sweden`. Unknown places: 404 with a hint. Place names: GeoNames (CC BY 4.0) |
 | `/utc` | ISO 8601 UTC timestamp only |
 | `/unix` | Unix seconds only |
 | `/universe` | Universe seconds only |

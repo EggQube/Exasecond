@@ -76,6 +76,14 @@ function snap(?array $instant, array $q): array {
     return $s;
 }
 
+/** The one-sentence local time (/local and the place addresses); JSON when asked for. */
+function local_answer(array $o, array $q, string $accept): array {
+    $s = snapshot(null, $o);
+    $line = local_sentence($s, $o['tz_res'], ($q['lang'] ?? '') === 'zh' ? 'zh' : 'en');
+    if (negotiate($accept, 'text') === 'json') return json_resp(['text' => $line, 'utc' => $s['utc'], 'local' => $s['local']] + (isset($s['tz_note']) ? ['tz_note' => $s['tz_note']] : []));
+    return send($line . "\n", 'text', ['Vary' => 'Accept']);
+}
+
 function route(string $method, string $uri, array $q, array $hdr, string $rawBody = ''): array {
     $path = rawurldecode((string)parse_url($uri, PHP_URL_PATH));
     $path = rtrim($path, '/') ?: '/';
@@ -99,12 +107,15 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
 
         // Human pages that exist in both languages
         if ($p === '/') {
+            // ?tz= puts that place's sentence first, on the page for people and the markdown for agents.
+            $o = opts($q);
+            $place = $o['tz_res'] ? local_sentence(snapshot(null, $o), $o['tz_res'], $lang) : null;
             if ($lang === 'en') {
                 $want = negotiate($accept, 'html');
-                if ($want === 'md') return send(home_md(snapshot()), 'md', ['Vary' => 'Accept']);
-                if ($want === 'json') return json_resp(snapshot());
+                if ($want === 'md') return send(home_md(snapshot(), $place), 'md', ['Vary' => 'Accept']);
+                if ($want === 'json') return json_resp(snap(null, $q));
             }
-            return send(render_home(snapshot(), $lang), 'html', ['Vary' => 'Accept', 'Link' => '</llms.txt>; rel="describedby"; type="text/plain"']);
+            return send(render_home(snapshot(), $lang, $place), 'html', ['Vary' => 'Accept', 'Link' => '</llms.txt>; rel="describedby"; type="text/plain"']);
         }
         if ($p === '/time') {
             // Browsers get the contents page; agents keep the old meaning of /time (an alias of /now).
@@ -160,11 +171,7 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
             case '/sitemap.xml': return send(sitemap_xml(), 'xml');
             case '/health': return json_resp(['ok' => true]);
             case '/local': case '/local.txt':
-                $o = opts($q);
-                $s = snapshot(null, $o);
-                $line = local_sentence($s, $o['tz_res'], ($q['lang'] ?? '') === 'zh' ? 'zh' : 'en');
-                if ($path === '/local' && negotiate($accept, 'text') === 'json') return json_resp(['text' => $line, 'utc' => $s['utc'], 'local' => $s['local']] + (isset($s['tz_note']) ? ['tz_note' => $s['tz_note']] : []));
-                return send($line . "\n", 'text', ['Vary' => 'Accept']);
+                return local_answer(opts($q), $q, $path === '/local' ? $accept : '');
             case '/fact': case '/fact.txt': case '/fact.json':
                 // General fact without a place; with ?tz= a place-specific one when there is one. ?lang=zh for Chinese.
                 $o = opts($q);
@@ -177,6 +184,13 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
                 if ($path === '/zones' && negotiate($accept, 'text') === 'json') return json_resp(zones_list(time(), $zq));
                 return send(zones_text(time(), $zq), 'text', ['Vary' => 'Accept']);
             case '/zones.json': return json_resp(zones_list(time(), isset($q['q']) && is_string($q['q']) ? $q['q'] : null));
+        }
+        // A place as the address: exasecond.com/stockholm, /sweden, /new-york, /cet, /utc+2. Real pages above always win.
+        $seg = substr($path, 1);
+        if ($seg !== '' && strlen($seg) <= 64 && !preg_match('#[/.]#', $seg)) {
+            $o = tz_opts($seg, null);
+            if (($o['tz_res']['how'] ?? 'unknown') !== 'unknown') return local_answer($o, $q, $accept);
+            if (!str_contains($accept, 'text/html')) return send("Not a place I know: $seg\nTry a bigger place nearby, the country, a time zone (Europe/Oslo) or an offset (+02:00): exasecond.com/local?tz=Oslo\n", 'text', [], 404);
         }
         if (str_contains($accept, 'text/html')) return send(render_not_found('en', $path), 'html', [], 404);
         return send("Not found: $path\nTry /now, /utc, /llms.txt\n", 'text', [], 404);

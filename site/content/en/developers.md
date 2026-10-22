@@ -16,7 +16,7 @@ The simplest way, no code. Add this to your agent's instructions or system promp
 
 ```
 Before greeting someone or mentioning the time of day, read
-https://exasecond.com/local?tz=<their city> and use that time.
+https://exasecond.com/<their city> and use that time.
 ```
 
 The agent needs a tool that can fetch web pages. The answer looks like this:
@@ -108,6 +108,7 @@ For Ollama and other local models used through Open WebUI: download [/dev/openwe
 | Address | Answer |
 |---|---|
 | `/local?tz=Oslo` | One sentence in spoken order: local time, part of day, weekday and place, then the date and zone in brackets, and an upcoming clock change |
+| `/oslo`, `/new-york`, `/sweden` | The same sentence with the place as the address: any city, region, country, zone or offset |
 | `/utc` | The ISO 8601 UTC timestamp only |
 | `/now` | About eight lines: UTC, weekday, Unix time, universe seconds |
 | `/now?tz=Oslo&cutoff=2025-06` | Adds local time and how long ago a training cutoff was |

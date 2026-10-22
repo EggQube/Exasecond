@@ -183,21 +183,43 @@ function resolve_zone(?string $in): ?array {
     }
 
     $key = trim(preg_replace('/\s+/', ' ', str_replace(['_', '.'], [' ', ''], $lc)));
-    if (isset(TZ_CITIES[$key])) return $res(TZ_CITIES[$key], 'city');
     $cities = tz_city_index();
+    // new-york as in a web address, but keep names that have a hyphen of their own (Port-au-Prince)
+    $key0 = $key;
+    if (!isset(TZ_CITIES[$key]) && !isset($cities[$key])) $key = str_replace('-', ' ', $key);
+    if (isset(TZ_CITIES[$key])) return $res(TZ_CITIES[$key], 'city');
     if (isset($cities[$key])) {
         return count($cities[$key]) === 1 ? $res($cities[$key][0], 'city') : $res(null, 'ambiguous', $cities[$key]);
     }
 
     $names = tz_country_names();
-    $cc = $names[$key] ?? (preg_match('/^[A-Z]{2}$/', $raw) ? $raw : null);
+    $cc = $names[$key0] ?? $names[$key] ?? (preg_match('/^[A-Z]{2}$/', $raw) ? $raw : null);
     $zones = $cc ? (tz_country_zones()[$cc] ?? null) : null;
     if ($zones) {
         if (count($zones) === 1) return $res($zones[0], 'country');
         if (isset(TZ_COUNTRY_MAIN[$cc])) return $res(TZ_COUNTRY_MAIN[$cc], 'country');
         return $res(null, 'ambiguous', TZ_COUNTRY_OPTIONS[$cc] ?? $zones);
     }
+
+    // Every place with 1,000 or more people (GeoNames). The biggest place with the name wins; the others are named.
+    if ($p = place_lookup($raw)) return $res($p[0]['zone'], 'place') + ['place' => $p[0], 'also' => array_slice($p, 1)];
     return $res(null, 'unknown');
+}
+
+/** Places called $name, biggest first: [['name', 'cc', 'country', 'zone', 'pop'], ...]. Reads one small shard of data/places/. */
+function place_lookup(string $name): array {
+    $key = trim(preg_replace('/\s+/u', ' ', str_replace(['_', '-', '.'], [' ', ' ', ''], mb_strtolower_safe($name))));
+    $file = __DIR__ . '/../data/places/' . substr(md5($key), 0, 2) . '.php';
+    if ($key === '' || !is_file($file)) return [];
+    $row = (include $file)[$key] ?? null;
+    if (!$row) return [];
+    $out = [];
+    foreach (explode(';', $row) as $e) {
+        [$n, $cc, $zone, $pop] = explode('|', $e);
+        $country = class_exists('Locale') ? (Locale::getDisplayRegion('-' . $cc, 'en') ?: $cc) : $cc;
+        $out[] = ['name' => $n, 'cc' => $cc, 'country' => $country, 'zone' => $zone, 'pop' => (int)$pop];
+    }
+    return $out;
 }
 
 /** One line explaining how ?tz= was read, or null when it was an exact IANA name. */
@@ -206,6 +228,10 @@ function tz_note(?array $r): ?string {
     $q = '"' . $r['input'] . '"';
     if ($r['zone']) {
         $extra = $r['how'] === 'offset' ? ' (a fixed offset, without daylight saving)' : '';
+        if ($r['how'] === 'place') {
+            $extra = " ({$r['place']['name']}, {$r['place']['country']})";
+            if ($r['also']) $extra .= '. Other places with this name: ' . implode('; ', array_map(fn($p) => "{$p['name']}, {$p['country']} ({$p['zone']})", $r['also']));
+        }
         return "$q read as {$r['zone']}$extra";
     }
     if ($r['how'] === 'ambiguous') {
@@ -276,13 +302,26 @@ function part_of_day(int $hour): string {
 function place_name(string $zone, ?array $res): string {
     if (preg_match('/^[+-]\d{2}:\d{2}$/', $zone)) return short_offset($zone);
     if ($zone === 'UTC') return 'UTC';
-    if ($res && $res['how'] === 'country') return $res['input'];
+    if ($res && $res['how'] === 'country') {
+        // From a web address (/south-africa, /sweden): spaces and capitals back; otherwise as typed.
+        $in = trim($res['input']);
+        if (str_contains($in, '-') && !isset(tz_country_names()[mb_strtolower_safe($in)])) $in = str_replace('-', ' ', $in);
+        return preg_match('/^[a-z -]{4,}$/', $in) ? ucwords($in, " -") : $in;
+    }
     if ($res && $res['how'] === 'abbreviation') return 'the ' . strtoupper($res['input']) . ' zone';
+    if ($res && $res['how'] === 'place') {
+        // Typed in Latin letters: the place's own spelling (Krakow -> Kraków). Other scripts: as the person wrote it.
+        $in = trim(preg_replace('/\s+/u', ' ', $res['input']));
+        $name = preg_match('/^[\x20-\x7e]+$/', $in) ? $res['place']['name'] : $in;
+        return $res['also'] ? "$name, {$res['place']['country']}" : $name;
+    }
     $p = explode('/', $zone);
     $zoneCity = str_replace('_', ' ', end($p));
     // A city that isn't the zone's own name (Beijing in Asia/Shanghai, Mumbai in Asia/Kolkata): use the city the person gave.
-    if ($res && $res['how'] === 'city' && mb_strtolower_safe(trim($res['input'])) !== mb_strtolower_safe($zoneCity)) {
+    $typed = mb_strtolower_safe(trim($res['input'] ?? ''));
+    if ($res && $res['how'] === 'city' && $typed !== mb_strtolower_safe($zoneCity) && str_replace('-', ' ', $typed) !== mb_strtolower_safe($zoneCity)) {
         $in = trim(preg_replace('/\s+/', ' ', $res['input']));
+        if (!isset(TZ_CITIES[mb_strtolower_safe($in)])) $in = str_replace('-', ' ', $in);
         return preg_match('/^[\x20-\x7e]+$/', $in) ? ucwords(strtolower($in)) : $in;
     }
     return $zoneCity;
@@ -346,7 +385,15 @@ function local_sentence(array $s, ?array $res, string $lang = 'en'): string {
     $where = ($place === $off || $place === 'UTC') ? " at $place" : " in $place";
     $out = "It's " . $d->format('H:i') . ' ' . day_phrase($d->format('l'), $l['part_of_day']) . $where . ' (' . implode(', ', $inner) . ').';
     $change = clock_change_sentence($l['next_change'] ?? null, $s['unix']);
-    return $change ? "$out $change" : $out;
+    if ($change) $out .= " $change";
+    // Same name, other clock: say so, so an agent can pick the right one.
+    $others = [];
+    foreach (($res['how'] ?? '') === 'place' ? $res['also'] : [] as $p) {
+        $o = short_offset((new DateTimeImmutable('@' . $s['unix']))->setTimezone(new DateTimeZone($p['zone']))->format('P'));
+        if ($o !== $off && count($others) < 3) $others[] = "{$p['name']}, {$p['country']} ($o)";
+    }
+    if ($others) $out .= ' Other places with this name: ' . implode('; ', $others) . '.';
+    return $out;
 }
 
 /** /zones: every canonical zone with its current offset, optionally filtered. */
