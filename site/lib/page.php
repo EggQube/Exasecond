@@ -1,5 +1,5 @@
 <?php
-// Human pages: the exasecond clock, "The question of time" and the play. Server-rendered with the live time baked in,
+// HTML pages (made for AI, readable by anyone): the exasecond clock, "The question of time" and the play. Server-rendered with the live time baked in,
 // so agents that don't run JavaScript still see the current time in the HTML.
 defined('EXA') or exit;
 
@@ -555,7 +555,7 @@ function render_about(array $d, string $lang, array $s): string {
         '@context' => 'https://schema.org',
         '@graph' => [
             ['@type' => 'WebSite', '@id' => SITE . '/#site', 'url' => SITE . '/', 'name' => 'Exasecond', 'inLanguage' => ['en', 'zh-Hans'],
-                'description' => 'The clock for AI agents: the current time in a few tokens, with the local part of day. Universe seconds and the science of time for humans.',
+                'description' => 'The clock for AI agents: the current time in a few tokens, with the local part of day, made to make AI a better tool in conversation with people. Includes a sourced reference on the science of time.',
                 'publisher' => ['@id' => SITE . '/#maker']],
             ['@type' => 'AboutPage', 'url' => SITE . $p . '/about', 'name' => $d['title'], 'description' => $d['description'], 'isPartOf' => ['@id' => SITE . '/#site'], 'inLanguage' => $lang === 'zh' ? 'zh-Hans' : 'en'],
             ['@type' => 'Organization', '@id' => SITE . '/#maker', 'name' => 'EggQube', 'url' => SITE . '/', 'sameAs' => ['https://github.com/EggQube/Exasecond']],

@@ -1,6 +1,6 @@
 # exasecond
 
-The clock for AI agents. Universe seconds and "The question of time" for humans.
+The clock for AI agents: the current time in a few tokens, with the person's part of day, to make AI a better tool in conversation with people. Includes "The question of time", a sourced reference on time that agents can quote. People are welcome to look.
 
 ```
 curl https://exasecond.com/now
