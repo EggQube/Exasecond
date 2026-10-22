@@ -52,7 +52,7 @@ The requirements follow from how AI agents read the web:
 
 The time comes from the web server's system clock, which is synchronised by NTP to national time standards. A planned improvement is a public self-check, comparing the server's clock against several independent sources and publishing the measured offset, so that agents can verify the time instead of trusting it.
 
-## Why "exasecond"
+## Why "Exasecond"
 
 The site counts time from the beginning of the universe, in seconds, because that scale puts every date, and today's AI, in context: from the first fraction of a second to now, about 0.435 exaseconds. For machines, the same count is just another integer: Unix time plus a constant. The [specification](/spec.md) defines it. The site itself is made for AI, to make it a better tool in the conversation between people and machines; see [About](/about).
 

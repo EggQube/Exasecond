@@ -251,7 +251,7 @@ $css
     <nav>$nav</nav>
   </header>
 $body
-  <p class="copy">© exasecond.com 2021-$year</p>
+  <p class="copy">© Exasecond.com 2021-$year</p>
 </div>
 <script>
 // The agent bar is for machines (who read the HTML and don't run this). People see it briefly, then it folds away.

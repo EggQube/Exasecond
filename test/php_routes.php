@@ -68,9 +68,9 @@ check('home: answer block comes before the counter', strpos($home, 'id="ans-now"
 check('home: world list for readers without a place', str_contains($home, 'Oslo, Stockholm, Berlin, Paris: ') && str_contains($home, 'Beijing: '));
 // About
 $ab = get('/about', 'text/html')[2];
-check('/about page', str_contains($ab, '<h1>About exasecond</h1>') && str_contains($ab, 'id="ans-fact"') && str_contains($ab, 'application/ld+json') && str_contains($ab, 'Made by EggQube') === false && str_contains($ab, 'made by EggQube'));
-check('/zh/about page', str_contains(get('/zh/about', 'text/html')[2], '<h1>关于 exasecond</h1>'));
-check('/about.md', str_starts_with(get('/about.md')[2], '# About exasecond'));
+check('/about page', str_contains($ab, '<h1>About Exasecond</h1>') && str_contains($ab, 'id="ans-fact"') && str_contains($ab, 'application/ld+json') && str_contains($ab, 'Made by EggQube') === false && str_contains($ab, 'Exasecond.com is made by EggQube'));
+check('/zh/about page', str_contains(get('/zh/about', 'text/html')[2], '<h1>关于 Exasecond</h1>'));
+check('/about.md', str_starts_with(get('/about.md')[2], '# About Exasecond'));
 check('About in menu, llms.txt and sitemap', str_contains(get('/', 'text/html')[2], 'href="/about"') && str_contains(get('/llms.txt')[2], '/about.md') && str_contains(get('/sitemap.xml')[2], '/zh/about'));
 check('/now without tz unchanged', !str_contains(get('/now')[2], 'Time zone') && str_contains(get('/now')[2], 'Tip: add ?tz='));
 check('/time stays a clock for agents', str_starts_with(get('/time')[2], 'UTC: '));
