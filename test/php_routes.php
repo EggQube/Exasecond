@@ -74,7 +74,7 @@ check('/about.md', str_starts_with(get('/about.md')[2], '# About Exasecond'));
 check('About in menu, llms.txt and sitemap', str_contains(get('/', 'text/html')[2], 'href="/about"') && str_contains(get('/llms.txt')[2], '/about.md') && str_contains(get('/sitemap.xml')[2], '/zh/about'));
 // Developers
 check('/developers page', str_contains(get('/developers', 'text/html')[2], '<h1>For developers</h1>') && str_starts_with(get('/developers.md')[2], '# For developers'));
-foreach (['openwebui_exasecond.py', 'exasecond.py', 'exasecond.js', 'openai-tool.json', 'anthropic-tool.json', 'mcp.json'] as $f) {
+foreach (['LICENSE', 'openwebui_exasecond.py', 'exasecond.py', 'exasecond.js', 'openai-tool.json', 'anthropic-tool.json', 'mcp.json'] as $f) {
     [$st, $hd, $b] = get("/dev/$f");
     check("/dev/$f", $st === 200 && strlen($b) > 50 && (!str_ends_with($f, '.json') || json_decode($b) !== null));
 }

@@ -1,4 +1,8 @@
-"""Exasecond: the current time for AI agents. Standard library only. https://exasecond.com/developers"""
+"""Exasecond: the current time for AI agents. Standard library only. https://exasecond.com/developers
+
+(c) 2026 EggQube, exasecond.com. MIT License: free to use, copy and modify; keep this notice.
+https://exasecond.com/dev/LICENSE
+"""
 
 import urllib.parse
 import urllib.request
