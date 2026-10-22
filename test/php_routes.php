@@ -132,6 +132,8 @@ check('/zh/developers in Chinese with the switch', (fn($b) => str_contains($b, '
 check('/zh/developers.md', str_starts_with(get('/zh/developers.md')[2], '# 开发者'));
 check('/developers links to Chinese', str_contains(get('/developers', 'text/html')[2], 'href="/zh/developers"'));
 check('zh about button goes to /zh/developers', str_contains(get('/zh/about', 'text/html')[2], 'href="/zh/developers"'));
+check('language menu: same page in the other language', str_contains(get('/developers', 'text/html')[2], '<details class="langs"><summary title="Language">EN</summary>') && str_contains(get('/developers', 'text/html')[2], 'href="/zh/developers" hreflang="zh-Hans"'));
+check('language menu: English-only page links to the Chinese front page', str_contains(get('/story', 'text/html')[2], 'href="/zh/" hreflang="zh-Hans"') && !str_contains(get('/story', 'text/html')[2], 'rel="alternate" hreflang'));
 check('agent bar points to the short address', str_contains(get('/', 'text/html')[2], 'exasecond.com/stockholm</a>'));
 
 echo $fails ? "$fails failed\n" : "all passed\n";

@@ -3,8 +3,25 @@
 // so agents that don't run JavaScript still see the current time in the HTML.
 defined('EXA') or exit;
 
-function lang_prefix(string $lang): string { return $lang === 'zh' ? '/zh' : ''; }
-function other_lang(string $lang): string { return $lang === 'zh' ? 'en' : 'zh'; }
+function lang_prefix(string $lang): string { return $lang === 'en' ? '' : '/' . $lang; }
+
+// Each language in its own name; 'tag' is the hreflang/lang code.
+const LANG_INFO = [
+    'en' => ['name' => 'English', 'short' => 'EN', 'tag' => 'en'],
+    'zh' => ['name' => '中文', 'short' => '中文', 'tag' => 'zh-Hans'],
+];
+
+/** The language dropdown: plain HTML (<details>), so it works without JavaScript and agents see ordinary links.
+ *  Each language links to this page when it exists in that language, otherwise to that language's front page. */
+function lang_menu(string $lang, array $here, callable $url): string {
+    $items = '';
+    foreach (LANGS as $l) {
+        $i = LANG_INFO[$l];
+        $href = in_array($l, $here, true) ? $url($l) : lang_prefix($l) . '/';
+        $items .= '<li><a href="' . h($href) . '" hreflang="' . $i['tag'] . '" lang="' . $i['tag'] . '"' . ($l === $lang ? ' aria-current="true"' : '') . '>' . h($i['name']) . '</a></li>';
+    }
+    return '<details class="langs"><summary title="' . h(t($lang, 'nav_lang')) . '">' . h(LANG_INFO[$lang]['short']) . '</summary><ul>' . $items . '</ul></details>';
+}
 
 function site_css(): string {
     return <<<'CSS'
@@ -49,6 +66,13 @@ sup { font-size: .7em; line-height: 0; }
 .top nav { font: 13px/1 var(--mono); color: var(--ink-2); display: flex; gap: 18px; flex-wrap: wrap; justify-content: flex-end; }
 .top nav a { text-decoration: none; }
 .top nav a:hover, .top nav a[aria-current] { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent); }
+.langs { position: relative; }
+.langs summary { list-style: none; cursor: pointer; white-space: nowrap; }
+.langs summary::-webkit-details-marker { display: none; }
+.langs summary::after { content: " \25BE"; color: var(--ink-3); }
+.langs summary:hover, .langs[open] summary { color: var(--ink); }
+.langs ul { position: absolute; right: 0; top: calc(100% + 10px); z-index: 10; margin: 0; padding: 6px 0; list-style: none; background: var(--bg-2); border: 1px solid var(--line); min-width: 9em; }
+.langs li a { display: block; padding: 7px 14px; white-space: nowrap; }
 
 /* clock */
 .hero { padding: 6vh 0 6vh; border-top: 1px solid var(--line); }
@@ -201,18 +225,15 @@ const FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' vi
 function layout(string $lang, array $o, string $body): string {
     $L = fn($k) => t($lang, $k);
     $path = $o['path'] ?? '/';
-    $hasAlt = $o['alt'] ?? true;
-    $enUrl = SITE . ($path === '/' ? '/' : $path);
-    $zhUrl = SITE . '/zh' . ($path === '/' ? '/' : $path);
-    $other = other_lang($lang);
-    $otherHref = $other === 'zh' ? '/zh' . ($path === '/' ? '/' : $path) : $path;
+    // The languages this page exists in: all by default, only its own when alt is false.
+    $here = $o['langs'] ?? (($o['alt'] ?? true) ? LANGS : [$lang]);
+    $url = fn($l) => lang_prefix($l) . ($path === '/' ? '/' : $path);
     $head = '';
-    if ($hasAlt) {
-        $head .= '<link rel="alternate" hreflang="en" href="' . h($enUrl) . '">' . "\n"
-            . '<link rel="alternate" hreflang="zh-Hans" href="' . h($zhUrl) . '">' . "\n"
-            . '<link rel="alternate" hreflang="x-default" href="' . h($enUrl) . '">' . "\n";
+    if (count($here) > 1) {
+        foreach ($here as $l) $head .= '<link rel="alternate" hreflang="' . LANG_INFO[$l]['tag'] . '" href="' . h(SITE . $url($l)) . '">' . "\n";
+        $head .= '<link rel="alternate" hreflang="x-default" href="' . h(SITE . $url('en')) . '">' . "\n";
     }
-    $head .= '<link rel="canonical" href="' . h($lang === 'zh' ? $zhUrl : $enUrl) . '">' . "\n";
+    $head .= '<link rel="canonical" href="' . h(SITE . $url($lang)) . '">' . "\n";
     if (!empty($o['md'])) $head .= '<link rel="alternate" type="text/markdown" href="' . h($o['md']) . '" title="Markdown">' . "\n";
     $head .= '<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt">' . "\n";
     $head .= $o['head'] ?? '';
@@ -220,7 +241,7 @@ function layout(string $lang, array $o, string $body): string {
     $cur = fn($k) => ($o['active'] ?? '') === $k ? ' aria-current="page"' : '';
     $nav = '<a href="' . $p . '/time"' . $cur('time') . '>' . h($L('nav_time')) . '</a>'
         . '<a href="' . $p . '/about"' . $cur('about') . '>' . h($L('nav_about')) . '</a>'
-        . ($hasAlt ? '<a href="' . h($otherHref) . '" hreflang="' . ($other === 'zh' ? 'zh-Hans' : 'en') . '" lang="' . ($other === 'zh' ? 'zh-Hans' : 'en') . '" title="' . h($L('nav_other_title')) . '">' . h($L('nav_other')) . '</a>' : '');
+        . lang_menu($lang, $here, $url);
     // Styling lives in /site.css (cached by browsers), so the page itself starts with the content: raw-HTML readers reach the time first.
     $cssHref = '/site.css?v=' . substr(md5(site_css()), 0, 8);
     $title = h($o['title']);
