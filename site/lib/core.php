@@ -28,8 +28,8 @@ function to_exaseconds(int $u, int $digits = 18): string {
     return ($neg ? '-' : '') . $whole . ($digits > 0 ? '.' . $frac : '');
 }
 
-function group_digits($n): string {
-    return preg_replace('/\B(?=(\d{3})+(?!\d))/', ',', (string)$n);
+function group_digits($n, string $sep = ','): string {
+    return preg_replace('/\B(?=(\d{3})+(?!\d))/', $sep, (string)$n);
 }
 
 // ---- Instants ------------------------------------------------------------------

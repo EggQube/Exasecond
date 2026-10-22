@@ -151,6 +151,7 @@ foreach (['fr' => ['Le saviez-vous ?', '# Pour les développeurs'], 'es' => ['¿
     check("$l facts count", count(FACTS_TR[$l]) === count(FACTS));
 }
 check('no long dashes in translated text', !preg_match('/[\x{2013}\x{2014}]/u', implode('', array_map(fn($l) => file_get_contents(content_path($l, 'about.md')) . file_get_contents(content_path($l, 'developers.md')), LANGS)) . implode('', array_merge(...array_values(FACTS_TR))) . json_encode(UI, JSON_UNESCAPED_UNICODE)));
+check('number style: thin space and decimal comma in German, comma in English and Chinese', (fn($de, $en, $zh) => str_contains($de, "\u{202F}") && str_contains($de, '<span id="es">0,') && preg_match('/\d,\d{3},\d{3}/', $en) && str_contains($en, '<span id="es">0.') && str_contains($zh, '<span id="es">0.'))(get('/de/', 'text/html')[2], get('/', 'text/html')[2], get('/zh/', 'text/html')[2]));
 check('agent bar points to the short address', str_contains(get('/', 'text/html')[2], 'exasecond.com/stockholm</a>'));
 
 echo $fails ? "$fails failed\n" : "all passed\n";

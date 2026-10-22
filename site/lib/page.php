@@ -16,6 +16,18 @@ const LANG_INFO = [
     'ru' => ['name' => 'Русский', 'short' => 'RU', 'tag' => 'ru', 'icu' => 'ru_RU', 'js' => 'ru-RU'],
 ];
 
+/**
+ * How a language writes numbers. The rule, for every language present and future: the decimal sign is the
+ * language's own (ICU: a comma in German, French, Russian, Norwegian...); digits are grouped with a comma where
+ * the language does (English, Chinese, Japanese, Korean), otherwise with a thin non-breaking space, the SI style.
+ */
+function num_style(string $lang): array {
+    if (!class_exists('NumberFormatter')) return ['group' => ',', 'dec' => '.'];
+    $f = new NumberFormatter(LANG_INFO[$lang]['icu'], NumberFormatter::DECIMAL);
+    $g = $f->getSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
+    return ['group' => $g === ',' ? ',' : "\u{202F}", 'dec' => $f->getSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL)];
+}
+
 /** Where the chapters are for this language: its own, or the English ones. */
 function time_prefix(string $lang): string { return in_array($lang, CHAPTER_LANGS, true) ? lang_prefix($lang) : ''; }
 
@@ -334,13 +346,15 @@ function render_home(array $s, string $lang, ?string $place = null): string {
     }
     $S = SITE;
     $C = OFFSET;
-    $count = group_digits($s['universe_seconds']);
+    $ns = num_style($lang);
+    $count = group_digits($s['universe_seconds'], $ns['group']);
     $weekday = $days[$s['technical']['weekday']] ?? $s['technical']['weekday'];
-    $esLine = sprintf(h($L('es_line')), '<span id="es">' . h($s['exaseconds']) . '</span>');
+    $esLine = sprintf(h($L('es_line')), '<span id="es">' . h(str_replace('.', $ns['dec'], $s['exaseconds'])) . '</span>');
     $p = lang_prefix($lang);
     $tp = time_prefix($lang);
     $cfg = json_encode([
         'offset' => (string)OFFSET, 'serverMs' => $s['unix'] * 1000, 'lang' => $lang, 'locale' => $en ? null : LANG_INFO[$lang]['js'],
+        'group' => $ns['group'], 'dec' => $ns['dec'],
         'calNames' => $en ? null : (CAL_NAMES[$lang] ?? null),
         'days' => $days,
         'labels' => ['universe' => $L('tr_universe'), 'es' => $L('tr_es'), 'utc' => 'UTC', 'zone' => $L('js_zone'), 'unix' => 'Unix', 'fail' => $L('js_fail')],
@@ -456,7 +470,7 @@ function home_js(): string {
   const C = BigInt(EXA.offset);
   const skew = EXA.serverMs - Date.now(); // align to server clock (second precision)
   const $ = (id) => document.getElementById(id);
-  const group = (s) => s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  const group = (s) => s.replace(/\B(?=(\d{3})+(?!\d))/g, EXA.group);
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const loc = EXA.locale || undefined;
   const localFmt = new Intl.DateTimeFormat(loc, { dateStyle: "full", timeStyle: "medium" });
@@ -465,9 +479,9 @@ function home_js(): string {
     const ms = Date.now() + skew;
     const unix = Math.floor(ms / 1000);
     const u = (BigInt(unix) + C).toString();
-    $("count").innerHTML = group(u.slice(0, -3)) + ',<span class="tick">' + u.slice(-3) + "</span>";
+    $("count").innerHTML = group(u.slice(0, -3)) + EXA.group + '<span class="tick">' + u.slice(-3) + "</span>";
     const frac = u.padStart(19, "0");
-    $("es").textContent = frac.slice(0, -18) + "." + frac.slice(-18, -6);
+    $("es").textContent = frac.slice(0, -18) + EXA.dec + frac.slice(-18, -6);
     const d = new Date(unix * 1000);
     $("utc").firstChild.nodeValue = d.toISOString().replace(/\.\d{3}Z$/, "Z");
     $("unix").textContent = unix;
@@ -536,7 +550,7 @@ function home_js(): string {
       const pad = (t) => t + " ".repeat(Math.max(1, 18 - [...t].length * (EXA.lang === "zh" ? 2 : 1)));
       const lines = [
         pad(L.universe) + group(s.universe_seconds),
-        pad(L.es) + s.exaseconds,
+        pad(L.es) + s.exaseconds.replace(".", EXA.dec),
         pad(L.utc) + s.utc + "  (" + ((EXA.days && EXA.days[s.technical.weekday]) || s.technical.weekday) + ")",
         pad(L.zone) + s.local.iso,
         pad(L.unix) + s.unix,
@@ -552,7 +566,7 @@ JS;
 
 function read_footer(string $lang, array $s, string $mdHref): string {
     $L = fn($k) => t($lang, $k);
-    return '<footer class="site"><p>' . h(sprintf($L('read_at'), $s['utc'], group_digits($s['universe_seconds']))) . '</p>'
+    return '<footer class="site"><p>' . h(sprintf($L('read_at'), $s['utc'], group_digits($s['universe_seconds'], num_style($lang)['group']))) . '</p>'
         . '<p><a href="' . h($mdHref) . '">' . h($L('md_twin')) . '</a> · <a href="/llms.txt">llms.txt</a> · ' . $L('foot_story') . '</p></footer>';
 }
 
