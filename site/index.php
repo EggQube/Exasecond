@@ -113,6 +113,10 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
             if (!empty($m[2]) || negotiate($accept, 'html') === 'md') return send(chapter_md($c, $lang), 'md', ['Vary' => 'Accept']);
             return send(render_chapter($c, $lang, snapshot()), 'html', ['Vary' => 'Accept']);
         }
+        if (($p === '/about' || $p === '/about.md') && ($d = load_doc($lang, 'about'))) {
+            if ($p === '/about.md' || negotiate($accept, 'html') === 'md') return send(doc_md($d), 'md', ['Vary' => 'Accept']);
+            return send(render_about($d, $lang, snapshot()), 'html', ['Vary' => 'Accept']);
+        }
         if ($lang === 'zh') return send(render_not_found('zh', $path), 'html', [], 404);
 
         switch ($path) {

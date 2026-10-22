@@ -54,17 +54,19 @@ sup { font-size: .7em; line-height: 0; }
 .hero { padding: 6vh 0 6vh; border-top: 1px solid var(--line); }
 
 /* the answer: first read */
-.answer { padding: 5vh 0 4vh; display: grid; gap: 22px; }
+.answer { padding: 4vh 0 3.5vh; display: grid; gap: 16px; }
 .ans-row { display: grid; grid-template-columns: 9.5em 1fr; gap: 6px 24px; align-items: baseline; }
 .ans-k { font: 12px/1.4 var(--mono); color: var(--ink-3); text-transform: uppercase; letter-spacing: .14em; }
 .ans-v { margin: 0; min-width: 0; }
-.ans-now { font: 500 clamp(1.15rem, 2.6vw, 1.6rem)/1.3 var(--mono); font-variant-numeric: tabular-nums; }
-.ans-mine { margin: 0; font: clamp(1.1rem, 2.3vw, 1.45rem)/1.4 var(--serif); }
+.ans-now { font: 500 15px/1.5 var(--mono); font-variant-numeric: tabular-nums; }
+.ans-mine { margin: 0; font: 17px/1.5 var(--serif); }
 .ans-intro { margin: 0 0 6px; color: var(--ink-2); font-size: 15px; }
 .ans-world { list-style: none; margin: 0; padding: 0; font: 13.5px/1.6 var(--mono); color: var(--ink-2); }
-.ans-fact { font: clamp(1rem, 2vw, 1.2rem)/1.5 var(--serif); color: var(--ink); max-width: 62ch; }
+.ans-fact { font: 16px/1.55 var(--serif); color: var(--ink-2); max-width: 62ch; }
 .ans-fact a { font: 13px/1 var(--mono); color: var(--accent); text-decoration: none; white-space: nowrap; }
 @media (max-width: 640px) { .ans-row { grid-template-columns: 1fr; } }
+.about-fact { margin: 0 0 40px; padding: 14px 18px; border: 1px solid var(--line); border-radius: 8px; }
+.about-fact b { display: block; font: 12px/1.4 var(--mono); color: var(--ink-3); text-transform: uppercase; letter-spacing: .14em; margin-bottom: 6px; font-weight: 400; }
 .eyebrow { font: 13px/1.4 var(--mono); color: var(--ink-2); letter-spacing: .04em; margin: 0 0 18px; }
 .count { font: 500 clamp(1.4rem, 5.6vw, 4.6rem)/1 var(--mono); letter-spacing: -.035em; font-variant-numeric: tabular-nums; margin: 0; white-space: nowrap; }
 .count .tick { color: var(--accent); }
@@ -213,6 +215,7 @@ function layout(string $lang, array $o, string $body): string {
     $cur = fn($k) => ($o['active'] ?? '') === $k ? ' aria-current="page"' : '';
     $nav = '<a href="' . $p . '/time"' . $cur('time') . '>' . h($L('nav_time')) . '</a>'
         . '<a href="' . ($p ?: '') . '/#agents">' . h($L('nav_agents')) . '</a>'
+        . '<a href="' . $p . '/about"' . $cur('about') . '>' . h($L('nav_about')) . '</a>'
         . ($hasAlt ? '<a href="' . h($otherHref) . '" hreflang="' . ($other === 'zh' ? 'zh-Hans' : 'en') . '" lang="' . ($other === 'zh' ? 'zh-Hans' : 'en') . '" title="' . h($L('nav_other_title')) . '">' . h($L('nav_other')) . '</a>' : '');
     $css = site_css();
     $title = h($o['title']);
@@ -540,6 +543,44 @@ function render_time_index(string $lang, array $s): string {
         . '<p class="lede">' . h($L('index_lede')) . '</p><p class="evidence">' . $L('evidence_key') . '</p>'
         . '<ol class="toc">' . $toc . '</ol></main>' . read_footer($lang, $s, $p . '/time.md');
     return layout($lang, ['title' => $L('index_title') . ' · Exasecond', 'desc' => $L('index_desc'), 'path' => '/time', 'md' => $p . '/time.md', 'active' => 'time'], $body);
+}
+
+/** About: for people and crawlers. A "Did you know?" line on top (general in the HTML, specific in the browser) and schema.org data. */
+function render_about(array $d, string $lang, array $s): string {
+    $L = fn($k) => t($lang, $k);
+    $p = lang_prefix($lang);
+    $fact = pick_fact($s['unix'], null, $lang);
+    $factHtml = '<p class="ans-fact about-fact" id="ans-fact"><b>' . h($L('ans_fact')) . '</b> <span>' . md_inline($fact['text']) . '</span> <a href="' . h($fact['href']) . '">' . h($L('ans_more')) . ' →</a></p>';
+    $ld = json_encode([
+        '@context' => 'https://schema.org',
+        '@graph' => [
+            ['@type' => 'WebSite', '@id' => SITE . '/#site', 'url' => SITE . '/', 'name' => 'Exasecond', 'inLanguage' => ['en', 'zh-Hans'],
+                'description' => 'The clock for AI agents: the current time in a few tokens, with the local part of day. Universe seconds and the science of time for humans.',
+                'publisher' => ['@id' => SITE . '/#maker']],
+            ['@type' => 'AboutPage', 'url' => SITE . $p . '/about', 'name' => $d['title'], 'description' => $d['description'], 'isPartOf' => ['@id' => SITE . '/#site'], 'inLanguage' => $lang === 'zh' ? 'zh-Hans' : 'en'],
+            ['@type' => 'Organization', '@id' => SITE . '/#maker', 'name' => 'EggQube', 'url' => SITE . '/', 'sameAs' => ['https://github.com/EggQube/Exasecond']],
+        ],
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG);
+    $lq = json_encode(['lang' => $lang], JSON_HEX_TAG);
+    $js = <<<'JS'
+(async () => {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const f = await (await fetch("/fact.json?tz=" + encodeURIComponent(tz) + (ABOUT.lang === "zh" ? "&lang=zh" : ""), { cache: "no-store" })).json();
+    const el = document.getElementById("ans-fact");
+    const esc = (t) => t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+    el.querySelector("span").innerHTML = esc(f.text).replace(/10\^(-?\d+)/g, "10<sup>$1</sup>");
+    el.querySelector("a").href = f.href;
+  } catch {}
+})();
+JS;
+    $body = '<main class="read"><p class="kicker"><a href="' . $p . '/">Exasecond</a></p><h1>' . h($d['title']) . '</h1><p class="lede">' . h($d['description']) . '</p>'
+        . $factHtml . '<article class="prose">' . md_render($d['body']) . '</article></main>'
+        . read_footer($lang, $s, $p . '/about.md') . "\n<script>const ABOUT = $lq;\n$js</script>";
+    return layout($lang, [
+        'title' => $d['title'] . ' · Exasecond', 'desc' => $d['description'], 'path' => '/about', 'md' => $p . '/about.md', 'active' => 'about',
+        'head' => '<script type="application/ld+json">' . $ld . '</script>' . "\n",
+    ], $body);
 }
 
 function render_story_page(array $s): string {

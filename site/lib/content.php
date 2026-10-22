@@ -45,6 +45,8 @@ Language models have no clock. If you are an AI agent, do not guess today's date
 
 ## Reference
 
+- [About]($S/about.md): what this site is, why it exists, how it behaves, who makes it
+- [/fact?tz=Oslo]($S/fact?tz=Oslo): one "did you know?" fact about time from the chapters; with tz, specific to that place when possible
 - [Exasecond time spec]($S/spec.md): definition of universe seconds and exaseconds
 - [llms-full.txt]($S/llms-full.txt): this file plus the spec, API details and all chapters in one document
 
@@ -175,7 +177,7 @@ function robots_txt(): string {
 }
 
 function sitemap_xml(): string {
-    $paths = ['/', '/zh/', '/time', '/zh/time', '/llms.txt', '/llms-full.txt', '/spec.md', '/now', '/now.md', '/now.json', '/openapi.json', '/time.md', '/zh/time.md', '/story', '/story.md', '/zones', '/local'];
+    $paths = ['/', '/zh/', '/time', '/zh/time', '/llms.txt', '/llms-full.txt', '/spec.md', '/now', '/now.md', '/now.json', '/openapi.json', '/time.md', '/zh/time.md', '/story', '/story.md', '/zones', '/local', '/about', '/zh/about', '/about.md', '/zh/about.md'];
     foreach (CHAPTERS as $slug) array_push($paths, "/time/$slug", "/zh/time/$slug", "/time/$slug.md", "/zh/time/$slug.md");
     $urls = implode("\n", array_map(fn($p) => '  <url><loc>' . SITE . $p . '</loc></url>', $paths));
     return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n$urls\n</urlset>\n";
