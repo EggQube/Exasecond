@@ -1,8 +1,12 @@
 ---
 title: For developers
-description: Make Exasecond.com your agent's clock in under a minute: one line for any prompt, MCP for AI apps, tool definitions for your own code, and a tool for local models.
+description: Help your AI get time right: not just the timestamp, but how to talk about it. Set up in under a minute.
 ---
-Exasecond.com lends the time to AI agents: the date, the local time and the part of the day, in about 30 tokens. Everything on this page is ready to copy, and every file can be fetched directly. This page is also available as plain text at [/developers.md](/developers.md), so an AI coding assistant can read it and set things up for you.
+Language models live in text. They have no clock, and even when they are given the time, they often relate to it poorly: greeting someone with "good evening" at breakfast, missing that a deadline has passed, forgetting that the clocks change on Sunday.
+
+So Exasecond.com is a clock made of text. Its main answer is a sentence an assistant can pass straight on to a person: "It's 16:02 on Thursday afternoon in Stockholm (22 October 2026, CEST, UTC+2). The clocks go back one hour on Sunday 25 October." About 30 tokens. The hope is that by reading the time the way people say it, AI will also say it that way. The plain clock is still here for everything else: the UTC timestamp, Unix time and full JSON (see section 5).
+
+Everything on this page is ready to copy, and every file can be fetched directly. This page is also available as plain text at [/developers.md](/developers.md), so an AI coding assistant can read it and set things up for you.
 
 No key and no sign-up needed. Please send at most one request per minute per conversation or agent.
 
