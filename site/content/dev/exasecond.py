@@ -9,7 +9,7 @@ import urllib.request
 
 
 def get_local_time(place: str = "") -> str:
-    """One sentence with the weekday, date, local time and part of day for a place (city, country, zone or offset)."""
+    """One sentence for talking to a person, e.g. "It's 16:02 on Thursday afternoon in Stockholm (22 October 2026, CEST, UTC+2)." place: city, country, zone or offset."""
     url = "https://exasecond.com/local" + ("?tz=" + urllib.parse.quote(place) if place else "")
     with urllib.request.urlopen(url, timeout=10) as r:
         return r.read().decode("utf-8").strip()

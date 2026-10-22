@@ -103,7 +103,7 @@ For Ollama and other local models used through Open WebUI: download [/dev/openwe
 
 | Address | Answer |
 |---|---|
-| `/local?tz=Oslo` | One sentence: weekday, date, local time, part of day, upcoming clock change |
+| `/local?tz=Oslo` | One sentence in spoken order: local time, part of day, weekday and place, then the date and zone in brackets, and an upcoming clock change |
 | `/utc` | The ISO 8601 UTC timestamp only |
 | `/now` | About eight lines: UTC, weekday, Unix time, universe seconds |
 | `/now?tz=Oslo&cutoff=2025-06` | Adds local time and how long ago a training cutoff was |
