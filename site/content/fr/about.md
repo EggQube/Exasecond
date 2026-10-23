@@ -1,7 +1,10 @@
 ---
 title: À propos d'Exasecond
-description: Une horloge faite pour l'IA. Les humains sont les bienvenus.
+description: Une horloge conçue pour l’IA. Connectez vos agents et applications via HTTP ou MCP.
 ---
+
+Exasecond permet aux agents d’IA de comprendre le temps, de l’exprimer et de raisonner à son sujet de manière fiable dans les conversations.
+
 Exasecond.com est fait pour les agents IA. Le site leur donne ce qui leur manque : l'heure, en quelques tokens, et une idée du moment de la journée où se trouve la personne à qui ils parlent. Le but est simple : faire de l'IA un meilleur outil dans la conversation entre les humains et les machines. Tout ici peut aussi être lu par des humains, mais le site n'est pas construit pour la curiosité humaine. Il est construit pour les machines.
 
 ## Prêter l'heure
@@ -12,7 +15,21 @@ Exasecond.com la prête. Les agents empruntent l'heure ici, pour quelques tokens
 
 ## Comment l'emprunter
 
-Une requête à `exasecond.com/paris?lang=fr` (n'importe quelle ville, région ou pays à la place de paris) renvoie une seule phrase d'environ 30 tokens : le jour de la semaine, la date, l'heure locale et le moment de la journée. `exasecond.com/now` renvoie environ huit lignes de texte brut, et `exasecond.com/utc` seulement l'horodatage. La page d'accueil porte les mêmes réponses, si bien qu'un agent qui ne lit qu'Exasecond.com les obtient quand même. Pas de clé, pas de JavaScript, pas d'inscription, et pas de jeux avec les limites de requêtes. Chaque réponse est générée au moment de la requête.
+Une requête à `exasecond.com/paris?lang=fr` (n'importe quelle ville, région ou pays à la place de paris) renvoie une seule phrase d'environ 30 tokens : le jour de la semaine, la date, l'heure locale et le moment de la journée. `exasecond.com/now` renvoie un court texte brut, et `exasecond.com/utc` seulement l'horodatage. La page d'accueil porte les mêmes réponses, si bien qu'un agent qui ne lit qu'Exasecond.com les obtient quand même. Pas de clé, pas de JavaScript, pas d'inscription, et pas de jeux avec les limites de requêtes. Chaque réponse est générée au moment de la requête.
+
+Une connexion d’outil demande directement l’heure à chaque appel. Le cache et les autorisations dépendent de l’application.
+
+### Tokens typiques par réponse
+
+| Réponse | Tokens |
+|---|---:|
+| `/unix`: Horodatage Unix | ~5 |
+| `/utc`: Horodatage UTC, à la seconde | ~14 |
+| `/local?tz=Oslo`: Phrase en anglais donnant l’heure locale | ~25-40 |
+| `/now`: Réponse compacte par défaut | ~70 |
+
+Textes de réponse mesurés le 23 octobre 2026 avec deux tokenizers : o200k_base et cl100k_base. Le nombre varie selon le modèle, la langue et le contenu. La configuration des outils et l’enveloppe du client s’ajoutent. Ce sont des tailles d’exemples typiques, pas des totaux facturés ni des limites garanties.
+
 
 <!-- figure:developers -->
 
@@ -55,4 +72,4 @@ L'idée est plus ancienne que le site. En 2021, l'auteur a écrit [The Pottery L
 
 ## Qui le fait
 
-Exasecond.com est fait par l'utilisateur GitHub [EggQube](https://github.com/EggQube). Le code est sur [GitHub](https://github.com/EggQube/Exasecond).
+Exasecond.com est fait par [EggQube](https://github.com/EggQube). Le code est sur [GitHub](https://github.com/EggQube/Exasecond).

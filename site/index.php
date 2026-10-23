@@ -104,7 +104,7 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
 
     if ($method === 'OPTIONS') return send('', 'text', [], 204);
     if ($path === '/mcp') {
-        [$st, $obj] = mcp_response($method, $rawBody);
+        [$st, $obj] = mcp_response($method, $rawBody, $hdr);
         if ($st === 405) return send("Exasecond MCP endpoint. POST JSON-RPC 2.0 here (streamable HTTP, stateless).\n", 'text', ['Allow' => 'POST'], 405);
         if ($obj === null) return send('', 'json', [], $st);
         return send((string)json_encode($obj, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 'json', [], $st);
@@ -126,11 +126,9 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
             // ?tz= puts that place's sentence first, on the page for people and the markdown for agents.
             $o = opts($q);
             $place = $o['tz_res'] ? local_sentence(snapshot(null, $o), $o['tz_res'], $lang) : null;
-            if ($lang === 'en') {
-                $want = negotiate($accept, 'html');
-                if ($want === 'md') return send(home_md(snapshot(), $place), 'md', ['Vary' => 'Accept']);
-                if ($want === 'json') return json_resp(snap(null, $q));
-            }
+            $want = negotiate($accept, 'html');
+            if ($want === 'md') return send(home_md(snapshot(), $place, $lang), 'md', ['Vary' => 'Accept']);
+            if ($lang === 'en' && $want === 'json') return json_resp(snap(null, $q));
             return send(render_home(snapshot(), $lang, $place), 'html', ['Vary' => 'Accept', 'Link' => '</llms.txt>; rel="describedby"; type="text/plain"']);
         }
         if ($p === '/time' && $chapters) {

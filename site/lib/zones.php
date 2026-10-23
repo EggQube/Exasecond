@@ -209,8 +209,8 @@ function resolve_zone(?string $in): ?array {
 
 /** Lower case, no accents, hyphens as spaces: "São Paulo" and "sao-paulo" fold the same. */
 function name_fold(string $s): string {
-    $s = class_exists('Normalizer') ? preg_replace('/p{Mn}/u', '', Normalizer::normalize($s, Normalizer::FORM_D)) : $s;
-    return trim(preg_replace('/s+/u', ' ', str_replace(['_', '-', '.'], [' ', ' ', ''], mb_strtolower_safe($s))));
+    $s = class_exists('Normalizer') ? preg_replace('/\p{Mn}/u', '', Normalizer::normalize($s, Normalizer::FORM_D)) : $s;
+    return trim(preg_replace('/\s+/u', ' ', str_replace(['_', '-', '.'], [' ', ' ', ''], mb_strtolower_safe($s))));
 }
 
 /** Places called $name, biggest first: [['name', 'cc', 'country', 'zone', 'pop'], ...]. Reads one small shard of data/places/. */

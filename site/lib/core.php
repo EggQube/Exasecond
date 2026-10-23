@@ -224,7 +224,7 @@ function snapshot(?array $instant = null, array $opts = []): array {
 class InputError extends Exception {}
 
 function checked_unix(int $unix, int $ms = 0): array {
-    if (abs($unix) > MAX_UNIX) {
+    if (abs($unix) > MAX_UNIX || ($unix === MAX_UNIX && $ms > 0)) {
         throw new InputError('That moment is outside the range human calendars can express here (about 271,821 BC to 275,760 AD). Universe seconds still work, but there is no human date to translate to.');
     }
     return [$unix, $ms];
@@ -237,7 +237,14 @@ function range_error(): InputError {
 
 /** Accepts ['iso'|'unix'|'universe'|'es' => string]. Returns an instant or throws InputError. */
 function parse_instant(array $p): array {
-    $v = fn($k) => isset($p[$k]) && is_scalar($p[$k]) && (string)$p[$k] !== '' ? (string)$p[$k] : null;
+    $given = [];
+    foreach (['iso', 'unix', 'universe', 'es'] as $key) {
+        if (!isset($p[$key]) || $p[$key] === '') continue;
+        if (!is_string($p[$key]) && !is_int($p[$key]) && !is_float($p[$key])) throw new InputError("$key must be a string or number");
+        $given[$key] = (string)$p[$key];
+    }
+    if (count($given) !== 1) throw new InputError('give exactly one of: iso, unix, universe, es');
+    $v = fn($k) => $given[$k] ?? null;
     if (($u = $v('universe')) !== null) {
         if (!preg_match('/^-?\d+$/', $u)) throw new InputError('universe must be an integer number of seconds');
         if (strlen(ltrim($u, '-')) > 18) throw range_error();
@@ -253,11 +260,20 @@ function parse_instant(array $p): array {
         if (!preg_match('/^-?\d+(\.\d+)?$/', $x)) throw new InputError('unix must be a number of seconds');
         $int = explode('.', $x)[0];
         if (strlen(ltrim($int, '-')) > 15) throw range_error();
-        return checked_unix((int)$int);
+        // Keep milliseconds without converting large decimal strings to floating point.
+        // Extra fractional digits are truncated toward zero at millisecond precision.
+        $ms = (int)str_pad(substr(explode('.', $x)[1] ?? '', 0, 3), 3, '0');
+        $seconds = (int)$int;
+        if ($x[0] === '-' && $ms > 0) return checked_unix($seconds - 1, 1000 - $ms);
+        return checked_unix($seconds, $ms);
     }
     if (($iso = $v('iso')) !== null) {
-        $ok = preg_match('/^[+-]?\d{4,6}(-\d{2}(-\d{2})?)?([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?)?(Z|[+-]\d{2}:?\d{2})?$/i', trim($iso));
-        try { $d = $ok ? new DateTimeImmutable(trim($iso), new DateTimeZone('UTC')) : null; } catch (Exception $e) { $d = null; }
+        $ok = preg_match('/^[+-]?\d{4,6}-\d{2}-\d{2}([T ]([01]\d|2[0-3]):[0-5]\d(:[0-5]\d(\.\d+)?)?(Z|[+-]([01]\d|2[0-3]):?[0-5]\d)?)?$/i', trim($iso));
+        try {
+            $d = $ok ? new DateTimeImmutable(trim($iso), new DateTimeZone('UTC')) : null;
+            $errors = $d ? DateTimeImmutable::getLastErrors() : false;
+            if ($errors && ($errors['warning_count'] || $errors['error_count'])) $d = null;
+        } catch (Exception $e) { $d = null; }
         if (!$d) throw new InputError('iso could not be parsed; use e.g. 2026-10-21T14:00:00Z');
         return checked_unix($d->getTimestamp(), (int)$d->format('v'));
     }

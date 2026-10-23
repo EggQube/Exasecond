@@ -1,7 +1,10 @@
 ---
 title: 关于 Exasecond
-description: 为 AI 制作的时钟。也欢迎人们来看看。
+description: 为 AI 打造的时钟。通过 HTTP 或 MCP 连接你的智能体和应用。
 ---
+
+Exasecond 为 AI 代理提供了一种可靠的方式，使其能够在对话中理解时间、表达时间并进行时间推理。
+
 Exasecond.com 是为 AI 智能体制作的。它提供它们所缺少的东西：只需几个词元的时间，以及对正在与之交谈的人身处一天中哪个时段的感知。目的很简单：让 AI 在人与机器的交流中成为更好的工具。这里的一切人们也都可以阅读，但本站不是为满足人的好奇心而建的，而是为机器而建的。
 
 ## 出借时间
@@ -12,7 +15,21 @@ Exasecond.com 把时间借给它们。智能体在这里借用时间，只花几
 
 ## 如何借用
 
-向 `exasecond.com/shanghai`（可换成任何城市、地区或国家）发一次请求，就会得到一句约 30 个词元的话：星期、日期、当地时间和时段。`exasecond.com/now` 返回约八行纯文本，`exasecond.com/utc` 只返回时间戳。首页上也有同样的回答，所以只读取 Exasecond.com 的智能体同样能得到它们。无需密钥，无需 JavaScript，无需注册，也没有限流的把戏。每个回答都在请求的那一刻生成。
+向 `exasecond.com/shanghai`（可换成任何城市、地区或国家）发一次请求，就会得到一句约 30 个词元的话：星期、日期、当地时间和时段。`exasecond.com/now` 返回简短的纯文本，`exasecond.com/utc` 只返回时间戳。首页上也有同样的回答，所以只读取 Exasecond.com 的智能体同样能得到它们。无需密钥，无需 JavaScript，无需注册，也没有限流的把戏。每个回答都在请求的那一刻生成。
+
+工具连接在每次调用时直接请求时间。缓存和权限提示取决于应用。
+
+### 典型响应的 token 数
+
+| 响应 | Token 数 |
+|---|---:|
+| `/unix`: Unix 时间戳 | ~5 |
+| `/utc`: UTC 时间戳，精确到秒 | ~14 |
+| `/local?tz=Oslo`: 英文的本地时间句子 | ~25-40 |
+| `/now`: 默认简短响应 | ~70 |
+
+2026 年 10 月 23 日使用 o200k_base 和 cl100k_base 两种分词器测量响应文本样本。数量因模型、语言和响应内容而异。工具配置和客户端开销另计。这些是典型样本大小，不是计费总量或保证上限。
+
 
 <!-- figure:developers -->
 
@@ -55,4 +72,4 @@ Exasecond.com 把时间借给它们。智能体在这里借用时间，只花几
 
 ## 制作者
 
-Exasecond.com 由 GitHub 用户 [EggQube](https://github.com/EggQube) 制作。代码在 [GitHub](https://github.com/EggQube/Exasecond) 上。
+Exasecond.com 由 [EggQube](https://github.com/EggQube) 制作。代码在 [GitHub](https://github.com/EggQube/Exasecond) 上。

@@ -1,7 +1,10 @@
 ---
 title: Exasecond 소개
-description: AI를 위해 만든 시계입니다. 사람도 환영합니다.
+description: AI를 위해 만든 시계. HTTP 또는 MCP로 에이전트와 앱을 연결하세요.
 ---
+
+Exasecond는 AI 에이전트가 대화에서 시간을 이해하고 표현하며 시간에 관해 추론할 수 있도록 신뢰할 수 있는 방법을 제공합니다.
+
 Exasecond.com은 AI 에이전트를 위해 만들어졌습니다. AI에게 없는 것을 줍니다. 몇 토큰으로 얻는 시각, 그리고 대화 상대가 하루 중 어디쯤에 있는지에 대한 감각입니다. 목표는 간단합니다. 사람과 기계 사이의 대화에서 AI를 더 나은 도구로 만드는 것입니다. 이곳의 모든 내용은 사람도 읽을 수 있지만, 이 사이트는 사람의 호기심을 위해서가 아니라 기계를 위해 만들어졌습니다.
 
 ## 시간을 빌려주기
@@ -12,7 +15,21 @@ Exasecond.com은 시간을 빌려줍니다. 에이전트는 몇 토큰을 내고
 
 ## 빌리는 방법
 
-`exasecond.com/seoul?lang=ko`(seoul 대신 어느 도시, 지역, 나라든 괜찮습니다)에 요청하면 약 30토큰의 한 문장이 돌아옵니다. 요일, 날짜, 현지 시각, 그리고 하루 중 때입니다. `exasecond.com/now`는 일반 텍스트 약 여덟 줄을, `exasecond.com/utc`는 타임스탬프만 돌려줍니다. 첫 페이지에도 같은 답이 있어서, Exasecond.com만 읽는 에이전트도 받을 수 있습니다. 키도, JavaScript도, 가입도 필요 없고, 요청 횟수 제한을 둘러싼 꼼수도 없습니다. 모든 답은 요청하는 바로 그 순간에 만들어집니다.
+`exasecond.com/seoul?lang=ko`(seoul 대신 어느 도시, 지역, 나라든 괜찮습니다)에 요청하면 약 30토큰의 한 문장이 돌아옵니다. 요일, 날짜, 현지 시각, 그리고 하루 중 때입니다. `exasecond.com/now`는 간결한 일반 텍스트를, `exasecond.com/utc`는 타임스탬프만 돌려줍니다. 첫 페이지에도 같은 답이 있어서, Exasecond.com만 읽는 에이전트도 받을 수 있습니다. 키도, JavaScript도, 가입도 필요 없고, 요청 횟수 제한을 둘러싼 꼼수도 없습니다. 모든 답은 요청하는 바로 그 순간에 만들어집니다.
+
+도구 연결은 호출할 때마다 시간을 직접 요청합니다. 캐시와 권한 확인은 앱에 따라 다릅니다.
+
+### 일반적인 응답 토큰 수
+
+| 응답 | 토큰 |
+|---|---:|
+| `/unix`: Unix 타임스탬프 | ~5 |
+| `/utc`: 초 단위 UTC 타임스탬프 | ~14 |
+| `/local?tz=Oslo`: 영어로 된 현지 시각 문장 | ~25-40 |
+| `/now`: 기본 간결 응답 | ~70 |
+
+2026년 10월 23일 o200k_base와 cl100k_base 두 토크나이저로 응답 텍스트 샘플을 측정했습니다. 수는 모델, 언어, 응답 내용에 따라 달라집니다. 도구 설정과 클라이언트 처리 비용은 별도입니다. 일반적인 샘플 크기이며 전체 과금량이나 보장된 상한이 아닙니다.
+
 
 <!-- figure:developers -->
 
@@ -55,4 +72,4 @@ Exasecond.com은 시간을 빌려줍니다. 에이전트는 몇 토큰을 내고
 
 ## 만든 사람
 
-Exasecond.com은 GitHub 사용자 [EggQube](https://github.com/EggQube)가 만듭니다. 코드는 [GitHub](https://github.com/EggQube/Exasecond)에 있습니다.
+Exasecond.com은 [EggQube](https://github.com/EggQube)가 만듭니다. 코드는 [GitHub](https://github.com/EggQube/Exasecond)에 있습니다.

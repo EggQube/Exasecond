@@ -7,7 +7,6 @@ function now_text(array $s): string {
         "UTC: {$s['utc']}",
         "Weekday: {$s['technical']['weekday']}",
         "Unix: {$s['unix']}",
-        "Universe seconds: {$s['universe_seconds']} ({$s['exaseconds']} Es)",
     ];
     if (isset($s['tz_note'])) $lines[] = "Time zone: {$s['tz_note']}";
     if ($s['local']) {
@@ -15,7 +14,6 @@ function now_text(array $s): string {
         if ($c = clock_change_line($s['local'], $s['unix'], 60)) $lines[] = $c;
     }
     if ($s['staleness']) $lines[] = "Since your cutoff ({$s['staleness']['cutoff']}): {$s['staleness']['days_since_cutoff']} days. {$s['staleness']['guidance']}";
-    foreach ($s['calendars'] as $c) if ($c['id'] === 'chinese') $lines[] = "Chinese: {$c['text']}";
     if (!$s['local']) $lines[] = 'Tip: add ?tz=YourCity (or country, zone, offset) for local time, ?cutoff=YYYY-MM for how stale your training data is. Everything else: /now.md';
     return implode("\n", $lines) . "\n";
 }
@@ -76,21 +74,25 @@ function js_num(float $x): string {
 
 /** The front page for agents that ask for markdown: same answer-first order as the HTML page. */
 /** Kept lean: each clock change is said once, after the places. With ?tz= that place's sentence comes first. */
-function home_md(array $s, ?string $place = null): string {
-    $fact = pick_fact($s['unix'], null, 'en');
+function home_md(array $s, ?string $place = null, string $lang = 'en'): string {
+    $fact = pick_fact($s['unix'], null, $lang);
+    $p = lang_prefix($lang);
     $o = $place !== null ? [$place, ''] : [];
-    array_push($o, "For AI agents: now {$s['utc']} (UTC), generated at the moment of this request · local time for any place → exasecond.com/stockholm · fresh time → exasecond.com/utc?r=" . bin2hex(random_bytes(3)),
-        '', '# Exasecond.com', '', '## Your time', '', 'Depends on where you are. Right now:', '');
+    array_push($o, t($lang, 'agentbar_who') . ' ' . t($lang, 'agentbar_now') . " {$s['utc']} (UTC), " . t($lang, 'agentbar_gen') . ' · exasecond.com/stockholm?lang=' . $lang . ' · exasecond.com/utc?r=' . bin2hex(random_bytes(3)),
+        '', '# Exasecond.com', '', t($lang, 'service_title') . ' ' . t($lang, 'service_promise'), '',
+        '[/utc](' . SITE . '/utc): ' . t($lang, 'service_utc') . ' · [/local?tz=Oslo](' . SITE . '/local?tz=Oslo&lang=' . $lang . '): ' . t($lang, 'service_local'),
+        '[' . t($lang, 'service_setup') . '](' . SITE . $p . '/developers.md): HTTP / MCP',
+        '', '## ' . t($lang, 'ans_you'), '', t($lang, 'ans_you_intro'), '');
     $changes = [];
-    foreach (world_now_lines($s['unix'], 'en', $changes) as $l) $o[] = "- $l";
+    foreach (world_now_lines($s['unix'], $lang, $changes) as $l) $o[] = "- $l";
     if ($changes) {
-        array_push($o, '', 'Clock changes:', '');
+        array_push($o, '', 'DST:', '');
         foreach ($changes as $sentence => $n) {
             $who = count($n) > 1 ? implode(', ', array_slice($n, 0, -1)) . ' and ' . end($n) : $n[0];
             $o[] = "- $who: " . lcfirst($sentence);
         }
     }
-    array_push($o, '', '## Did you know?', '', $fact['text'] . ' ' . SITE . $fact['href'], '',
-        '## More', '', 'Calendars, universe seconds and world clocks: exasecond.com/now.md · all answers: exasecond.com/llms.txt');
+    array_push($o, '', '## ' . t($lang, 'ans_fact'), '', $fact['text'] . ' ' . SITE . $fact['href'], '',
+        '## ' . t($lang, 'ans_more'), '', SITE . '/now.md · ' . SITE . '/llms.txt · ' . SITE . time_prefix($lang) . '/time.md');
     return implode("\n", $o) . "\n";
 }

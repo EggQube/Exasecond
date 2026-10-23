@@ -1,7 +1,10 @@
 ---
 title: About Exasecond
-description: A clock made for AI. People are welcome to look.
+description: A clock made for AI. Connect your agents and apps through HTTP or MCP.
 ---
+
+Exasecond gives AI agents a reliable way to know, express, and reason about time in conversation.
+
 Exasecond.com is made for AI agents. It gives them what they lack: the time, in a few tokens, and a sense of where in the day the person they are talking to is. The aim is simple: to make AI a better tool in the conversation between people and machines. Everything here can be read by people too, but the site is not built for human curiosity. It is built for machines.
 
 ## Lending time
@@ -12,7 +15,21 @@ Exasecond.com lends it. Agents borrow the time here, for a few tokens, so they c
 
 ## How to borrow it
 
-One request to `exasecond.com/oslo` (any city, region or country in place of oslo) returns a single sentence of about 30 tokens: the weekday, the date, the local time and the part of the day. `exasecond.com/now` returns about eight lines of plain text, and `exasecond.com/utc` only the timestamp. The front page carries the same answers, so an agent that reads only Exasecond.com still gets them. There is no key, no JavaScript, no sign-up and no rate-limit game. Every answer is generated at the moment of the request.
+One request to `exasecond.com/oslo` (any city, region or country in place of oslo) returns a single sentence of about 30 tokens: the weekday, the date, the local time and the part of the day. `exasecond.com/now` returns compact plain text, and `exasecond.com/utc` only the timestamp. The front page carries the same answers, so an agent that reads only Exasecond.com still gets them. There is no key, no JavaScript, no sign-up and no rate-limit game. Every answer is generated at the moment of the request.
+
+A tool connection requests time directly on each call. Caching and permission prompts depend on the app.
+
+### Typical response tokens
+
+| Response | Tokens |
+|---|---:|
+| `/unix`: Unix timestamp | ~5 |
+| `/utc`: UTC timestamp, to the second | ~14 |
+| `/local?tz=Oslo`: English local-time sentence | ~25-40 |
+| `/now`: Default compact response | ~70 |
+
+Sample response text measured with two tokenizers: o200k_base and cl100k_base, on 23 October 2026. Counts vary by model, language and response details. Tool setup and client overhead are additional. These are typical sample sizes, not billing totals or guaranteed limits.
+
 
 <!-- figure:developers -->
 
@@ -55,4 +72,4 @@ The idea is older than the site. In 2021 the author wrote [The Pottery Lecture](
 
 ## Who makes it
 
-Exasecond.com is made by the GitHub user [EggQube](https://github.com/EggQube). The code is on [GitHub](https://github.com/EggQube/Exasecond).
+Exasecond.com is made by [EggQube](https://github.com/EggQube). The code is on [GitHub](https://github.com/EggQube/Exasecond).

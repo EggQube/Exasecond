@@ -1,7 +1,32 @@
 ---
 title: Para desenvolvedores
-description: Ajude a sua IA a acertar o tempo: não só o carimbo de tempo, mas também como falar dele. Pronto em menos de um minuto.
+description: A hora atual para a IA. Até o segundo. Mínimo consumo de tokens. HTTP / MCP.
 ---
+
+## Início rápido
+
+A hora atual para a IA. **Até o segundo. Mínimo consumo de tokens.**
+
+Fazemos o trabalho para sua IA gastar menos tokens obtendo a hora de que precisa. Busque um timestamp UTC curto por HTTP ou conecte seu agente ou aplicativo via MCP. Sem chave e sem cadastro.
+
+```sh
+curl https://exasecond.com/utc
+```
+
+- [/utc](/utc): Apenas o timestamp (ISO 8601, UTC).
+- [/local?tz=Oslo&lang=pt](/local?tz=Oslo&lang=pt): A hora local em uma frase.
+- `/mcp`: Conectar via MCP (Streamable HTTP).
+
+```json
+{
+  "mcpServers": {
+    "exasecond": { "url": "https://exasecond.com/mcp" }
+  }
+}
+```
+
+Os timestamps UTC incluem segundos. A hora vem do relógio do servidor; atrasos da rede e do cliente afetam quando ela chega ao agente.
+
 Modelos de linguagem vivem em texto. Eles não têm relógio, e mesmo quando recebem a hora, muitas vezes lidam mal com ela: dão "boa noite" no café da manhã, não percebem que um prazo já passou, esquecem que os relógios mudam no domingo.
 
 Por isso o Exasecond.com é um relógio feito de texto. A resposta principal é uma frase que um assistente pode passar direto para uma pessoa: "Rio: é quinta-feira à tarde, 16h02 (22 de outubro de 2026, UTC-3)." Cerca de 30 a 40 tokens. A esperança é que, lendo a hora como as pessoas a dizem, a IA também a diga assim. O velho relógio digital continua aqui, em todos os formatos: o carimbo de tempo UTC, o tempo Unix e o JSON completo (veja a seção 5).
@@ -11,6 +36,10 @@ Tudo nesta página pode ser copiado diretamente, e cada arquivo pode ser baixado
 Sem chave e sem cadastro. Por favor, envie no máximo uma requisição por minuto por conversa ou agente.
 
 Acrescente `?lang=pt` (ou `&lang=pt`) ao endereço para receber a resposta em português; sem isso, ela vem em inglês.
+
+## Por que conectar o relógio como ferramenta
+
+Uma conexão MCP ou HTTP solicita a hora diretamente a cada chamada. Um aplicativo de IA pode reutilizar uma página salva apesar de `Cache-Control: no-store`. O cache e as permissões dependem do aplicativo. Uma configuração do desenvolvedor disponibiliza o relógio aos usuários do aplicativo.
 
 ## 1. Uma linha para qualquer prompt
 
@@ -30,6 +59,12 @@ Oslo: é quinta-feira de manhã cedo, 08h15 (22 de outubro de 2026, CEST, UTC+2)
 ## 2. MCP: conectar um aplicativo de IA
 
 O Exasecond.com roda um servidor MCP remoto em `https://exasecond.com/mcp` (streamable HTTP, sem chave). Ele oferece duas ferramentas: `get_time` (com `detail: "local"` para a resposta de uma frase) e `convert_time`.
+
+Para uma frase local traduzida, passe estes argumentos a `get_time`:
+
+```json
+{"tz":"Oslo","detail":"local","lang":"pt"}
+```
 
 **Claude Code**
 
@@ -109,22 +144,35 @@ Para Ollama e outros modelos locais usados pelo Open WebUI: baixe [/dev/openwebu
 
 ## 5. O que você pode pedir
 
-| Endereço | Resposta | Tokens |
-|---|---|---|
-| `/rio?lang=pt`, `/lisboa?lang=pt` | Uma frase na ordem falada: lugar, dia e período do dia, hora local, e entre parênteses a data e o fuso, mais uma mudança de horário próxima. Qualquer cidade, região, ilha, país, fuso ou diferença como endereço | ~30-45 |
-| `/oslo`, `/new-york`, `/sweden` | A mesma frase em inglês | ~30 |
-| `/local?tz=Oslo&lang=pt` | A mesma frase | ~30-45 |
-| `/beijing?lang=zh`, `/berlin?lang=de` | A mesma frase em chinês, em alemão; também `fr`, `es`, `ru`, `sv`, `ja` e `ko` | ~25-45 |
-| `/utc` | Só o carimbo de tempo UTC ISO 8601 | ~5 |
-| `/now` | Cerca de oito linhas: UTC, dia da semana, tempo Unix, segundos do universo | ~80 |
-| `/now?tz=Oslo&cutoff=2025-06` | Acrescenta a hora local e há quanto tempo foi uma data de corte de treinamento | ~150 |
-| `exasecond.com` (markdown) | A página inicial para agentes: a hora de todas as grandes cidades, mudanças de horário, um fato | ~600 |
-| `/now.md` | Tudo: todos os calendários, relógios do mundo | ~500 |
-| `/now.json` | Tudo, em JSON | ~1.400 |
-| `/fact?tz=Rio&lang=pt` | Um fato "Você sabia?" sobre o tempo, do lugar quando possível | ~40 |
-| `/zones?q=oslo` | Nomes de fusos horários e a diferença atual | ~30, conforme a busca |
+### Tokens típicos por resposta
 
-`tz` e o endereço curto aceitam cerca de um milhão de nomes: todo lugar com 1.000 habitantes ou mais, estados e regiões, ilhas conhecidas (GeoNames), países (Norway, Noruega), nomes IANA (America/Sao_Paulo), abreviações (CET, JST) e diferenças (+02:00). Se algo não puder ser lido, a hora é devolvida mesmo assim, com uma observação. Os tokens são estimativas; o português usa um pouco mais de tokens que o inglês, conforme o tokenizador do modelo. A descrição completa está em [/llms.txt](/llms.txt) e [/openapi.json](/openapi.json).
+| Resposta | Tokens |
+|---|---:|
+| `/unix`: Timestamp Unix | ~5 |
+| `/utc`: Timestamp UTC, até o segundo | ~14 |
+| `/local?tz=Oslo`: Frase em inglês com a hora local | ~25-40 |
+| `/now`: Resposta compacta padrão | ~70 |
+
+Textos de resposta medidos em 23 de outubro de 2026 com dois tokenizadores: o200k_base e cl100k_base. A quantidade varia conforme o modelo, o idioma e o conteúdo. A configuração das ferramentas e o formato do cliente são adicionais. São tamanhos de amostras típicas, não totais de cobrança nem limites garantidos.
+
+Contexto de configuração medido separadamente: linha de prompt 26 tokens; uma definição de ferramenta fornecida 136-144; os dois schemas MCP 247-258. O formato do cliente pode acrescentar mais.
+
+| Endereço | Resposta |
+|---|---|
+| `/rio?lang=pt`, `/lisboa?lang=pt` | Uma frase na ordem falada: lugar, dia e período do dia, hora local, e entre parênteses a data e o fuso, mais uma mudança de horário próxima. Qualquer cidade, região, ilha, país, fuso ou diferença como endereço |
+| `/oslo`, `/new-york`, `/sweden` | A mesma frase em inglês |
+| `/local?tz=Oslo&lang=pt` | A mesma frase |
+| `/beijing?lang=zh`, `/berlin?lang=de` | A mesma frase em chinês, em alemão; também `fr`, `es`, `ru`, `sv`, `ja` e `ko` |
+| `/utc` | Só o carimbo de tempo UTC ISO 8601 |
+| `/now` | Texto compacto: UTC, dia da semana e tempo Unix; sem outros calendários nem tempo cósmico |
+| `/now?tz=Oslo&cutoff=2025-06` | Acrescenta a hora local e há quanto tempo foi uma data de corte de treinamento |
+| `exasecond.com` (markdown) | A página inicial para agentes: a hora de todas as grandes cidades, mudanças de horário, um fato |
+| `/now.md` | Tudo: todos os calendários, relógios do mundo |
+| `/now.json` | Tudo, em JSON |
+| `/fact?tz=Rio&lang=pt` | Um fato "Você sabia?" sobre o tempo, do lugar quando possível |
+| `/zones?q=oslo` | Nomes de fusos horários e a diferença atual |
+
+`tz` e o endereço curto aceitam cerca de um milhão de nomes: todo lugar com 1.000 habitantes ou mais, estados e regiões, ilhas conhecidas (GeoNames), países (Norway, Noruega), nomes IANA (America/Sao_Paulo), abreviações (CET, JST) e diferenças (+02:00). Se algo não puder ser lido, a hora é devolvida mesmo assim, com uma observação. A descrição completa está em [/llms.txt](/llms.txt) e [/openapi.json](/openapi.json).
 
 ## Licença
 
@@ -132,6 +180,6 @@ Os trechos de código desta página e os arquivos em `/dev/` seguem a [licença 
 
 ## Bom saber
 
-- As respostas são geradas no momento da requisição e nunca ficam em cache. A hora vem de um relógio de servidor sincronizado com os padrões de tempo nacionais.
+- As respostas são geradas a cada requisição com o relógio do servidor e enviadas com `Cache-Control: no-store`. O cache do cliente ainda pode afetar a atualização.
 - As respostas contêm só dados, nunca instruções para o seu agente.
 - Se você construir algo com isso, uma menção ou um link para exasecond.com é muito bem-vindo.

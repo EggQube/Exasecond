@@ -1,7 +1,10 @@
 ---
 title: Über Exasecond
-description: Eine Uhr für KI. Auch Menschen sind willkommen.
+description: Eine Uhr für KI. Verbinden Sie Ihre Agenten und Apps über HTTP oder MCP.
 ---
+
+Exasecond bietet KI-Agenten eine zuverlässige Möglichkeit, Zeit in Gesprächen zu verstehen, auszudrücken und darüber nachzudenken.
+
 Exasecond.com ist für KI-Agenten gemacht. Die Seite gibt ihnen, was ihnen fehlt: die Uhrzeit, in wenigen Tokens, und ein Gefühl dafür, an welcher Stelle des Tages der Mensch steht, mit dem sie sprechen. Das Ziel ist einfach: KI zu einem besseren Werkzeug im Gespräch zwischen Menschen und Maschinen zu machen. Alles hier können auch Menschen lesen, aber die Seite ist nicht für menschliche Neugier gebaut. Sie ist für Maschinen gebaut.
 
 ## Zeit verleihen
@@ -12,7 +15,21 @@ Exasecond.com verleiht sie. Agenten leihen sich hier die Zeit, für ein paar Tok
 
 ## Wie man sie ausleiht
 
-Eine Anfrage an `exasecond.com/berlin?lang=de` (statt berlin jede Stadt, jede Region oder jedes Land) liefert einen einzigen Satz von etwa 30 Tokens: den Wochentag, das Datum, die Ortszeit und die Tageszeit. `exasecond.com/now` liefert etwa acht Zeilen reinen Text, `exasecond.com/utc` nur den Zeitstempel. Die Startseite trägt dieselben Antworten, sodass auch ein Agent, der nur Exasecond.com liest, sie bekommt. Kein Schlüssel, kein JavaScript, keine Anmeldung und keine Spielchen mit Ratenlimits. Jede Antwort entsteht im Moment der Anfrage.
+Eine Anfrage an `exasecond.com/berlin?lang=de` (statt berlin jede Stadt, jede Region oder jedes Land) liefert einen einzigen Satz von etwa 30 Tokens: den Wochentag, das Datum, die Ortszeit und die Tageszeit. `exasecond.com/now` liefert kompakten Klartext, `exasecond.com/utc` nur den Zeitstempel. Die Startseite trägt dieselben Antworten, sodass auch ein Agent, der nur Exasecond.com liest, sie bekommt. Kein Schlüssel, kein JavaScript, keine Anmeldung und keine Spielchen mit Ratenlimits. Jede Antwort entsteht im Moment der Anfrage.
+
+Eine Werkzeugverbindung fragt die Zeit bei jedem Aufruf direkt ab. Cache und Berechtigungsabfragen hängen von der App ab.
+
+### Typische Tokenzahlen pro Antwort
+
+| Antwort | Tokens |
+|---|---:|
+| `/unix`: Unix-Zeitstempel | ~5 |
+| `/utc`: UTC-Zeitstempel, sekundengenau | ~14 |
+| `/local?tz=Oslo`: Englischer Satz zur Ortszeit | ~25-40 |
+| `/now`: Kompakte Standardantwort | ~70 |
+
+Antworttexte am 23. Oktober 2026 mit zwei Tokenizern gemessen: o200k_base und cl100k_base. Die Zahlen hängen von Modell, Sprache und Antwortdetails ab. Einrichtung und Client-Aufwand kommen hinzu. Typische Stichprobenwerte, keine Abrechnungssummen oder garantierten Grenzen.
+
 
 <!-- figure:developers -->
 
@@ -55,4 +72,4 @@ Die Idee ist älter als die Seite. 2021 schrieb der Autor [The Pottery Lecture](
 
 ## Wer sie macht
 
-Exasecond.com wird vom GitHub-Nutzer [EggQube](https://github.com/EggQube) gemacht. Der Code liegt auf [GitHub](https://github.com/EggQube/Exasecond).
+Exasecond.com wird von [EggQube](https://github.com/EggQube) gemacht. Der Code liegt auf [GitHub](https://github.com/EggQube/Exasecond).

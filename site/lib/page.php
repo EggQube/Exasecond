@@ -110,10 +110,10 @@ sup { font-size: .7em; line-height: 0; }
   .top nav { font-size: 11px; gap: 12px; color: var(--ink-3); border-left: 1px solid var(--line); padding-left: 12px; }
 }
 .agentbar a:hover { color: var(--accent); }
-.top { display: flex; justify-content: space-between; align-items: baseline; padding: 24px 0; gap: 16px; }
+.top { display: flex; justify-content: space-between; align-items: center; padding: 24px 0; gap: 16px; }
 .mark { font: 600 15px/1 var(--mono); letter-spacing: .32em; text-transform: uppercase; text-decoration: none; white-space: nowrap; }
 .mark b { color: var(--accent); font-weight: 600; }
-.top nav { font: 13px/1 var(--mono); color: var(--ink-2); display: flex; gap: 18px; flex-wrap: wrap; justify-content: flex-end; }
+.top nav { font: 13px/1 var(--mono); color: var(--ink-2); display: flex; align-items: center; gap: 18px; flex-wrap: nowrap; justify-content: flex-end; }
 .top nav a { text-decoration: none; }
 .top nav a:hover, .top nav a[aria-current] { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent); }
 .langs { position: relative; }
@@ -123,8 +123,38 @@ sup { font-size: .7em; line-height: 0; }
 .langs summary:hover, .langs[open] summary { color: var(--ink); }
 .langs ul { position: absolute; right: 0; top: calc(100% + 10px); z-index: 10; margin: 0; padding: 6px 0; list-style: none; background: var(--bg-2); border: 1px solid var(--line); min-width: 9em; }
 .langs li a { display: block; padding: 7px 14px; white-space: nowrap; }
+.site-menu { position: relative; }
+.site-menu summary { list-style: none; cursor: pointer; white-space: nowrap; }
+.site-menu summary::-webkit-details-marker { display: none; }
+.site-menu summary::after { content: " \25BE"; color: var(--ink-3); }
+.site-menu summary:focus-visible, .langs summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.site-menu summary, .langs summary { display: flex; align-items: center; min-height: 44px; }
+.site-menu ul { position: absolute; right: 0; top: 100%; z-index: 10; margin: 0; padding: 6px 0; list-style: none; background: var(--bg-2); border: 1px solid var(--line); min-width: 12em; max-width: calc(100vw - 32px); }
+.site-menu li a { display: block; padding: 13px 16px; line-height: 1.5; }
+@media (max-width: 640px) {
+  .top { align-items: center; gap: 12px; }
+  .top nav { align-items: center; flex-wrap: nowrap; font-size: 12px; gap: 12px; border: 0; padding-left: 0; }
+  .langs li a { min-height: 44px; padding-top: 14px; padding-bottom: 14px; }
+}
 
 /* clock */
+.service { padding: 34px 0 38px; border-top: 1px solid var(--line); }
+.service-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 36px; align-items: center; }
+.service h1 { font: 500 clamp(2rem, 4.6vw, 3.6rem)/1.08 var(--sans); letter-spacing: -.035em; margin: 0 0 18px; max-width: 16ch; }
+.service-promise { font: 400 clamp(1.1rem, 2vw, 1.5rem)/1.4 var(--sans); color: var(--accent); margin: 0 0 16px; }
+.service-desc { color: var(--ink-2); max-width: 57ch; margin: 0 0 18px; }
+.service-terminal { background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; min-width: 0; }
+.service-terminal p { padding: 12px 18px; margin: 0; color: var(--ink-2); font: 12px/1.5 var(--mono); border-bottom: 1px solid var(--line); }
+.service-terminal pre { font: 13px/1.8 var(--mono); padding: 20px 18px; margin: 0; overflow-x: auto; }
+.service-terminal output { display: block; padding: 0 18px 22px; color: var(--accent); font: 15px/1.5 var(--mono); overflow-wrap: anywhere; }
+.service-routes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 28px; }
+.service-routes a { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; text-decoration: none; min-width: 0; }
+.service-routes a:hover { border-color: var(--accent); background: var(--bg-2); }
+.service-routes code { display: block; color: var(--accent); overflow-wrap: anywhere; margin-bottom: 4px; }
+.service-routes span { color: var(--ink-2); font-size: 13px; }
+.service-definition { margin: 22px 0 0; max-width: 76ch; color: var(--ink-2); font-size: 14px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+@media (max-width: 760px) { .service-grid, .service-routes { grid-template-columns: 1fr; } .service-grid { gap: 22px; } .service h1 { max-width: 22ch; } }
 .hero { padding: 6vh 0 6vh; border-top: 1px solid var(--line); }
 
 /* the answer: first read */
@@ -198,7 +228,8 @@ pre.agents .c { color: var(--ink-3); }
 .more { margin-top: 18px; font: 14px/1.4 var(--mono); }
 
 /* reading pages */
-.read { max-width: 720px; margin: 0 auto; padding: 4vh 0 24px; }
+.read { margin: 0 auto; padding: 4vh 0 24px; }
+.read-story { max-width: 720px; }
 .kicker { font: 12px/1.5 var(--mono); color: var(--ink-2); letter-spacing: .06em; margin: 0 0 18px; }
 .kicker a { text-decoration: none; color: var(--accent); }
 .read h1 { font: 400 clamp(2rem, 6vw, 3.1rem)/1.12 var(--serif); margin: 0 0 18px; letter-spacing: -.01em; }
@@ -220,6 +251,7 @@ pre.agents .c { color: var(--ink-3); }
 .prose th { text-align: left; font: 12px/1.4 var(--mono); color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; }
 .prose th, .prose td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
 .prose td:first-child { white-space: nowrap; }
+.home-costs p { font: 16px/1.55 var(--sans); color: var(--ink-2); }
 #sources + ul, #来源 + ul { font: 14.5px/1.6 var(--sans); color: var(--ink-2); }
 .evidence { font: 14px/1.6 var(--sans); color: var(--ink-2); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin: 0 0 36px; }
 .evidence b { color: var(--ink); font-weight: 600; }
@@ -292,9 +324,13 @@ function layout(string $lang, array $o, string $body): string {
     $head .= $o['head'] ?? '';
     $p = lang_prefix($lang);
     $cur = fn($k) => ($o['active'] ?? '') === $k ? ' aria-current="page"' : '';
-    $nav = '<a href="' . time_prefix($lang) . '/time"' . $cur('time') . '>' . h($L('nav_time')) . '</a>'
-        . '<a href="' . $p . '/about"' . $cur('about') . '>' . h($L('nav_about')) . '</a>'
-        . lang_menu($lang, $here, $url);
+    $navLinks = [
+        '<a href="' . $p . '/developers"' . $cur('developers') . '>' . h($L('service_setup')) . '</a>',
+        '<a href="' . time_prefix($lang) . '/time"' . $cur('time') . '>' . h($L('nav_time')) . '</a>',
+        '<a href="' . $p . '/about"' . $cur('about') . '>' . h($L('nav_about')) . '</a>',
+    ];
+    $nav = '<details class="site-menu"><summary>' . h($L('nav_menu')) . '</summary><ul><li>'
+        . implode('</li><li>', $navLinks) . '</li></ul></details>' . lang_menu($lang, $here, $url);
     // Styling lives in /site.css (cached by browsers), so the page itself starts with the content: raw-HTML readers reach the time first.
     $cssHref = '/site.css?v=' . substr(md5(site_css()), 0, 8);
     $title = h($o['title']);
@@ -338,6 +374,23 @@ $body
   <p class="copy">© Exasecond.com 2021-$year</p>
 </div>
 <script>
+// Keep the native dropdowns usable without JavaScript; enhance dismissal when available.
+(() => {
+  const dropdowns = document.querySelectorAll(".top nav details");
+  document.addEventListener("click", (event) => {
+    for (const dropdown of dropdowns) {
+      if (!dropdown.contains(event.target) || event.target.closest("a")) dropdown.open = false;
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    for (const dropdown of dropdowns) {
+      if (!dropdown.open) continue;
+      dropdown.open = false;
+      dropdown.querySelector("summary").focus();
+    }
+  });
+})();
 // The agent bar is for machines (who read the HTML and don't run this). People see it briefly, then it folds away.
 setTimeout(() => {
   const b = document.querySelector(".agentbar");
@@ -412,6 +465,23 @@ function render_home(array $s, string $lang, ?string $place = null): string {
     $world = implode('', array_map(fn($l) => '<li>' . strtr(htmlspecialchars($l, ENT_NOQUOTES, 'UTF-8'), $links) . '</li>', world_now_lines($s['unix'], $lang)));
     $fact = pick_fact($s['unix'], null, $lang);
     $devBtn = dev_button($lang);
+    $tokenCosts = md_render(token_cost_md($lang));
+    $serviceTitle = h($L('service_title'));
+    $servicePromise = h($L('service_promise'));
+    $serviceDesc = h($L('service_desc'));
+    $serviceDefinition = h($L('service_definition'));
+    $serviceClock = h($L('service_clock'));
+    $serviceBytes = h(sprintf($L('service_bytes'), strlen($s['utc']) + 1));
+    $serviceUtc = h($L('service_utc'));
+    $serviceLocal = h($L('service_local'));
+    $serviceMcp = h($L('service_mcp'));
+    $serviceSetup = h($L('service_setup'));
+    $localHref = '/local?tz=Oslo' . ($en ? '' : '&amp;lang=' . $lang);
+    $structured = json_encode([
+        '@context' => 'https://schema.org', '@type' => 'WebAPI', 'name' => 'Exasecond.com',
+        'url' => SITE . $p . '/', 'description' => $L('service_title') . ' ' . $L('service_promise') . ' ' . $L('service_desc'),
+        'documentation' => SITE . $p . '/developers', 'inLanguage' => LANG_INFO[$lang]['tag'],
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG);
     $answer = '<section class="answer" aria-label="' . h($L('ans_label')) . '">'
         . '<div class="ans-row"><span class="ans-k">' . h($L('ans_now')) . '</span><p class="ans-v ans-now" id="ans-now">' . h($nowLine) . '</p></div>'
         . '<div class="ans-row"><span class="ans-k">' . h($L('ans_you')) . '</span><div class="ans-v" id="ans-you">'
@@ -420,6 +490,28 @@ function render_home(array $s, string $lang, ?string $place = null): string {
         . '</section>';
     $body = <<<HTML
   <main>
+    <section class="service" aria-labelledby="service-title">
+      <div class="service-grid">
+        <div>
+          <h1 id="service-title">$serviceTitle</h1>
+          <p class="service-promise">$servicePromise</p>
+          <p class="service-desc">$serviceDesc</p>
+          <a class="devbtn" href="{$p}/developers">$serviceSetup →</a>
+        </div>
+        <div class="service-terminal">
+          <p>HTTP GET · $serviceBytes · text/plain</p>
+          <pre><code>curl https://exasecond.com/utc</code></pre>
+          <p>$serviceClock · UTC</p>
+          <output>{$s['utc']}</output>
+        </div>
+      </div>
+      <div class="service-routes">
+        <a href="/utc"><code>/utc</code><span>$serviceUtc</span></a>
+        <a href="$localHref"><code>/local?tz=Oslo</code><span>$serviceLocal</span></a>
+        <a href="{$p}/developers"><code>/mcp</code><span>$serviceMcp</span></a>
+      </div>
+      <p class="service-definition">$serviceDefinition</p>
+    </section>
     $answer
     <div class="hero">
       <p class="eyebrow">{$L('eyebrow')}</p>
@@ -477,14 +569,14 @@ HTML;
     <section id="agents" aria-labelledby="h-agents">
       <h2 id="h-agents">{$L('ag_h')}</h2>
       <p class="sub">{$L('ag_sub')}</p>
-<pre class="agents" lang="en"><span class="c"># current time, ~8 lines</span>
+<pre class="agents" lang="en"><span class="c"># UTC timestamp, to the second</span>
+curl $S/utc
+
+<span class="c"># compact UTC, weekday and Unix</span>
 curl $S/now
 
-<span class="c"># with your time zone and training cutoff</span>
-curl "$S/now?tz=Asia/Shanghai&amp;cutoff=2025-06"
-
-<span class="c"># just the timestamp</span>
-curl $S/utc
+<span class="c"># local time in one sentence</span>
+curl "$S/local?tz=Oslo"
 
 <span class="c"># MCP: add as a remote server</span>
 $S/mcp</pre>
@@ -492,6 +584,8 @@ $S/mcp</pre>
         <a href="/llms.txt">/llms.txt</a><a href="/llms-full.txt">/llms-full.txt</a><a href="/now.md">/now.md</a>
         <a href="/now.json">/now.json</a><a href="/openapi.json">/openapi.json</a><a href="/spec.md">/spec.md</a><a href="{$tp}/time.md">{$tp}/time.md</a>
       </div>
+      <p>{$L('tool_connection')}</p>
+      <div class="prose home-costs">$tokenCosts</div>
       <div class="dev-cta">{$devBtn}</div>
     </section>
   </main>
@@ -505,8 +599,9 @@ HTML;
     return layout($lang, [
         'title' => $L('home_title'),
         'desc' => $L('home_desc') . $L('desc_now') . $s['utc'] . ' UTC.',
-        'path' => '/', 'md' => '/now.md',
-        'head' => '<link rel="alternate" type="application/json" href="/now.json" title="Current time as JSON">' . "\n",
+        'path' => '/', 'md' => $p . '/',
+        'head' => '<link rel="alternate" type="application/json" href="/now.json" title="Current time as JSON">' . "\n"
+            . '<script type="application/ld+json">' . $structured . '</script>' . "\n",
     ], $body);
 }
 
@@ -700,7 +795,7 @@ function render_doc(array $d, string $lang, string $path, array $s): string {
 }
 
 function render_story_page(array $s): string {
-    $body = '<main class="read"><p class="kicker">' . h(t('en', 'story_eyebrow')) . '</p><article class="play">' . story_html_body(story_md()) . '</article></main>'
+    $body = '<main class="read read-story"><p class="kicker">' . h(t('en', 'story_eyebrow')) . '</p><article class="play">' . story_html_body(story_md()) . '</article></main>'
         . '<footer class="site"><p>' . h(sprintf(t('en', 'read_at'), $s['utc'], $s['universe_seconds'])) . '</p><p><a href="/story.md">story.md</a></p></footer>';
     return layout('en', ['title' => 'The Pottery Lecture · Exasecond', 'desc' => 'Why this site exists: a short theatrical play for AI readers, first published November 4, 2021.', 'path' => '/story', 'alt' => false, 'md' => '/story.md'], $body);
 }

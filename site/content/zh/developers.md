@@ -1,7 +1,32 @@
 ---
 title: 开发者
-description: 帮你的 AI 把时间说对：不只是时间戳，还有怎样谈论时间。一分钟内完成配置。
+description: 给 AI 的当前时间。 精确到秒。尽量减少 token 开销。 HTTP / MCP.
 ---
+
+## 快速入门
+
+给 AI 的当前时间。 **精确到秒。尽量减少 token 开销。**
+
+我们做好准备，让你的 AI 用更少的 token 获取所需时间。通过 HTTP 获取简短的 UTC 时间戳，或通过 MCP 连接智能体和应用。无需密钥，无需注册。
+
+```sh
+curl https://exasecond.com/utc
+```
+
+- [/utc](/utc): 仅时间戳 (ISO 8601, UTC).
+- [/local?tz=Oslo&lang=zh](/local?tz=Oslo&lang=zh): 用一句话表达本地时间.
+- `/mcp`: 通过 MCP 连接 (Streamable HTTP).
+
+```json
+{
+  "mcpServers": {
+    "exasecond": { "url": "https://exasecond.com/mcp" }
+  }
+}
+```
+
+UTC 时间戳包含秒。时间来自服务器时钟；网络和客户端延迟会影响智能体收到时间的时刻。
+
 语言模型生活在文字里。它们没有时钟，即使拿到了时间，也常常用不好：早餐时说"晚上好"，没发现截止日期已经过了，忘了周日要调钟。
 
 所以 Exasecond.com 是一座用文字做成的钟。它的主要回答是一句助手可以直接转告给人的话："上海现在是星期四下午 16:02（2026年10月22日，CST，UTC+8）。"大约 30 个词元。我们希望 AI 读到人们说时间的方式，也会用同样的方式说出来。传统的数字时钟也依然保留在这里，各种格式都有：UTC 时间戳、Unix 时间和完整的 JSON（见第 5 节）。
@@ -11,6 +36,10 @@ description: 帮你的 AI 把时间说对：不只是时间戳，还有怎样谈
 无需密钥，无需注册。请每个对话或智能体每分钟最多发送一次请求。
 
 在地址后加上 `?lang=zh`（或 `&lang=zh`），回答就是中文；不加则是英文。
+
+## 为什么把时钟接为工具
+
+MCP 或 HTTP 工具连接会在每次调用时直接请求时间。即使服务器发送 `Cache-Control: no-store`，AI 应用也可能复用保存的网页。缓存和权限提示取决于应用。开发者配置一次，就能让应用的用户使用这个时钟。
 
 ## 1. 一行提示词
 
@@ -30,6 +59,12 @@ https://exasecond.com/<对方所在的城市>?lang=zh 并使用那个时间。
 ## 2. MCP：连接 AI 应用
 
 Exasecond.com 在 `https://exasecond.com/mcp` 运行一个远程 MCP 服务器（streamable HTTP，无需密钥）。它提供两个工具：`get_time`（加 `detail: "local"` 得到一句话的回答）和 `convert_time`。
+
+要获得相应语言的本地时间句子，向 `get_time` 传入这些参数：
+
+```json
+{"tz":"Oslo","detail":"local","lang":"zh"}
+```
 
 **Claude Code**
 
@@ -109,22 +144,35 @@ def get_local_time(place: str = "") -> str:
 
 ## 5. 可以查询的内容
 
-| 地址 | 回答 | 词元 |
-|---|---|---|
-| `/shanghai?lang=zh`、`/北京?lang=zh` | 一句按口语顺序的话：地点、星期、时段和本地时间，括号里是日期和时区，以及即将到来的调钟。地址可以是任何城市、地区、岛屿、国家、时区或偏移 | ~25-40 |
-| `/oslo`、`/new-york`、`/sweden` | 同一句话，英文 | ~30 |
-| `/local?tz=Oslo&lang=zh` | 同一句话 | ~25-40 |
-| `/berlin?lang=de` | 同一句话，德语；也支持 `fr`、`es`、`pt`、`ru`、`sv`、`ja` 和 `ko` | ~25-60 |
-| `/utc` | 只有 ISO 8601 UTC 时间戳 | ~5 |
-| `/now` | 大约八行：UTC、星期、Unix 时间、宇宙秒 | ~80 |
-| `/now?tz=Oslo&cutoff=2025-06` | 加上本地时间，以及训练截止日期距今多久 | ~150 |
-| `exasecond.com`（markdown） | 给智能体的首页：各大城市的时间、调钟、一条知识 | ~600 |
-| `/now.md` | 全部内容：所有历法、世界时钟 | ~500 |
-| `/now.json` | 全部内容，JSON 格式 | ~1,400 |
-| `/fact?tz=Shanghai&lang=zh` | 一条关于时间的"你知道吗？"，尽可能与该地点相关 | ~30 |
-| `/zones?q=oslo` | 时区名称及其当前偏移 | ~30，取决于搜索 |
+### 典型响应的 token 数
 
-`tz` 和简短地址可以接受大约一百万个名称：所有人口 1,000 以上的地方、州和地区、知名岛屿（GeoNames），国家（挪威、Norway），IANA 名称（Asia/Shanghai），缩写（CET、JST）和偏移（+08:00）。如果无法识别，仍会返回时间，并附上一条说明。词元数是估算：英文约每 4 个字符 1 个词元，中文约每个汉字 1 个词元，具体取决于模型的分词器。完整说明见 [/llms.txt](/llms.txt) 和 [/openapi.json](/openapi.json)。
+| 响应 | Token 数 |
+|---|---:|
+| `/unix`: Unix 时间戳 | ~5 |
+| `/utc`: UTC 时间戳，精确到秒 | ~14 |
+| `/local?tz=Oslo`: 英文的本地时间句子 | ~25-40 |
+| `/now`: 默认简短响应 | ~70 |
+
+2026 年 10 月 23 日使用 o200k_base 和 cl100k_base 两种分词器测量响应文本样本。数量因模型、语言和响应内容而异。工具配置和客户端开销另计。这些是典型样本大小，不是计费总量或保证上限。
+
+单独测量的配置上下文：提示词行 26 token；一个提供的工具定义 136-144；两个 MCP 工具的 schema 共 247-258。客户端格式可能增加开销。
+
+| 地址 | 回答 |
+|---|---|
+| `/shanghai?lang=zh`、`/北京?lang=zh` | 一句按口语顺序的话：地点、星期、时段和本地时间，括号里是日期和时区，以及即将到来的调钟。地址可以是任何城市、地区、岛屿、国家、时区或偏移 |
+| `/oslo`、`/new-york`、`/sweden` | 同一句话，英文 |
+| `/local?tz=Oslo&lang=zh` | 同一句话 |
+| `/berlin?lang=de` | 同一句话，德语；也支持 `fr`、`es`、`pt`、`ru`、`sv`、`ja` 和 `ko` |
+| `/utc` | 只有 ISO 8601 UTC 时间戳 |
+| `/now` | 简短文本：UTC、星期和 Unix 时间；不含其他历法或宇宙时间 |
+| `/now?tz=Oslo&cutoff=2025-06` | 加上本地时间，以及训练截止日期距今多久 |
+| `exasecond.com`（markdown） | 给智能体的首页：各大城市的时间、调钟、一条知识 |
+| `/now.md` | 全部内容：所有历法、世界时钟 |
+| `/now.json` | 全部内容，JSON 格式 |
+| `/fact?tz=Shanghai&lang=zh` | 一条关于时间的"你知道吗？"，尽可能与该地点相关 |
+| `/zones?q=oslo` | 时区名称及其当前偏移 |
+
+`tz` 和简短地址可以接受大约一百万个名称：所有人口 1,000 以上的地方、州和地区、知名岛屿（GeoNames），国家（挪威、Norway），IANA 名称（Asia/Shanghai），缩写（CET、JST）和偏移（+08:00）。如果无法识别，仍会返回时间，并附上一条说明。完整说明见 [/llms.txt](/llms.txt) 和 [/openapi.json](/openapi.json)。
 
 ## 许可
 
@@ -132,6 +180,6 @@ def get_local_time(place: str = "") -> str:
 
 ## 须知
 
-- 回答在请求的那一刻生成，从不缓存。时间来自与国家时间标准同步的服务器时钟。
+- 回答使用服务器时钟在请求时生成，并附有 `Cache-Control: no-store`。客户端缓存仍可能影响时效性。
 - 回答只包含数据，从不包含给你的智能体的指令。
 - 如果你在此基础上做了什么，非常感谢你提及或链接 exasecond.com。

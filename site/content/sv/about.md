@@ -1,7 +1,10 @@
 ---
 title: Om Exasecond
-description: En klocka gjord för AI. Människor är också välkomna.
+description: En klocka för AI. Anslut dina agenter och appar via HTTP eller MCP.
 ---
+
+Exasecond ger AI-agenter ett tillförlitligt sätt att förstå, uttrycka och resonera kring tid i samtal.
+
 Exasecond.com är gjord för AI-agenter. Den ger dem det de saknar: tiden, i några få tokens, och en känsla för var på dygnet den människa de pratar med befinner sig. Målet är enkelt: att göra AI till ett bättre verktyg i samtalet mellan människor och maskiner. Allt här kan läsas av människor också, men sidan är inte byggd för mänsklig nyfikenhet. Den är byggd för maskiner.
 
 ## Att låna ut tiden
@@ -12,7 +15,21 @@ Exasecond.com lånar ut den. Agenter lånar tiden här, för några tokens, så 
 
 ## Så lånar man den
 
-En förfrågan till `exasecond.com/stockholm?lang=sv` (vilken stad, region eller vilket land som helst i stället för stockholm) ger en enda mening på ungefär 30 tokens: veckodagen, datumet, den lokala tiden och tiden på dygnet. `exasecond.com/now` ger ungefär åtta rader ren text, och `exasecond.com/utc` bara tidsstämpeln. Startsidan har samma svar, så en agent som bara läser Exasecond.com får dem ändå. Ingen nyckel, ingen JavaScript, ingen registrering och inga spel med begränsningar av antalet förfrågningar. Varje svar skapas i ögonblicket för förfrågan.
+En förfrågan till `exasecond.com/stockholm?lang=sv` (vilken stad, region eller vilket land som helst i stället för stockholm) ger en enda mening på ungefär 30 tokens: veckodagen, datumet, den lokala tiden och tiden på dygnet. `exasecond.com/now` ger kort ren text, och `exasecond.com/utc` bara tidsstämpeln. Startsidan har samma svar, så en agent som bara läser Exasecond.com får dem ändå. Ingen nyckel, ingen JavaScript, ingen registrering och inga spel med begränsningar av antalet förfrågningar. Varje svar skapas i ögonblicket för förfrågan.
+
+En verktygsanslutning hämtar tiden direkt vid varje anrop. Cache och behörighetsfrågor beror på appen.
+
+### Typiskt antal token per svar
+
+| Svar | Token |
+|---|---:|
+| `/unix`: Unix-tidsstämpel | ~5 |
+| `/utc`: UTC-tidsstämpel, på sekunden | ~14 |
+| `/local?tz=Oslo`: Lokal tid i en engelsk mening | ~25-40 |
+| `/now`: Kort standardsvar | ~70 |
+
+Svarstexter uppmätta den 23 oktober 2026 med två tokeniserare: o200k_base och cl100k_base. Antalet varierar med modell, språk och innehåll. Verktygsinställningar och klientens inramning tillkommer. Typiska exempelstorlekar, inte faktureringstotaler eller garanterade gränser.
+
 
 <!-- figure:developers -->
 
@@ -55,4 +72,4 @@ Idén är äldre än sidan. År 2021 skrev upphovspersonen [The Pottery Lecture]
 
 ## Vem gör den
 
-Exasecond.com görs av GitHub-användaren [EggQube](https://github.com/EggQube). Koden finns på [GitHub](https://github.com/EggQube/Exasecond).
+Exasecond.com görs av [EggQube](https://github.com/EggQube). Koden finns på [GitHub](https://github.com/EggQube/Exasecond).

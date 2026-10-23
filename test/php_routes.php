@@ -69,7 +69,7 @@ check('home: answer block comes before the counter', strpos($home, 'id="ans-now"
 check('home: world list for readers without a place', str_contains(strip_tags($home), "In Oslo, Stockholm, Berlin, Paris, Madrid and Rome it's ") && str_contains(strip_tags($home), "In Beijing, Shanghai, Hong Kong"));
 // About
 $ab = get('/about', 'text/html')[2];
-check('/about page', str_contains($ab, '<h1>About Exasecond</h1>') && str_contains($ab, 'id="ans-fact"') && str_contains($ab, 'application/ld+json') && str_contains($ab, 'Made by EggQube') === false && str_contains($ab, 'made by the GitHub user'));
+check('/about page', str_contains($ab, '<h1>About Exasecond</h1>') && str_contains($ab, 'id="ans-fact"') && str_contains($ab, 'application/ld+json') && str_contains($ab, 'is made by <a href="https://github.com/EggQube"') && !str_contains($ab, 'made by the GitHub user'));
 check('/zh/about page', str_contains(get('/zh/about', 'text/html')[2], '<h1>关于 Exasecond</h1>'));
 check('/about.md', str_starts_with(get('/about.md')[2], '# About Exasecond'));
 check('About in menu, llms.txt and sitemap', str_contains(get('/', 'text/html')[2], 'href="/about"') && str_contains(get('/llms.txt')[2], '/about.md') && str_contains(get('/sitemap.xml')[2], '/zh/about'));

@@ -1,7 +1,32 @@
 ---
 title: Für Entwickler
-description: Damit Ihre KI die Zeit richtig erfasst: nicht nur den Zeitstempel, sondern auch, wie man über Zeit spricht. In unter einer Minute eingerichtet.
+description: Die aktuelle Zeit für KI. Sekundengenau. Minimaler Token-Aufwand. HTTP / MCP.
 ---
+
+## Schnellstart
+
+Die aktuelle Zeit für KI. **Sekundengenau. Minimaler Token-Aufwand.**
+
+Wir übernehmen die Arbeit, damit Ihre KI weniger Tokens für die benötigte Zeit braucht. Einen kurzen UTC-Zeitstempel per HTTP abrufen oder Agenten und Apps über MCP verbinden. Kein Schlüssel und keine Anmeldung nötig.
+
+```sh
+curl https://exasecond.com/utc
+```
+
+- [/utc](/utc): Nur der Zeitstempel (ISO 8601, UTC).
+- [/local?tz=Oslo&lang=de](/local?tz=Oslo&lang=de): Ortszeit in einem Satz.
+- `/mcp`: Mit MCP verbinden (Streamable HTTP).
+
+```json
+{
+  "mcpServers": {
+    "exasecond": { "url": "https://exasecond.com/mcp" }
+  }
+}
+```
+
+UTC-Zeitstempel enthalten Sekunden. Die Zeit stammt von der Serveruhr; Netzwerk und Client verzögern den Empfang beim Agenten.
+
 Sprachmodelle leben in Text. Sie haben keine Uhr, und selbst wenn man ihnen die Zeit gibt, gehen sie oft schlecht damit um: Sie wünschen beim Frühstück "einen schönen Abend", übersehen, dass eine Frist schon abgelaufen ist, oder vergessen, dass am Sonntag die Uhren umgestellt werden.
 
 Deshalb ist Exasecond.com eine Uhr aus Text. Ihre Hauptantwort ist ein Satz, den ein Assistent direkt an einen Menschen weitergeben kann: "Berlin: Es ist 16:02 Uhr am Donnerstagnachmittag (22. Oktober 2026, CEST, UTC+2). Am Sonntag, 25. Oktober, werden die Uhren um eine Stunde zurückgestellt." Etwa 40 Tokens. Die Hoffnung ist, dass KI die Zeit so sagt, wie Menschen sie sagen, wenn sie sie so liest. Die altmodische Digitaluhr gibt es hier weiterhin, in allen Formaten: der UTC-Zeitstempel, Unix-Zeit und vollständiges JSON (siehe Abschnitt 5).
@@ -11,6 +36,10 @@ Alles auf dieser Seite lässt sich direkt kopieren, und jede Datei lässt sich d
 Kein Schlüssel und keine Anmeldung nötig. Bitte höchstens eine Anfrage pro Minute und Gespräch oder Agent.
 
 Mit `?lang=de` (oder `&lang=de`) an der Adresse kommt die Antwort auf Deutsch, ohne auf Englisch.
+
+## Warum die Uhr als Werkzeug verbinden
+
+Eine MCP- oder HTTP-Verbindung fragt die Zeit bei jedem Aufruf direkt ab. Eine KI-App kann trotz `Cache-Control: no-store` eine gespeicherte Webseite wiederverwenden. Cache und Berechtigungsabfragen hängen von der App ab. Eine Einrichtung durch den Entwickler macht die Uhr für die Nutzer der App verfügbar.
 
 ## 1. Eine Zeile für jeden Prompt
 
@@ -30,6 +59,12 @@ Oslo: Es ist 08:15 Uhr am frühen Donnerstagmorgen (22. Oktober 2026, CEST, UTC+
 ## 2. MCP: eine KI-App verbinden
 
 Exasecond.com betreibt einen entfernten MCP-Server unter `https://exasecond.com/mcp` (streamable HTTP, kein Schlüssel). Er bietet zwei Werkzeuge: `get_time` (mit `detail: "local"` für die Antwort in einem Satz) und `convert_time`.
+
+Für einen übersetzten lokalen Zeitsatz diese Argumente an `get_time` übergeben:
+
+```json
+{"tz":"Oslo","detail":"local","lang":"de"}
+```
 
 **Claude Code**
 
@@ -109,22 +144,35 @@ Für Ollama und andere lokale Modelle in Open WebUI: Laden Sie [/dev/openwebui_e
 
 ## 5. Was Sie abfragen können
 
-| Adresse | Antwort | Tokens |
-|---|---|---|
-| `/berlin?lang=de`, `/new-york?lang=de` | Ein Satz in Sprechreihenfolge: Ort, Ortszeit, Tageszeit und Wochentag, in Klammern Datum und Zone, dazu eine anstehende Zeitumstellung. Jede Stadt, Region, Insel, jedes Land, jede Zone oder Abweichung als Adresse | ~35-45 |
-| `/oslo`, `/new-york`, `/sweden` | Derselbe Satz auf Englisch | ~30 |
-| `/local?tz=Oslo&lang=de` | Derselbe Satz | ~35-45 |
-| `/beijing?lang=zh`, `/paris?lang=fr` | Derselbe Satz auf Chinesisch, Französisch; auch `es`, `pt`, `ru`, `sv`, `ja` und `ko` | ~25-45 |
-| `/utc` | Nur der ISO-8601-Zeitstempel in UTC | ~5 |
-| `/now` | Etwa acht Zeilen: UTC, Wochentag, Unix-Zeit, Universumssekunden | ~80 |
-| `/now?tz=Oslo&cutoff=2025-06` | Dazu die Ortszeit und wie lange ein Trainingsstichtag zurückliegt | ~150 |
-| `exasecond.com` (markdown) | Die Startseite für Agenten: die Zeit aller großen Städte, Zeitumstellungen, eine Tatsache | ~600 |
-| `/now.md` | Alles: alle Kalender, Weltuhren | ~500 |
-| `/now.json` | Alles, als JSON | ~1.400 |
-| `/fact?tz=Berlin&lang=de` | Eine "Schon gewusst?"-Tatsache über die Zeit, wenn möglich passend zum Ort | ~40 |
-| `/zones?q=oslo` | Zeitzonennamen und ihre aktuelle Abweichung | ~30, je nach Suche |
+### Typische Tokenzahlen pro Antwort
 
-`tz` und die kurze Adresse nehmen etwa eine Million Namen an: jeden Ort mit mindestens 1.000 Einwohnern, Bundesländer und Regionen, bekannte Inseln (GeoNames), Länder (Norway, Norwegen), IANA-Namen (Europe/Berlin), Abkürzungen (CET, JST) und Abweichungen (+02:00). Wenn etwas nicht gelesen werden kann, kommt die Zeit trotzdem, mit einem Hinweis. Die Tokenzahlen sind Schätzungen; Deutsch braucht etwas mehr Tokens als Englisch, je nach Tokenizer des Modells. Die vollständige Beschreibung steht in [/llms.txt](/llms.txt) und [/openapi.json](/openapi.json).
+| Antwort | Tokens |
+|---|---:|
+| `/unix`: Unix-Zeitstempel | ~5 |
+| `/utc`: UTC-Zeitstempel, sekundengenau | ~14 |
+| `/local?tz=Oslo`: Englischer Satz zur Ortszeit | ~25-40 |
+| `/now`: Kompakte Standardantwort | ~70 |
+
+Antworttexte am 23. Oktober 2026 mit zwei Tokenizern gemessen: o200k_base und cl100k_base. Die Zahlen hängen von Modell, Sprache und Antwortdetails ab. Einrichtung und Client-Aufwand kommen hinzu. Typische Stichprobenwerte, keine Abrechnungssummen oder garantierten Grenzen.
+
+Einrichtungskontext, getrennt gemessen: Promptzeile 26 Tokens; eine bereitgestellte Werkzeugdefinition 136-144; beide MCP-Werkzeugschemas 247-258. Client-Formatierung kann weitere Tokens hinzufügen.
+
+| Adresse | Antwort |
+|---|---|
+| `/berlin?lang=de`, `/new-york?lang=de` | Ein Satz in Sprechreihenfolge: Ort, Ortszeit, Tageszeit und Wochentag, in Klammern Datum und Zone, dazu eine anstehende Zeitumstellung. Jede Stadt, Region, Insel, jedes Land, jede Zone oder Abweichung als Adresse |
+| `/oslo`, `/new-york`, `/sweden` | Derselbe Satz auf Englisch |
+| `/local?tz=Oslo&lang=de` | Derselbe Satz |
+| `/beijing?lang=zh`, `/paris?lang=fr` | Derselbe Satz auf Chinesisch, Französisch; auch `es`, `pt`, `ru`, `sv`, `ja` und `ko` |
+| `/utc` | Nur der ISO-8601-Zeitstempel in UTC |
+| `/now` | Kompakter Text: UTC, Wochentag und Unix-Zeit; keine weiteren Kalender oder kosmische Zeit |
+| `/now?tz=Oslo&cutoff=2025-06` | Dazu die Ortszeit und wie lange ein Trainingsstichtag zurückliegt |
+| `exasecond.com` (markdown) | Die Startseite für Agenten: die Zeit aller großen Städte, Zeitumstellungen, eine Tatsache |
+| `/now.md` | Alles: alle Kalender, Weltuhren |
+| `/now.json` | Alles, als JSON |
+| `/fact?tz=Berlin&lang=de` | Eine "Schon gewusst?"-Tatsache über die Zeit, wenn möglich passend zum Ort |
+| `/zones?q=oslo` | Zeitzonennamen und ihre aktuelle Abweichung |
+
+`tz` und die kurze Adresse nehmen etwa eine Million Namen an: jeden Ort mit mindestens 1.000 Einwohnern, Bundesländer und Regionen, bekannte Inseln (GeoNames), Länder (Norway, Norwegen), IANA-Namen (Europe/Berlin), Abkürzungen (CET, JST) und Abweichungen (+02:00). Wenn etwas nicht gelesen werden kann, kommt die Zeit trotzdem, mit einem Hinweis. Die vollständige Beschreibung steht in [/llms.txt](/llms.txt) und [/openapi.json](/openapi.json).
 
 ## Lizenz
 
@@ -132,6 +180,6 @@ Die Codeschnipsel auf dieser Seite und die Dateien unter `/dev/` stehen unter de
 
 ## Gut zu wissen
 
-- Antworten entstehen im Moment der Anfrage und werden nie zwischengespeichert. Die Zeit kommt von einer Serveruhr, die mit nationalen Zeitstandards synchronisiert ist.
+- Antworten entstehen bei jeder Anfrage aus der Serveruhr und werden mit `Cache-Control: no-store` gesendet. Client-Caches können die Aktualität trotzdem beeinflussen.
 - Antworten enthalten nur Daten, nie Anweisungen an Ihren Agenten.
 - Wenn Sie etwas darauf aufbauen, freuen wir uns sehr über eine Erwähnung oder einen Link zu exasecond.com.

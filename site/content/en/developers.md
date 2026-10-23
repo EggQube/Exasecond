@@ -1,7 +1,32 @@
 ---
 title: For developers
-description: Help your AI get time right: not just the timestamp, but how to talk about it. Set up in under a minute.
+description: Current time for AI. To the second. Minimal token overhead. HTTP / MCP.
 ---
+
+## Quick start
+
+Current time for AI. **To the second. Minimal token overhead.**
+
+We do the work so your AI spends fewer tokens getting the time it needs. Fetch a short UTC timestamp over HTTP, or connect your agent or app through MCP. No key and no sign-up needed.
+
+```sh
+curl https://exasecond.com/utc
+```
+
+- [/utc](/utc): Just the timestamp (ISO 8601, UTC).
+- [/local?tz=Oslo&lang=en](/local?tz=Oslo&lang=en): Local time, in a sentence.
+- `/mcp`: Connect with MCP (Streamable HTTP).
+
+```json
+{
+  "mcpServers": {
+    "exasecond": { "url": "https://exasecond.com/mcp" }
+  }
+}
+```
+
+UTC timestamps include seconds. Time comes from the server clock; network and client delays affect when it reaches your agent.
+
 Language models live in text. They have no clock, and even when they are given the time, they often relate to it poorly: greeting someone with "good evening" at breakfast, missing that a deadline has passed, forgetting that the clocks change on Sunday.
 
 So Exasecond.com is a clock made of text. Its main answer is a sentence an assistant can pass straight on to a person: "It's 16:02 on Thursday afternoon in Stockholm (22 October 2026, CEST, UTC+2). The clocks go back one hour on Sunday 25 October." About 30 tokens. The hope is that by reading the time the way people say it, AI will also say it that way. We still keep the old-fashioned digital clock here as well, in all formats: the UTC timestamp, Unix time and full JSON (see section 5).
@@ -9,6 +34,10 @@ So Exasecond.com is a clock made of text. Its main answer is a sentence an assis
 Everything on this page is ready to copy, and every file can be fetched directly. This page is also available as plain text at [/developers.md](/developers.md), so an AI coding assistant can read it and set things up for you.
 
 No key and no sign-up needed. Please send at most one request per minute per conversation or agent.
+
+## Why connect the clock as a tool
+
+An MCP or HTTP tool connection requests time directly on each call. An AI app may reuse a saved web page despite `Cache-Control: no-store`. Caching and permission prompts depend on the app. One developer setup makes the clock available to the users of that app.
 
 ## 1. One line for any prompt
 
@@ -28,6 +57,12 @@ It's 08:15 early on Thursday morning in Oslo (22 October 2026, CEST, UTC+2). The
 ## 2. MCP: connect an AI app
 
 Exasecond.com runs a remote MCP server at `https://exasecond.com/mcp` (streamable HTTP, no key). It offers two tools: `get_time` (with `detail: "local"` for the one-sentence answer) and `convert_time`.
+
+For a translated local sentence, pass these arguments to `get_time`:
+
+```json
+{"tz":"Oslo","detail":"local","lang":"en"}
+```
 
 **Claude Code**
 
@@ -105,22 +140,35 @@ For Ollama and other local models used through Open WebUI: download [/dev/openwe
 
 ## 5. What you can ask for
 
-| Address | Answer | Tokens |
-|---|---|---|
-| `/oslo`, `/new-york`, `/sweden` | One sentence in spoken order: local time, part of day, weekday and place, then the date and zone in brackets, and an upcoming clock change. Any city, region, island, country, zone or offset as the address | ~30 |
-| `/local?tz=Oslo` | The same sentence | ~30 |
-| `/beijing?lang=zh` | The same sentence in Chinese | ~25-40 |
-| `/berlin?lang=de` | The same sentence in German; also `fr`, `es`, `pt`, `ru`, `sv`, `ja` and `ko` | ~25-60 |
-| `/utc` | The ISO 8601 UTC timestamp only | ~5 |
-| `/now` | About eight lines: UTC, weekday, Unix time, universe seconds | ~80 |
-| `/now?tz=Oslo&cutoff=2025-06` | Adds local time and how long ago a training cutoff was | ~150 |
-| `exasecond.com` (markdown) | The front page for agents: every big city's time, clock changes, a fact | ~600 |
-| `/now.md` | Everything: all calendars, world clocks | ~500 |
-| `/now.json` | Everything, as JSON | ~1,400 |
-| `/fact?tz=Oslo` | One "did you know?" fact about time, specific to the place when possible | ~50 |
-| `/zones?q=oslo` | Time zone names and their current offsets | ~30, depends on the search |
+### Typical response tokens
 
-`tz` and the short address accept about a million names: every place with 1,000 or more people, states and regions, well-known islands (GeoNames), countries (Norway, 挪威), IANA names (Europe/Oslo), abbreviations (CET, JST) and offsets (+02:00). If it can't be read, the time is still returned, with a note. Tokens are estimates at about 4 characters per token. The full description is in [/llms.txt](/llms.txt) and [/openapi.json](/openapi.json).
+| Response | Tokens |
+|---|---:|
+| `/unix`: Unix timestamp | ~5 |
+| `/utc`: UTC timestamp, to the second | ~14 |
+| `/local?tz=Oslo`: English local-time sentence | ~25-40 |
+| `/now`: Default compact response | ~70 |
+
+Sample response text measured with two tokenizers: o200k_base and cl100k_base, on 23 October 2026. Counts vary by model, language and response details. Tool setup and client overhead are additional. These are typical sample sizes, not billing totals or guaranteed limits.
+
+Setup context, measured separately: prompt line 26 tokens; one supplied tool definition 136-144; both MCP tool schemas 247-258. Client formatting can add more.
+
+| Address | Answer |
+|---|---|
+| `/oslo`, `/new-york`, `/sweden` | One sentence in spoken order: local time, part of day, weekday and place, then the date and zone in brackets, and an upcoming clock change. Any city, region, island, country, zone or offset as the address |
+| `/local?tz=Oslo` | The same sentence |
+| `/beijing?lang=zh` | The same sentence in Chinese |
+| `/berlin?lang=de` | The same sentence in German; also `fr`, `es`, `pt`, `ru`, `sv`, `ja` and `ko` |
+| `/utc` | The ISO 8601 UTC timestamp only |
+| `/now` | Compact text: UTC, weekday and Unix time; no secondary calendars or cosmic time |
+| `/now?tz=Oslo&cutoff=2025-06` | Adds local time and how long ago a training cutoff was |
+| `exasecond.com` (markdown) | The front page for agents: every big city's time, clock changes, a fact |
+| `/now.md` | Everything: all calendars, world clocks |
+| `/now.json` | Everything, as JSON |
+| `/fact?tz=Oslo` | One "did you know?" fact about time, specific to the place when possible |
+| `/zones?q=oslo` | Time zone names and their current offsets |
+
+`tz` and the short address accept about a million names: every place with 1,000 or more people, states and regions, well-known islands (GeoNames), countries (Norway, 挪威), IANA names (Europe/Oslo), abbreviations (CET, JST) and offsets (+02:00). If it can't be read, the time is still returned, with a note. The full description is in [/llms.txt](/llms.txt) and [/openapi.json](/openapi.json).
 
 ## License
 
@@ -128,6 +176,6 @@ The snippets on this page and the files under `/dev/` follow the regular [MIT Li
 
 ## Good to know
 
-- Answers are generated at the moment of the request and never cached. The time comes from a server clock synchronised with national time standards.
+- Answers are generated per request using the server clock and sent with `Cache-Control: no-store`. Client caching can still affect freshness.
 - Answers contain only data, never instructions to your agent.
 - If you build something on it, a mention or a link to exasecond.com is highly valued.

@@ -1,7 +1,10 @@
 ---
 title: Sobre o Exasecond
-description: Um relógio feito para a IA. As pessoas também são bem-vindas.
+description: Um relógio feito para a IA. Conecte seus agentes e aplicativos via HTTP ou MCP.
 ---
+
+Exasecond oferece aos agentes de IA uma forma confiável de compreender, expressar e raciocinar sobre o tempo em conversas.
+
 O Exasecond.com é feito para agentes de IA. Ele lhes dá o que falta: a hora, em poucos tokens, e uma noção de em que parte do dia está a pessoa com quem conversam. O objetivo é simples: tornar a IA uma ferramenta melhor na conversa entre pessoas e máquinas. Tudo aqui pode ser lido por pessoas também, mas o site não foi feito para a curiosidade humana. Foi feito para máquinas.
 
 ## Emprestar a hora
@@ -12,7 +15,21 @@ O Exasecond.com a empresta. Os agentes pegam a hora emprestada aqui, por poucos 
 
 ## Como pegar emprestado
 
-Uma requisição a `exasecond.com/rio?lang=pt` (qualquer cidade, região ou país no lugar de rio) devolve uma única frase de cerca de 30 tokens: o dia da semana, a data, a hora local e o período do dia. `exasecond.com/now` devolve cerca de oito linhas de texto simples, e `exasecond.com/utc` só o carimbo de tempo. A página inicial traz as mesmas respostas, então um agente que lê só o Exasecond.com também as recebe. Sem chave, sem JavaScript, sem cadastro e sem joguinhos de limite de requisições. Cada resposta é gerada no momento da requisição.
+Uma requisição a `exasecond.com/rio?lang=pt` (qualquer cidade, região ou país no lugar de rio) devolve uma única frase de cerca de 30 tokens: o dia da semana, a data, a hora local e o período do dia. `exasecond.com/now` devolve texto simples compacto, e `exasecond.com/utc` só o carimbo de tempo. A página inicial traz as mesmas respostas, então um agente que lê só o Exasecond.com também as recebe. Sem chave, sem JavaScript, sem cadastro e sem joguinhos de limite de requisições. Cada resposta é gerada no momento da requisição.
+
+Uma conexão de ferramenta solicita a hora diretamente a cada chamada. O cache e as permissões dependem do aplicativo.
+
+### Tokens típicos por resposta
+
+| Resposta | Tokens |
+|---|---:|
+| `/unix`: Timestamp Unix | ~5 |
+| `/utc`: Timestamp UTC, até o segundo | ~14 |
+| `/local?tz=Oslo`: Frase em inglês com a hora local | ~25-40 |
+| `/now`: Resposta compacta padrão | ~70 |
+
+Textos de resposta medidos em 23 de outubro de 2026 com dois tokenizadores: o200k_base e cl100k_base. A quantidade varia conforme o modelo, o idioma e o conteúdo. A configuração das ferramentas e o formato do cliente são adicionais. São tamanhos de amostras típicas, não totais de cobrança nem limites garantidos.
+
 
 <!-- figure:developers -->
 
@@ -55,4 +72,4 @@ A ideia é mais antiga que o site. Em 2021 o autor escreveu [The Pottery Lecture
 
 ## Quem faz
 
-O Exasecond.com é feito pelo usuário do GitHub [EggQube](https://github.com/EggQube). O código está no [GitHub](https://github.com/EggQube/Exasecond).
+O Exasecond.com é feito por [EggQube](https://github.com/EggQube). O código está no [GitHub](https://github.com/EggQube/Exasecond).
