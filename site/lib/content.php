@@ -12,11 +12,11 @@ function now_line(array $s): string {
 /** Measured sample response costs; setup and client framing are separate. */
 function token_cost_md(string $lang): string {
     return '### ' . t($lang, 'cost_heading') . "\n\n"
-        . '| ' . t($lang, 'cost_response') . ' | ' . t($lang, 'cost_tokens') . " |\n|---|---:|\n"
-        . '| `/unix`: ' . t($lang, 'cost_unix') . " | ~5 |\n"
-        . '| `/utc`: ' . t($lang, 'cost_utc') . " | ~14 |\n"
-        . '| `/local?tz=Oslo`: ' . t($lang, 'cost_local') . " | ~25-40 |\n"
-        . '| `/now`: ' . t($lang, 'cost_basic') . " | ~70 |\n\n"
+        . '| ' . t($lang, 'cost_response') . ' | ' . t($lang, 'cost_bytes') . ' | ' . t($lang, 'cost_tokens') . " |\n|---|---:|---:|\n"
+        . '| `/unix`: ' . t($lang, 'cost_unix') . " | 11 | ~5 |\n"
+        . '| `/utc`: ' . t($lang, 'cost_utc') . " | 21 | ~14 |\n"
+        . '| `/local?tz=Oslo`: ' . t($lang, 'cost_local') . " | ~70-120 | ~25-40 |\n"
+        . '| `/now`: ' . t($lang, 'cost_basic') . " | ~200 | ~70 |\n\n"
         . t($lang, 'cost_note') . "\n";
 }
 

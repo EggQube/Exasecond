@@ -146,12 +146,12 @@ Pour Ollama et les autres modèles locaux utilisés via Open WebUI : télécharg
 
 ### Tokens typiques par réponse
 
-| Réponse | Tokens |
-|---|---:|
-| `/unix`: Horodatage Unix | ~5 |
-| `/utc`: Horodatage UTC, à la seconde | ~14 |
-| `/local?tz=Oslo`: Phrase en anglais donnant l’heure locale | ~25-40 |
-| `/now`: Réponse compacte par défaut | ~70 |
+| Réponse | Octets | Tokens |
+|---|---:|---:|
+| `/unix`: Horodatage Unix | 11 | ~5 |
+| `/utc`: Horodatage UTC, à la seconde | 21 | ~14 |
+| `/local?tz=Oslo`: Phrase en anglais donnant l’heure locale | ~70-120 | ~25-40 |
+| `/now`: Réponse compacte par défaut | ~200 | ~70 |
 
 Textes de réponse mesurés le 23 octobre 2026 avec deux tokenizers : o200k_base et cl100k_base. Le nombre varie selon le modèle, la langue et le contenu. La configuration des outils et l’enveloppe du client s’ajoutent. Ce sont des tailles d’exemples typiques, pas des totaux facturés ni des limites garanties.
 

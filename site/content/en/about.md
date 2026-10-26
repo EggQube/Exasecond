@@ -21,12 +21,12 @@ A tool connection requests time directly on each call. Caching and permission pr
 
 ### Typical response tokens
 
-| Response | Tokens |
-|---|---:|
-| `/unix`: Unix timestamp | ~5 |
-| `/utc`: UTC timestamp, to the second | ~14 |
-| `/local?tz=Oslo`: English local-time sentence | ~25-40 |
-| `/now`: Default compact response | ~70 |
+| Response | Bytes | Tokens |
+|---|---:|---:|
+| `/unix`: Unix timestamp | 11 | ~5 |
+| `/utc`: UTC timestamp, to the second | 21 | ~14 |
+| `/local?tz=Oslo`: English local-time sentence | ~70-120 | ~25-40 |
+| `/now`: Default compact response | ~200 | ~70 |
 
 Sample response text measured with two tokenizers: o200k_base and cl100k_base, on 23 October 2026. Counts vary by model, language and response details. Tool setup and client overhead are additional. These are typical sample sizes, not billing totals or guaranteed limits.
 

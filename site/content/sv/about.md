@@ -21,12 +21,12 @@ En verktygsanslutning hämtar tiden direkt vid varje anrop. Cache och behörighe
 
 ### Typiskt antal token per svar
 
-| Svar | Token |
-|---|---:|
-| `/unix`: Unix-tidsstämpel | ~5 |
-| `/utc`: UTC-tidsstämpel, på sekunden | ~14 |
-| `/local?tz=Oslo`: Lokal tid i en engelsk mening | ~25-40 |
-| `/now`: Kort standardsvar | ~70 |
+| Svar | Byte | Token |
+|---|---:|---:|
+| `/unix`: Unix-tidsstämpel | 11 | ~5 |
+| `/utc`: UTC-tidsstämpel, på sekunden | 21 | ~14 |
+| `/local?tz=Oslo`: Lokal tid i en engelsk mening | ~70-120 | ~25-40 |
+| `/now`: Kort standardsvar | ~200 | ~70 |
 
 Svarstexter uppmätta den 23 oktober 2026 med två tokeniserare: o200k_base och cl100k_base. Antalet varierar med modell, språk och innehåll. Verktygsinställningar och klientens inramning tillkommer. Typiska exempelstorlekar, inte faktureringstotaler eller garanterade gränser.
 

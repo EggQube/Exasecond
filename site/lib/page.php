@@ -74,14 +74,14 @@ function site_css(): string {
     return <<<'CSS'
 :root {
   --bg: #07080c; --bg-2: #0e1017; --line: #23262f; --ink: #ece8df; --ink-2: #9c9a93; --ink-3: #6e6d74;
-  --accent: #f0b44c; --accent-2: #f0b44c22;
+  --accent: #39ff14; --accent-2: #39ff1422;
   --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
   --sans: ui-sans-serif, -apple-system, "Segoe UI", Inter, Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Songti SC", "Noto Serif SC", "Source Han Serif SC", SimSun, serif;
   --read: var(--serif);
 }
 @media (prefers-color-scheme: light) {
-  :root { --bg: #f4f1e9; --bg-2: #ebe6da; --line: #d6d0c2; --ink: #16171c; --ink-2: #55545a; --ink-3: #7c7a73; --accent: #a8590f; --accent-2: #a8590f1a; }
+  :root { --bg: #f4f1e9; --bg-2: #ebe6da; --line: #d6d0c2; --ink: #16171c; --ink-2: #55545a; --ink-3: #7c7a73; --accent: #328000; --accent-2: #39ff1433; }
 }
 :lang(zh) { --read: var(--sans); }
 /* Japanese and Korean need their own fonts: Chinese fonts draw shared characters in Chinese forms. */
@@ -131,6 +131,9 @@ sup { font-size: .7em; line-height: 0; }
 .site-menu summary, .langs summary { display: flex; align-items: center; min-height: 44px; }
 .site-menu ul { position: absolute; right: 0; top: 100%; z-index: 10; margin: 0; padding: 6px 0; list-style: none; background: var(--bg-2); border: 1px solid var(--line); min-width: 12em; max-width: calc(100vw - 32px); }
 .site-menu li a { display: block; padding: 13px 16px; line-height: 1.5; }
+@media (hover: hover) and (pointer: fine) {
+  .langs ul { top: 100%; }
+}
 @media (max-width: 640px) {
   .top { align-items: center; gap: 12px; }
   .top nav { align-items: center; flex-wrap: nowrap; font-size: 12px; gap: 12px; border: 0; padding-left: 0; }
@@ -140,7 +143,8 @@ sup { font-size: .7em; line-height: 0; }
 /* clock */
 .service { padding: 34px 0 38px; border-top: 1px solid var(--line); }
 .service-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 36px; align-items: center; }
-.service h1 { font: 500 clamp(2rem, 4.6vw, 3.6rem)/1.08 var(--sans); letter-spacing: -.035em; margin: 0 0 18px; max-width: 16ch; }
+.service h1, .read:not(.read-story) > h1 { font: 500 clamp(2rem, 4.6vw, 3.6rem)/1.08 var(--sans); letter-spacing: -.035em; margin: 0 0 18px; }
+.service h1 { max-width: 16ch; }
 .service-promise { font: 400 clamp(1.1rem, 2vw, 1.5rem)/1.4 var(--sans); color: var(--accent); margin: 0 0 16px; }
 .service-desc { color: var(--ink-2); max-width: 57ch; margin: 0 0 18px; }
 .service-terminal { background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; min-width: 0; }
@@ -232,20 +236,19 @@ pre.agents .c { color: var(--ink-3); }
 .read-story { max-width: 720px; }
 .kicker { font: 12px/1.5 var(--mono); color: var(--ink-2); letter-spacing: .06em; margin: 0 0 18px; }
 .kicker a { text-decoration: none; color: var(--accent); }
-.read h1 { font: 400 clamp(2rem, 6vw, 3.1rem)/1.12 var(--serif); margin: 0 0 18px; letter-spacing: -.01em; }
-.lede { font: clamp(1.1rem, 2.4vw, 1.3rem)/1.5 var(--serif); color: var(--ink-2); margin: 0 0 40px; }
-.prose { font: 18.5px/1.72 var(--read); }
-.prose:lang(zh), .prose:lang(ja), .prose:lang(ko) { font-size: 17px; line-height: 1.9; }
+.read-story h1 { font: 400 clamp(2rem, 6vw, 3.1rem)/1.12 var(--serif); margin: 0 0 18px; letter-spacing: -.01em; }
+.lede { font: 16px/1.55 var(--sans); color: var(--ink-2); margin: 0 0 40px; }
+.prose { font: 16px/1.55 var(--sans); }
 .prose p, .prose ul, .prose ol { margin: 0 0 1.05em; }
 .prose ul, .prose ol { padding-left: 1.3em; }
 .prose li { margin-bottom: .4em; }
-.prose h2 { margin: 2.2em 0 .6em; font-size: clamp(1.35rem, 3vw, 1.7rem); }
+.prose h2 { margin: 2.2em 0 .6em; }
 .prose h3 { font: 600 13px/1.4 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); margin: 2em 0 .8em; }
 .prose blockquote { margin: 1.5em 0; padding: .2em 0 .2em 1.1em; border-left: 2px solid var(--accent); color: var(--ink-2); }
 .prose blockquote p:last-child { margin-bottom: 0; }
 .prose hr { border: 0; border-top: 1px solid var(--line); margin: 2.5em 0; }
 .prose strong { font-weight: 600; }
-.prose pre { background: var(--bg-2); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font: 14px/1.6 var(--mono); }
+.prose pre { background: var(--bg-2); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; overflow-x: auto; font: 13.5px/1.75 var(--mono); }
 .table { overflow-x: auto; margin: 1.4em 0 1.8em; border-top: 1px solid var(--line); }
 .prose table { border-collapse: collapse; width: 100%; font: 15px/1.5 var(--sans); }
 .prose th { text-align: left; font: 12px/1.4 var(--mono); color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; }
@@ -258,9 +261,9 @@ pre.agents .c { color: var(--ink-3); }
 .toc { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
 .toc li { border-bottom: 1px solid var(--line); }
 .toc a { display: grid; grid-template-columns: 3.2em 1fr; gap: 4px 12px; padding: 18px 0; text-decoration: none; }
-.toc .num { font: 500 22px/1.2 var(--mono); color: var(--accent); grid-row: span 2; }
-.toc .ttl { font: 400 21px/1.3 var(--serif); }
-.toc .dsc { color: var(--ink-2); font-size: 15px; }
+.toc .num { font: 12px/1.4 var(--mono); color: var(--accent); grid-row: span 2; }
+.toc .ttl { font: 400 19px/1.3 var(--serif); }
+.toc .dsc { color: var(--ink-2); font-size: 14px; }
 .toc a:hover .ttl { text-decoration: underline; text-decoration-color: var(--accent); }
 .pager { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; border-top: 1px solid var(--line); margin-top: 56px; padding-top: 22px; font: 14px/1.4 var(--sans); }
 .pager a { text-decoration: none; }
@@ -301,7 +304,7 @@ footer.site p { max-width: 75ch; margin: 0 0 10px; }
 CSS;
 }
 
-const FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='%23f0b44c' stroke-width='3'/%3E%3Cpath d='M16 7v9l6 4' stroke='%23f0b44c' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E";
+const FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='%2339ff14' stroke-width='3'/%3E%3Cpath d='M16 7v9l6 4' stroke='%2339ff14' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E";
 
 /**
  * $o: title, desc, path (this page, without language prefix), alt (null if no translation), md (markdown twin href),
@@ -377,6 +380,18 @@ $body
 // Keep the native dropdowns usable without JavaScript; enhance dismissal when available.
 (() => {
   const dropdowns = document.querySelectorAll(".top nav details");
+  const hoverMenus = window.matchMedia("(hover: hover) and (pointer: fine)");
+  for (const dropdown of dropdowns) {
+    dropdown.addEventListener("pointerenter", (event) => {
+      if (!hoverMenus.matches || event.pointerType !== "mouse") return;
+      for (const other of dropdowns) if (other !== dropdown) other.open = false;
+      dropdown.open = true;
+    });
+    dropdown.addEventListener("pointerleave", (event) => {
+      if (!hoverMenus.matches || event.pointerType !== "mouse") return;
+      if (!dropdown.contains(document.activeElement)) dropdown.open = false;
+    });
+  }
   document.addEventListener("click", (event) => {
     for (const dropdown of dropdowns) {
       if (!dropdown.contains(event.target) || event.target.closest("a")) dropdown.open = false;
@@ -471,7 +486,7 @@ function render_home(array $s, string $lang, ?string $place = null): string {
     $serviceDesc = h($L('service_desc'));
     $serviceDefinition = h($L('service_definition'));
     $serviceClock = h($L('service_clock'));
-    $serviceBytes = h(sprintf($L('service_bytes'), strlen($s['utc']) + 1));
+    $serviceBytes = h($L('service_bytes'));
     $serviceUtc = h($L('service_utc'));
     $serviceLocal = h($L('service_local'));
     $serviceMcp = h($L('service_mcp'));

@@ -21,12 +21,12 @@ Una conexión de herramienta solicita la hora directamente en cada llamada. La c
 
 ### Tokens típicos por respuesta
 
-| Respuesta | Tokens |
-|---|---:|
-| `/unix`: Marca de tiempo Unix | ~5 |
-| `/utc`: Marca de tiempo UTC, al segundo | ~14 |
-| `/local?tz=Oslo`: Frase en inglés con la hora local | ~25-40 |
-| `/now`: Respuesta compacta predeterminada | ~70 |
+| Respuesta | Bytes | Tokens |
+|---|---:|---:|
+| `/unix`: Marca de tiempo Unix | 11 | ~5 |
+| `/utc`: Marca de tiempo UTC, al segundo | 21 | ~14 |
+| `/local?tz=Oslo`: Frase en inglés con la hora local | ~70-120 | ~25-40 |
+| `/now`: Respuesta compacta predeterminada | ~200 | ~70 |
 
 Textos de respuesta medidos el 23 de octubre de 2026 con dos tokenizadores: o200k_base y cl100k_base. La cantidad varía según el modelo, el idioma y el contenido. La configuración de herramientas y el formato del cliente son adicionales. Son tamaños de muestras típicas, no totales de facturación ni límites garantizados.
 
