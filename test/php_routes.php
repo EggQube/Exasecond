@@ -67,6 +67,7 @@ check('/local in Chinese', str_contains(local_sentence(snapshot([$oct, 0], tz_op
 $home = get('/', 'text/html')[2];
 check('home: answer block comes before the counter', strpos($home, 'id="ans-now"') < strpos($home, 'id="count"') && strpos($home, 'id="ans-you"') < strpos($home, 'id="count"'));
 check('home: box gives bytes and tokens, table has a bytes column', str_contains($home, 'HTTP GET · 21 bytes · ~14 tokens · text/plain') && str_contains(strip_tags($home), 'BytesTokens') && str_contains(get('/llms.txt')[2], '| 21 | ~14 |'));
+check('story: the play is the first section', (bool)preg_match('/\A# The Pottery Lecture\n(?:\n\*[^\n]*\*\n)+\n## The play\n/', get('/story.md')[2]));
 check('home: world list for readers without a place', str_contains(strip_tags($home), "In Oslo, Stockholm, Berlin, Paris, Madrid and Rome it's ") && str_contains(strip_tags($home), "In Beijing, Shanghai, Hong Kong"));
 // About
 $ab = get('/about', 'text/html')[2];
