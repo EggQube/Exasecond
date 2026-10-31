@@ -18,6 +18,8 @@ require __DIR__ . '/lib/figures.php';
 require __DIR__ . '/lib/i18n.php';
 require __DIR__ . '/lib/facts.php';
 require __DIR__ . '/lib/facts_tr.php';
+require __DIR__ . '/lib/logo.php';
+require __DIR__ . '/lib/eggqube.php';
 require __DIR__ . '/lib/page.php';
 require __DIR__ . '/lib/mcp.php';
 
@@ -28,6 +30,7 @@ const TYPES = [
     'html' => 'text/html; charset=utf-8',
     'xml' => 'application/xml; charset=utf-8',
     'css' => 'text/css; charset=utf-8',
+    'svg' => 'image/svg+xml; charset=utf-8',
 ];
 
 /** A response is [status, headers, body]. Kept as data so tests can call route() directly. */
@@ -112,6 +115,10 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
     if (!in_array($method, ['GET', 'HEAD'], true)) return send("Method not allowed\n", 'text', ['Allow' => 'GET, HEAD'], 405);
     // The stylesheet is the one thing that may be cached: it holds no time. Pages link it with ?v=<hash>, so changes reach browsers at once.
     if ($path === '/site.css') return send(site_css(), 'css', ['Cache-Control' => 'public, max-age=86400']);
+    // The tab icon and the header logo: no time in them either, so they are cached the same way.
+    if ($path === '/icon.svg') return send(ICON_SVG, 'svg', ['Cache-Control' => 'public, max-age=86400']);
+    if ($path === '/logo.svg') return send(LOGO_SVG, 'svg', ['Cache-Control' => 'public, max-age=86400']);
+    if ($path === '/eggqube.svg') return send(EGGQUBE_SVG, 'svg', ['Cache-Control' => 'public, max-age=86400']);
 
     try {
         $lang = 'en';

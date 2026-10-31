@@ -72,6 +72,7 @@ check('home: world list for readers without a place', str_contains(strip_tags($h
 // About
 $ab = get('/about', 'text/html')[2];
 check('/about page', str_contains($ab, '<h1>About Exasecond</h1>') && str_contains($ab, 'id="ans-fact"') && str_contains($ab, 'application/ld+json') && str_contains($ab, 'is made by <a href="https://github.com/EggQube"') && !str_contains($ab, 'made by the GitHub user'));
+check('about: every chapter is an answer row, original text, in every language', array_reduce(['', '/zh', '/de', '/fr', '/es', '/pt', '/ru', '/sv', '/ja', '/ko'], function ($ok, $p) { $b = get("$p/about", 'text/html')[2]; $md = get("$p/about.md")[2]; return $ok && preg_match_all('/<div class="ans-row about-row"><h2 class="ans-k" id="[^"]+">/', $b) === preg_match_all('/^## /m', $md) && !preg_match('/<h2(?! class="ans-k")/', $b) && !str_contains($md, '<!-- grid -->'); }, true) && str_contains(get('/about', 'text/html')[2], 'No advertising, no cookies, no tracking scripts.'));
 check('/zh/about page', str_contains(get('/zh/about', 'text/html')[2], '<h1>关于 Exasecond</h1>'));
 check('/about.md', str_starts_with(get('/about.md')[2], '# About Exasecond'));
 check('About in menu, llms.txt and sitemap', str_contains(get('/', 'text/html')[2], 'href="/about"') && str_contains(get('/llms.txt')[2], '/about.md') && str_contains(get('/sitemap.xml')[2], '/zh/about'));
@@ -88,6 +89,14 @@ check('city name as given (Beijing, not Shanghai)', str_contains(local_sentence(
 check('/site.css served and cacheable', $st === 200 && str_starts_with($hd['Content-Type'], 'text/css') && str_contains($hd['Cache-Control'], 'max-age') && str_contains($b, '.agentbar'));
 $h1 = get('/', 'text/html')[2];
 check('pages link the stylesheet, no inline CSS, time within the first 3 KB', str_contains($h1, '<link rel="stylesheet" href="/site.css?v=') && !str_contains($h1, '<style>') && strpos($h1, 'now <time') < 3000);
+// Tab icon and header logo are cached SVG files; pages link them, not inline them
+foreach (['/icon.svg', '/logo.svg', '/eggqube.svg'] as $f) {
+    [$st, $hd, $b] = get($f);
+    check("$f served and cacheable", $st === 200 && str_starts_with($hd['Content-Type'], 'image/svg+xml') && str_contains($hd['Cache-Control'], 'max-age') && str_starts_with($b, '<svg xmlns="http://www.w3.org/2000/svg"') && str_ends_with($b, '</svg>'));
+}
+check('footer: the Pottery Lecture line carries © 2021 in every language', array_reduce(LANGS, fn($ok, $l) => $ok && str_contains(t($l, 'foot_story'), '© 2021') && !preg_match('/2021\s*(年|년)/u', t($l, 'foot_story')), true));
+check('footer: Exasecond.com by EggQube, years up to now', str_contains($h1, '<p class="copy">Exasecond.com by <span class="eq" aria-hidden="true"></span>EggQube <span class="c">©</span> 2021-' . gmdate('Y') . '</p>') && str_contains(strip_tags('<p class="copy">Exasecond.com by <span class="eq" aria-hidden="true"></span>EggQube <span class="c">©</span> 2021</p>'), 'Exasecond.com by EggQube © 2021'));
+check('pages link the icon and the logo, no inline SVG', str_contains($h1, '<link rel="icon" href="/icon.svg?v=') && str_contains($h1, '<img src="/logo.svg?v=') && !str_contains($h1, '<svg'));
 check('/now without tz unchanged', !str_contains(get('/now')[2], 'Time zone') && str_contains(get('/now')[2], 'Tip: add ?tz='));
 check('/time stays a clock for agents', str_starts_with(get('/time')[2], 'UTC: '));
 check('/time is the contents page for browsers', str_contains(get('/time', 'text/html')[2], 'The question of time'));
