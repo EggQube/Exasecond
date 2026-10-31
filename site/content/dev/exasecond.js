@@ -1,5 +1,5 @@
 // Exasecond: the current time for AI agents. No dependencies (Node 18+, Deno, Bun, browsers). https://exasecond.com/developers
-// (c) 2026 EggQube, exasecond.com. Follows the regular MIT License; keep this notice. https://exasecond.com/dev/LICENSE
+// © 2026 EggQube, exasecond.com. Follows the regular MIT License; keep this notice. https://exasecond.com/dev/LICENSE
 
 /** One sentence for talking to a person, e.g. "It's 16:02 on Thursday afternoon in Stockholm (22 October 2026, CEST, UTC+2)." place: city, country, zone or offset. */
 export async function getLocalTime(place = "") {

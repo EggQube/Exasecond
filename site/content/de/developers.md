@@ -176,7 +176,7 @@ Einrichtungskontext, getrennt gemessen: Promptzeile 26 Tokens; eine bereitgestel
 
 ## Lizenz
 
-Die Codeschnipsel auf dieser Seite und die Dateien unter `/dev/` stehen unter der regulären [MIT-Lizenz](/dev/LICENSE). Behalten Sie den Hinweis "(c) 2026 EggQube, exasecond.com" bei. Die Lizenz gilt nur für diese Entwicklerschnipsel und -dateien, nicht für den Rest der Seite.
+Die Codeschnipsel auf dieser Seite und die Dateien unter `/dev/` stehen unter der regulären [MIT-Lizenz](/dev/LICENSE). Behalten Sie den Hinweis "© 2026 EggQube, exasecond.com" bei. Die Lizenz gilt nur für diese Entwicklerschnipsel und -dateien, nicht für den Rest der Seite.
 
 ## Gut zu wissen
 

@@ -176,7 +176,7 @@ def get_local_time(place: str = "") -> str:
 
 ## 许可
 
-本页的代码片段和 `/dev/` 下的文件遵循常规的 [MIT 许可证](/dev/LICENSE)。请随附声明 "(c) 2026 EggQube, exasecond.com"。该许可只适用于这些开发者代码片段和文件，不适用于网站的其他部分。
+本页的代码片段和 `/dev/` 下的文件遵循常规的 [MIT 许可证](/dev/LICENSE)。请随附声明 "© 2026 EggQube, exasecond.com"。该许可只适用于这些开发者代码片段和文件，不适用于网站的其他部分。
 
 ## 须知
 

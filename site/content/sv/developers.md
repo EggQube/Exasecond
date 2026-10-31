@@ -176,7 +176,7 @@ Inställningskontext mätt separat: promptrad 26 token; en tillhandahållen verk
 
 ## Licens
 
-Kodsnuttarna på den här sidan och filerna under `/dev/` följer den vanliga [MIT-licensen](/dev/LICENSE). Behåll texten "(c) 2026 EggQube, exasecond.com". Licensen gäller bara dessa utvecklarsnuttar och filer, inte resten av sidan.
+Kodsnuttarna på den här sidan och filerna under `/dev/` följer den vanliga [MIT-licensen](/dev/LICENSE). Behåll texten "© 2026 EggQube, exasecond.com". Licensen gäller bara dessa utvecklarsnuttar och filer, inte resten av sidan.
 
 ## Bra att veta
 

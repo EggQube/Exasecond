@@ -1,6 +1,6 @@
 """Exasecond: the current time for AI agents. Standard library only. https://exasecond.com/developers
 
-(c) 2026 EggQube, exasecond.com. Follows the regular MIT License; keep this notice.
+© 2026 EggQube, exasecond.com. Follows the regular MIT License; keep this notice.
 https://exasecond.com/dev/LICENSE
 """
 

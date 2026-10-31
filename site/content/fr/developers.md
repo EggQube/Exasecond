@@ -176,7 +176,7 @@ Contexte de configuration mesuré séparément : ligne de prompt 26 tokens ; une
 
 ## Licence
 
-Les extraits de code de cette page et les fichiers sous `/dev/` suivent la [licence MIT](/dev/LICENSE) habituelle. Conservez la mention « (c) 2026 EggQube, exasecond.com ». La licence ne couvre que ces extraits et fichiers pour développeurs, pas le reste du site.
+Les extraits de code de cette page et les fichiers sous `/dev/` suivent la [licence MIT](/dev/LICENSE) habituelle. Conservez la mention « © 2026 EggQube, exasecond.com ». La licence ne couvre que ces extraits et fichiers pour développeurs, pas le reste du site.
 
 ## Bon à savoir
 

@@ -29,26 +29,42 @@ php test/php_reliability.php
 php tools/measure_tokens.php
 ```
 
-With the local PHP server running, `node test/http_smoke.mjs` checks the HTTP responses, translated pages and MCP initialization/tool flow. It uses Node's built-in APIs and needs no packages.
+### HTTP smoke test
 
-If PHP is not on PATH, use the full path to `php.exe` and `-c path/to/php.ini`. The size report uses characters divided by four, not a model tokenizer. `php tools/measure_tokens.php --json` includes the sample texts for measurement with a target model's tokenizer. It covers both MCP schemas and all ten answer languages, with and without a nearby clock change. Client framing and billing are not measured.
+With the local server running:
 
-For comparison with the archived Node time engine, run from `backup/version 02 node-worker/`:
+```
+node test/http_smoke.mjs [http://127.0.0.1:8791]
+```
+
+It checks the HTTP responses, the translated pages and the MCP initialization and tool flow. It uses Node's built-in APIs only.
+
+If PHP is not on your PATH, call `php.exe` by its full path and pass `-c path/to/php.ini`.
+
+### Response sizes
+
+`php tools/measure_tokens.php` estimates response sizes as characters divided by four; it is not a model tokenizer. With `--json` it also exports the sample texts, so they can be measured with a target model's own tokenizer. The samples cover both MCP schemas and all ten answer languages, with and without an upcoming clock change. Client framing and billing are not measured.
+
+### Parity with the archived Node engine
+
+From `backup/version 02 node-worker/`:
 
 ```
 node test/parity.mjs path/to/php.exe path/to/php.ini
 ```
 
-The original shared calculations should still match. New PHP features and stricter input validation are covered by the PHP suites; the archive is not the current feature set.
+The calculations shared with the Node version should still match. Features added since, and the stricter input validation, are covered by the PHP suites; the archive does not have the current feature set.
 
-## Deploy and restore
+## Deploy
 
-Upload all contents of `site/`, including hidden `.htaccess` files and `site/data/places/`, to the web root. All 256 PHP place shards are required for the full place-name lookup. They are ignored by Git, so a fresh Git clone alone is incomplete. Without shards, built-in city and zone names still work but many place addresses return 404.
+1. Run both PHP test suites.
+2. Upload the contents of `site/` to the web root, including the hidden `.htaccess` files and `site/data/places/`.
+3. On the live host, check `/`, `/local?tz=Oslo`, a GeoNames place such as `/kiruna`, `/api/convert` and the MCP initialization and tool flow. The local PHP server does not run Apache's rewrite rules, so these checks matter on the host itself.
 
-Restore the place shards from a complete project backup, or rebuild them with `tools/build_places.php` and the three GeoNames input files described at the top of that script. Rebuilding replaces the shard files; do it in a separate restored copy and validate before deployment. Keep GeoNames attribution with the site.
+The server's clock and time-zone database are maintained by the host. Exasecond.com reports the server's time; it does not certify clock synchronization on its own.
 
-`docs/` and `CLAUDE.md` are local handoff material excluded by `.git/info/exclude`. Keep them in complete backups alongside Git history and place data; they are not deployed. Dated local snapshots live in `backup/snapshots/`. Verify an archive against its `.sha256.txt` file and restore into a separate directory before replacing a working copy. Keep another copy off this drive.
+### Place data
 
-Before publishing, run both PHP suites and smoke-test `/`, `/local?tz=Oslo`, a GeoNames place such as `/kiruna`, `/api/convert` and the MCP initialization/tool flow on the target host. The local PHP server does not exercise Apache rewrite rules. The server clock and time-zone database must be maintained by the host; this application does not independently certify clock synchronization.
+The full place-name lookup needs all 256 place shards in `site/data/places/`. They are not in Git, so a fresh clone is incomplete: without them, built-in city and time-zone names still work, but many place addresses return 404.
 
-Native proofreading and tests through ChatGPT, Claude, DeepSeek, Gemini and a local model remain separate acceptance checks. Use a fresh conversation for each, record model/client/version and the UTC retrieval time, and compare with an independent clock. Include Stockholm's clock change, Tokyo's part of day, a sourced time-zone fact and a translated MCP local answer. The local regression suites do not substitute for these app-specific checks.
+To restore them, copy them from a complete backup, or rebuild them with `tools/build_places.php` from the three GeoNames input files listed at the top of that script. A rebuild replaces the shard files, so run it in a separate copy and test before deploying. Place names come from GeoNames (CC BY 4.0); keep the attribution with the site.

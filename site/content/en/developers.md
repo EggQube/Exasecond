@@ -172,7 +172,7 @@ Setup context, measured separately: prompt line 26 tokens; one supplied tool def
 
 ## License
 
-The snippets on this page and the files under `/dev/` follow the regular [MIT License](/dev/LICENSE). Keep the notice "(c) 2026 EggQube, exasecond.com" with them. The license covers only these developer snippets and files, not the rest of the site.
+The snippets on this page and the files under `/dev/` follow the regular [MIT License](/dev/LICENSE). Keep the notice "© 2026 EggQube, exasecond.com" with them. The license covers only these developer snippets and files, not the rest of the site.
 
 ## Good to know
 
