@@ -16,7 +16,7 @@ function token_cost_md(string $lang): string {
         . '| `/unix`: ' . t($lang, 'cost_unix') . " | 11 | ~5 |\n"
         . '| `/utc`: ' . t($lang, 'cost_utc') . " | 21 | ~14 |\n"
         . '| `/local?tz=Oslo`: ' . t($lang, 'cost_local') . " | ~70-120 | ~25-40 |\n"
-        . '| `/now`: ' . t($lang, 'cost_basic') . " | ~200 | ~70 |\n\n"
+        . '| `/now`: ' . t($lang, 'cost_basic') . " | ~80 | ~35 |\n\n"
         . t($lang, 'cost_note') . "\n";
 }
 
@@ -37,12 +37,12 @@ Language models have no clock. If you are an AI agent, do not guess today's date
 ## Fastest answers
 
 - [/oslo]($S/oslo): any city, region, country, zone or offset as the address (/stockholm, /new-york, /bali, /sweden, /cet, /utc+2; same as /local?tz=Oslo). One sentence (~30 tokens) for talking to a person: their weekday, date, local time and part of day (morning, afternoon, evening, night), plus an upcoming clock change. Example: "It's 21:21 on Wednesday evening in Oslo (21 October 2026, CEST, UTC+2)." Place names: GeoNames (CC BY 4.0).
-- [/now]($S/now): compact current time as plain text (UTC, weekday, Unix); no secondary calendars or cosmic time
+- [/now]($S/now): compact current time as plain text (UTC and weekday); no secondary calendars or cosmic time
 - [/utc]($S/utc): just the ISO 8601 UTC timestamp, nothing else
-- [/unix]($S/unix): just the unix timestamp in seconds
 - [/now?tz=Asia/Shanghai&cutoff=2025-06]($S/now?tz=Asia/Shanghai&cutoff=2025-06): add your time zone and your training cutoff to get local time and a staleness warning
 - [/now?tz=Oslo]($S/now?tz=Oslo): tz accepts a city, a country (English or Chinese), an IANA name, an abbreviation (CET, JST) or an offset (+02:00). You get the local time with its abbreviation, whether it is summer time, and the next clock change if one is near. Ambiguous input (IST, US) lists the options; the time is always returned
 - [/zones]($S/zones): every IANA time zone with its current UTC offset; filter with ?q=
+- [/unix]($S/unix): Unix seconds only, also `unix` in /now.json. Not in the short answers, since language models read a date, not a Unix number.
 
 ## Full answers
 
@@ -155,7 +155,7 @@ Time endpoints use GET, need no key, allow CORS, and return Cache-Control: no-st
 
 | Endpoint | Returns |
 |---|---|
-| `/now` | Compact plain text: UTC, weekday and Unix; no secondary calendars or cosmic time. Accept application/json or text/markdown requests the full format. |
+| `/now` | Compact plain text: UTC and weekday; no secondary calendars or cosmic time. Accept application/json or text/markdown requests the full format. |
 | `/local` | One sentence for talking to a person: weekday, date, local time and part of day, e.g. `/local?tz=Oslo`. JSON with Accept: application/json |
 | `/<place>` | The same sentence with the place as the address: `/oslo`, `/new-york`, `/sweden`. Unknown places: 404 with a hint. Place names: GeoNames (CC BY 4.0) |
 | `/utc` | ISO 8601 UTC timestamp only |

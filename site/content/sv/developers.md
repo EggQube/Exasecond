@@ -151,11 +151,11 @@ För Ollama och andra lokala modeller i Open WebUI: ladda ner [/dev/openwebui_ex
 | `/unix`: Unix-tidsstämpel | 11 | ~5 |
 | `/utc`: UTC-tidsstämpel, på sekunden | 21 | ~14 |
 | `/local?tz=Oslo`: Lokal tid i en engelsk mening | ~70-120 | ~25-40 |
-| `/now`: Kort standardsvar | ~200 | ~70 |
+| `/now`: Kort standardsvar | ~80 | ~35 |
 
-Svarstexter uppmätta den 23 oktober 2026 med två tokeniserare: o200k_base och cl100k_base. Antalet varierar med modell, språk och innehåll. Verktygsinställningar och klientens inramning tillkommer. Typiska exempelstorlekar, inte faktureringstotaler eller garanterade gränser.
+Svarstexter uppmätta den 1 november 2026 med två tokeniserare: o200k_base och cl100k_base. Antalet varierar med modell, språk och innehåll. Verktygsinställningar och klientens inramning tillkommer. Typiska exempelstorlekar, inte faktureringstotaler eller garanterade gränser.
 
-Inställningskontext mätt separat: promptrad 26 token; en tillhandahållen verktygsdefinition 136-144; båda MCP-schemana 247-258. Klientens formatering kan lägga till fler.
+Inställningskontext mätt separat: promptrad 26 token; en tillhandahållen verktygsdefinition 136-144; båda MCP-schemana 245-256. Klientens formatering kan lägga till fler.
 
 | Adress | Svar |
 |---|---|
@@ -164,7 +164,8 @@ Inställningskontext mätt separat: promptrad 26 token; en tillhandahållen verk
 | `/local?tz=Oslo&lang=sv` | Samma mening |
 | `/beijing?lang=zh`, `/berlin?lang=de` | Samma mening på kinesiska, tyska; även `fr`, `es`, `pt`, `ru`, `ja` och `ko` |
 | `/utc` | Bara ISO 8601-tidsstämpeln i UTC |
-| `/now` | Kort text: UTC, veckodag och Unix-tid; inga andra kalendrar eller kosmisk tid |
+| `/unix` | Bara Unix-sekunderna, även som `unix` i `/now.json`. Inte med i de korta svaren, eftersom språkmodeller läser ett datum, inte ett Unix-tal |
+| `/now` | Kort text: UTC och veckodag; inga andra kalendrar eller kosmisk tid |
 | `/now?tz=Oslo&cutoff=2025-06` | Lägger till lokal tid och hur länge sedan ett träningsslutdatum var |
 | `exasecond.com` (markdown) | Startsidan för agenter: tiden i alla stora städer, tidsomställningar, ett faktum |
 | `/now.md` | Allt: alla kalendrar, världsklockor |

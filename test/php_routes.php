@@ -68,7 +68,13 @@ $home = get('/', 'text/html')[2];
 check('home: answer block comes before the counter', strpos($home, 'id="ans-now"') < strpos($home, 'id="count"') && strpos($home, 'id="ans-you"') < strpos($home, 'id="count"'));
 check('home: box gives bytes and tokens, table has a bytes column', str_contains($home, 'HTTP GET · 21 bytes · ~14 tokens · text/plain') && str_contains(strip_tags($home), 'BytesTokens') && str_contains(get('/llms.txt')[2], '| 21 | ~14 |'));
 check('story: the play is the first section', (bool)preg_match('/\A# The Pottery Lecture\n(?:\n\*[^\n]*\*\n)+\n## The play\n/', get('/story.md')[2]));
-check('home: world list for readers without a place', str_contains(strip_tags($home), "In Oslo, Stockholm, Berlin, Paris, Madrid and Rome it's ") && str_contains(strip_tags($home), "In Beijing, Shanghai, Hong Kong"));
+// World list for readers without a place: cities share a line while their clocks agree, so the lines change with the seasons
+$wl = fn(int $t) => implode("\n", world_now_lines($t, 'en'));
+check('world list: winter puts Lagos and Kinshasa with Central Europe', str_contains($wl(1800014400), "In Lagos, Kinshasa, Oslo, Stockholm, Berlin, Paris, Madrid and Rome it's 13:00 around midday on Friday (UTC+1)."));
+check('world list: summer puts London with Lagos, Johannesburg with Central Europe', str_contains($wl(1784116800), "In London, Lagos and Kinshasa it's 13:00 around midday on Wednesday (UTC+1).") && preg_match('/^In Oslo, Stockholm, Berlin, Paris, Madrid, Rome(,| and) Johannesburg/m', $wl(1784116800)));   // old tz data (PHP 8.0 here: 2022) misses Egypt's summer time, so Cairo may follow
+check('world list: a clock change within 14 days splits a line', str_contains($wl($oct), "In Lagos and Kinshasa it's 06:51") && str_contains($wl($oct), "In Oslo, Stockholm, Berlin, Paris, Madrid and Rome it's 07:51 early on Thursday morning (CEST, UTC+2). The clocks go back one hour on Sunday 25 October."));
+$wlist = preg_match('~<ul class="ans-world">(.*?)</ul>~s', $home, $m) ? strip_tags($m[1]) : '';
+check('home: world list for readers without a place, every city once', $wlist !== '' && count(array_filter(PLACES, fn($p) => substr_count($wlist, $p[1]) === 1)) === count(PLACES) && (bool)preg_match('/Oslo, Stockholm, Berlin, Paris, Madrid(,| and) Rome/', $wlist) && str_contains($wlist, "In Beijing, Shanghai, Hong Kong, Taipei, Singapore and Manila it's "));
 // About
 $ab = get('/about', 'text/html')[2];
 check('/about page', str_contains($ab, '<h1>About Exasecond</h1>') && str_contains($ab, 'id="ans-fact"') && str_contains($ab, 'application/ld+json') && str_contains($ab, 'is made by <a href="https://github.com/EggQube"') && !str_contains($ab, 'made by the GitHub user'));
@@ -88,6 +94,10 @@ check('city name as given (Beijing, not Shanghai)', str_contains(local_sentence(
 [$st, $hd, $b] = get('/site.css');
 check('/site.css served and cacheable', $st === 200 && str_starts_with($hd['Content-Type'], 'text/css') && str_contains($hd['Cache-Control'], 'max-age') && str_contains($b, '.agentbar'));
 $h1 = get('/', 'text/html')[2];
+[$st, $hd, $b] = get('/site.js');
+check('/site.js served and cacheable, menu and clock code, no time in it', $st === 200 && str_starts_with($hd['Content-Type'], 'text/javascript') && str_contains($hd['Cache-Control'], 'max-age') && str_contains($b, '.top nav details') && str_contains($b, 'if (typeof EXA !== "undefined")') && str_contains($b, 'BigInt(EXA.offset)') && !preg_match('/\d{4}-\d\d-\d\dT\d\d|' . substr((string)time(), 0, 6) . '/', $b));
+check('front page: only the clock settings and the structured data inline, code in /site.js', str_contains($h1, '<script src="/site.js?v=') && substr_count($h1, '<script>') === 1 && str_contains($h1, "<script>\nconst EXA = {") && substr_count($h1, '<script type="application/ld+json">') === 1 && !str_contains($h1, 'BigInt(') && !str_contains($h1, '.top nav details'));
+check('other pages: no inline script, they link /site.js', array_reduce(['/developers', '/time/nature', '/zh/developers', '/story'], fn($ok, $u) => $ok && ($h = get($u, 'text/html')[2]) && !str_contains($h, '<script>') && str_contains($h, '<script src="/site.js?v='), true));
 check('pages link the stylesheet, no inline CSS, time within the first 3 KB', str_contains($h1, '<link rel="stylesheet" href="/site.css?v=') && !str_contains($h1, '<style>') && strpos($h1, 'now <time') < 3000);
 // Tab icon and header logo are cached SVG files; pages link them, not inline them
 foreach (['/icon.svg', '/logo.svg', '/eggqube.svg'] as $f) {
@@ -98,6 +108,12 @@ check('footer: the Pottery Lecture line carries © 2021 in every language', arra
 check('footer: Exasecond.com by EggQube, years up to now', str_contains($h1, '<p class="copy">Exasecond.com by <span class="eq" aria-hidden="true"></span>EggQube <span class="c">©</span> 2021-' . gmdate('Y') . '</p>') && str_contains(strip_tags('<p class="copy">Exasecond.com by <span class="eq" aria-hidden="true"></span>EggQube <span class="c">©</span> 2021</p>'), 'Exasecond.com by EggQube © 2021'));
 check('pages link the icon and the logo, no inline SVG', str_contains($h1, '<link rel="icon" href="/icon.svg?v=') && str_contains($h1, '<img src="/logo.svg?v=') && !str_contains($h1, '<svg'));
 check('/now without tz unchanged', !str_contains(get('/now')[2], 'Time zone') && str_contains(get('/now')[2], 'Tip: add ?tz='));
+check('/now without tz: UTC, weekday and the short tip, no Unix line', preg_match('/^UTC: \S+Z\nWeekday: \w+\nTip: add \?tz=YourCity for local time\.\n$/', get('/now')[2]) === 1);
+check('/now with tz: no Unix line, the local time stays', !str_contains($nowOslo = get('/now?tz=Oslo')[2], 'Unix:') && str_contains($nowOslo, 'Local (Europe/Oslo): '));
+check('token tables: /now is ~80 bytes, ~35 tokens everywhere', str_contains(llms_txt(snapshot()), " | ~80 | ~35 |\n") && array_reduce(LANGS, fn($ok, $l) => $ok && str_contains(load_doc($l, 'about')['body'] ?? '', '| ~80 | ~35 |') && str_contains(load_doc($l, 'developers')['body'] ?? '', '| ~80 | ~35 |') && str_contains(load_doc($l, 'developers')['body'] ?? '', '245-256') && !str_contains(load_doc($l, 'developers')['body'] ?? '', 'Unix time;'), true));
+check('/unix: available, not in the short answers (llms.txt, developer pages in every language)', str_contains($l = llms_txt(snapshot()), "- [/unix](https://exasecond.com/unix): Unix seconds only, also `unix` in /now.json. Not in the short answers, since language models read a date, not a Unix number.\n\n## Full answers") && !str_contains($l, 'just the unix timestamp') && array_reduce(LANGS, fn($ok, $lg) => $ok && preg_match('/^\| `\/utc` \|[^\n]*\n\| `\/unix` \| [^\n]*`\/now\.json`[^\n]*\|$/mu', load_doc($lg, 'developers')['body'] ?? '') === 1, true));
+check('token tables: measured on 1 November 2026, same note in i18n, About and developer pages, every language', array_reduce(LANGS, fn($ok, $lg) => $ok && preg_match('/1\. November 2026|1 November 2026|11 月 1 日|1er novembre 2026|1 de noviembre de 2026|1º de novembro de 2026|1 ноября 2026|1 november 2026|2026年11月1日|2026년 11월 1일/u', $n = t($lg, 'cost_note')) === 1 && str_contains(load_doc($lg, 'about')['body'] ?? '', $n) && str_contains(load_doc($lg, 'developers')['body'] ?? '', $n), true));
+check('Machines chapter describes /now as it is (en, zh)', str_contains(chapter_md(chapter('en', 'machines'), 'en'), '**/now** returns a few short lines of plain text: the UTC time and the weekday.') && !str_contains(chapter_md(chapter('zh', 'machines'), 'zh'), '约八行'));
 check('/time stays a clock for agents', str_starts_with(get('/time')[2], 'UTC: '));
 check('/time is the contents page for browsers', str_contains(get('/time', 'text/html')[2], 'The question of time'));
 check('/zh/time contents', str_contains(get('/zh/time', 'text/html')[2], '时间之问'));
@@ -121,6 +137,7 @@ check('/api/convert', json_decode(get('/api/convert?iso=2000-01-01T00:00:00Z')[2
 check('/api/convert bad input is 400', get('/api/convert?es=2.5')[0] === 400);
 [$st, , $b] = route('POST', '/mcp', [], [], '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_time","arguments":{}}}');
 check('mcp get_time', $st === 200 && str_starts_with(json_decode($b, true)['result']['content'][0]['text'], 'UTC: '));
+check('mcp get_time default: UTC and weekday only (no Unix line, no web-address tip)', preg_match('/^UTC: \S+Z\nWeekday: \w+\n$/', json_decode($b, true)['result']['content'][0]['text']) === 1);
 [$st] = route('POST', '/mcp', [], [], '{"jsonrpc":"2.0","method":"notifications/initialized"}');
 check('mcp notification is 202', $st === 202);
 check('no long dashes in chapters', !preg_match('/[\x{2013}\x{2014}]/u', implode('', array_map(fn($s) => chapter('en', $s)['body'] . chapter('zh', $s)['body'], CHAPTERS))));

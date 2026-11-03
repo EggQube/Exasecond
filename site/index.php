@@ -115,6 +115,7 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
     if (!in_array($method, ['GET', 'HEAD'], true)) return send("Method not allowed\n", 'text', ['Allow' => 'GET, HEAD'], 405);
     // The stylesheet is the one thing that may be cached: it holds no time. Pages link it with ?v=<hash>, so changes reach browsers at once.
     if ($path === '/site.css') return send(site_css(), 'css', ['Cache-Control' => 'public, max-age=86400']);
+    if ($path === '/site.js') return send(site_js(), 'text', ['Cache-Control' => 'public, max-age=86400', 'Content-Type' => 'text/javascript; charset=utf-8']);
     // The tab icon and the header logo: no time in them either, so they are cached the same way.
     if ($path === '/icon.svg') return send(ICON_SVG, 'svg', ['Cache-Control' => 'public, max-age=86400']);
     if ($path === '/logo.svg') return send(LOGO_SVG, 'svg', ['Cache-Control' => 'public, max-age=86400']);

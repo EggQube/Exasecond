@@ -370,6 +370,8 @@ function layout(string $lang, array $o, string $body): string {
         . implode('</li><li>', $navLinks) . '</li></ul></details>' . lang_menu($lang, $here, $url);
     // Styling lives in /site.css (cached by browsers), so the page itself starts with the content: raw-HTML readers reach the time first.
     $cssHref = '/site.css?v=' . substr(md5(site_css()), 0, 8);
+    // Scripts live in /site.js the same way: raw-HTML readers don't pay for code they can't run.
+    $jsHref = '/site.js?v=' . substr(md5(site_js()), 0, 8);
     $title = h($o['title']);
     $desc = h($o['desc'] ?? '');
     $htmlLang = $L('html_lang');
@@ -412,7 +414,16 @@ $head<link rel="icon" href="$fav" type="image/svg+xml">
 $body
   <p class="copy">Exasecond.com by <span class="eq" aria-hidden="true"></span>EggQube <span class="c">©</span> 2021-$year</p>
 </div>
-<script>
+<script src="$jsHref" defer></script>
+</body>
+</html>
+
+HTML;
+}
+
+/** The scripts of every page, served as /site.js. No time in it: the front page hands its clock settings over inline, as EXA. */
+function site_js(): string {
+    $menu = <<<'JS'
 // Keep the native dropdowns usable without JavaScript; enhance dismissal when available.
 (() => {
   const dropdowns = document.querySelectorAll(".top nav details");
@@ -450,11 +461,10 @@ setTimeout(() => {
   if (window.scrollY > h) { b.style.transition = "none"; b.classList.add("folded"); window.scrollBy(0, -h); }
   else b.classList.add("folded");
 }, 2000);
-</script>
-</body>
-</html>
-
-HTML;
+// The front page's clock: only where the page defines EXA.
+if (typeof EXA !== "undefined")
+JS;
+    return $menu . "\n" . home_js();
 }
 
 function chapter_url(string $lang, string $slug): string { return lang_prefix($lang) . '/time/' . $slug; }
@@ -500,7 +510,6 @@ function render_home(array $s, string $lang, ?string $place = null): string {
         'days' => $days,
         'labels' => ['universe' => $L('tr_universe'), 'es' => $L('tr_es'), 'utc' => 'UTC', 'zone' => $L('js_zone'), 'unix' => 'Unix', 'fail' => $L('js_fail')],
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG);
-    $js = home_js();
     // The answer comes first: the time now, the reader's time, one fact. The counter is the visual that follows.
     $nowD = dt_utc($s['unix']);
     if ($zh) $nowLine = $nowD->format('Y') . '年' . $nowD->format('n') . '月' . $nowD->format('j') . '日 ' . WEEKDAYS_ZH[$nowD->format('l')] . ' ' . $nowD->format('H:i:s') . ' UTC';
@@ -623,7 +632,7 @@ HTML;
 <pre class="agents" lang="en"><span class="c"># UTC timestamp, to the second</span>
 curl $S/utc
 
-<span class="c"># compact UTC, weekday and Unix</span>
+<span class="c"># compact UTC and weekday</span>
 curl $S/now
 
 <span class="c"># local time in one sentence</span>
@@ -646,7 +655,8 @@ HTML;
     $body .= '<p>' . sprintf($L('foot_convention'), $C) . '</p>';
     $body .= '<p>' . $L('foot_story') . '</p>';
     $body .= '<p>' . h($L('foot_lifespan')) . '</p>';
-    $body .= "\n  </footer>\n<script>\nconst EXA = $cfg;\n$js</script>";
+    // Only the settings stay in the page (they carry the server time); the clock code is in /site.js.
+    $body .= "\n  </footer>\n<script>\nconst EXA = $cfg;\n</script>";
     return layout($lang, [
         'title' => $L('home_title'),
         'desc' => $L('home_desc') . $L('desc_now') . $s['utc'] . ' UTC.',

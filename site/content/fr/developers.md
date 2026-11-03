@@ -151,11 +151,11 @@ Pour Ollama et les autres modèles locaux utilisés via Open WebUI : télécharg
 | `/unix`: Horodatage Unix | 11 | ~5 |
 | `/utc`: Horodatage UTC, à la seconde | 21 | ~14 |
 | `/local?tz=Oslo`: Phrase en anglais donnant l’heure locale | ~70-120 | ~25-40 |
-| `/now`: Réponse compacte par défaut | ~200 | ~70 |
+| `/now`: Réponse compacte par défaut | ~80 | ~35 |
 
-Textes de réponse mesurés le 23 octobre 2026 avec deux tokenizers : o200k_base et cl100k_base. Le nombre varie selon le modèle, la langue et le contenu. La configuration des outils et l’enveloppe du client s’ajoutent. Ce sont des tailles d’exemples typiques, pas des totaux facturés ni des limites garanties.
+Textes de réponse mesurés le 1er novembre 2026 avec deux tokenizers : o200k_base et cl100k_base. Le nombre varie selon le modèle, la langue et le contenu. La configuration des outils et l’enveloppe du client s’ajoutent. Ce sont des tailles d’exemples typiques, pas des totaux facturés ni des limites garanties.
 
-Contexte de configuration mesuré séparément : ligne de prompt 26 tokens ; une définition d’outil fournie 136-144 ; les deux schémas MCP 247-258. Le format du client peut en ajouter.
+Contexte de configuration mesuré séparément : ligne de prompt 26 tokens ; une définition d’outil fournie 136-144 ; les deux schémas MCP 245-256. Le format du client peut en ajouter.
 
 | Adresse | Réponse |
 |---|---|
@@ -164,7 +164,8 @@ Contexte de configuration mesuré séparément : ligne de prompt 26 tokens ; une
 | `/local?tz=Oslo&lang=fr` | La même phrase |
 | `/beijing?lang=zh`, `/berlin?lang=de` | La même phrase en chinois, en allemand ; aussi `es`, `pt`, `ru`, `sv`, `ja` et `ko` |
 | `/utc` | Seulement l'horodatage UTC ISO 8601 |
-| `/now` | Texte compact : UTC, jour de la semaine et temps Unix ; sans calendriers supplémentaires ni temps cosmique |
+| `/unix` | Seulement les secondes Unix, aussi en `unix` dans `/now.json`. Absent des réponses courtes, car les modèles de langage lisent une date, pas un nombre Unix |
+| `/now` | Texte compact : UTC et jour de la semaine ; sans calendriers supplémentaires ni temps cosmique |
 | `/now?tz=Oslo&cutoff=2025-06` | Ajoute l'heure locale et l'ancienneté d'une date limite d'entraînement |
 | `exasecond.com` (markdown) | La page d'accueil pour les agents : l'heure de toutes les grandes villes, les changements d'heure, un fait |
 | `/now.md` | Tout : tous les calendriers, les horloges du monde |

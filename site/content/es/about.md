@@ -26,9 +26,9 @@ Una conexión de herramienta solicita la hora directamente en cada llamada. La c
 | `/unix`: Marca de tiempo Unix | 11 | ~5 |
 | `/utc`: Marca de tiempo UTC, al segundo | 21 | ~14 |
 | `/local?tz=Oslo`: Frase en inglés con la hora local | ~70-120 | ~25-40 |
-| `/now`: Respuesta compacta predeterminada | ~200 | ~70 |
+| `/now`: Respuesta compacta predeterminada | ~80 | ~35 |
 
-Textos de respuesta medidos el 23 de octubre de 2026 con dos tokenizadores: o200k_base y cl100k_base. La cantidad varía según el modelo, el idioma y el contenido. La configuración de herramientas y el formato del cliente son adicionales. Son tamaños de muestras típicas, no totales de facturación ni límites garantizados.
+Textos de respuesta medidos el 1 de noviembre de 2026 con dos tokenizadores: o200k_base y cl100k_base. La cantidad varía según el modelo, el idioma y el contenido. La configuración de herramientas y el formato del cliente son adicionales. Son tamaños de muestras típicas, no totales de facturación ni límites garantizados.
 
 
 <!-- figure:developers -->

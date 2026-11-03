@@ -26,9 +26,9 @@ Une connexion d’outil demande directement l’heure à chaque appel. Le cache 
 | `/unix`: Horodatage Unix | 11 | ~5 |
 | `/utc`: Horodatage UTC, à la seconde | 21 | ~14 |
 | `/local?tz=Oslo`: Phrase en anglais donnant l’heure locale | ~70-120 | ~25-40 |
-| `/now`: Réponse compacte par défaut | ~200 | ~70 |
+| `/now`: Réponse compacte par défaut | ~80 | ~35 |
 
-Textes de réponse mesurés le 23 octobre 2026 avec deux tokenizers : o200k_base et cl100k_base. Le nombre varie selon le modèle, la langue et le contenu. La configuration des outils et l’enveloppe du client s’ajoutent. Ce sont des tailles d’exemples typiques, pas des totaux facturés ni des limites garanties.
+Textes de réponse mesurés le 1er novembre 2026 avec deux tokenizers : o200k_base et cl100k_base. Le nombre varie selon le modèle, la langue et le contenu. La configuration des outils et l’enveloppe du client s’ajoutent. Ce sont des tailles d’exemples typiques, pas des totaux facturés ni des limites garanties.
 
 
 <!-- figure:developers -->

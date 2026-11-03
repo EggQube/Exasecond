@@ -2,11 +2,11 @@
 // Render a snapshot (from snapshot()) as compact text or markdown (port of src/formats.js).
 defined('EXA') or exit;
 
-function now_text(array $s): string {
+/** $tip: the ?tz= hint for web addresses; MCP leaves it out (its tool schema already describes tz and cutoff). */
+function now_text(array $s, bool $tip = true): string {
     $lines = [
         "UTC: {$s['utc']}",
         "Weekday: {$s['technical']['weekday']}",
-        "Unix: {$s['unix']}",
     ];
     if (isset($s['tz_note'])) $lines[] = "Time zone: {$s['tz_note']}";
     if ($s['local']) {
@@ -14,7 +14,7 @@ function now_text(array $s): string {
         if ($c = clock_change_line($s['local'], $s['unix'], 60)) $lines[] = $c;
     }
     if ($s['staleness']) $lines[] = "Since your cutoff ({$s['staleness']['cutoff']}): {$s['staleness']['days_since_cutoff']} days. {$s['staleness']['guidance']}";
-    if (!$s['local']) $lines[] = 'Tip: add ?tz=YourCity (or country, zone, offset) for local time, ?cutoff=YYYY-MM for how stale your training data is. Everything else: /now.md';
+    if (!$s['local'] && $tip) $lines[] = 'Tip: add ?tz=YourCity for local time.';
     return implode("\n", $lines) . "\n";
 }
 

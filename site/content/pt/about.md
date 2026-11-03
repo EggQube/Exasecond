@@ -26,9 +26,9 @@ Uma conexão de ferramenta solicita a hora diretamente a cada chamada. O cache e
 | `/unix`: Timestamp Unix | 11 | ~5 |
 | `/utc`: Timestamp UTC, até o segundo | 21 | ~14 |
 | `/local?tz=Oslo`: Frase em inglês com a hora local | ~70-120 | ~25-40 |
-| `/now`: Resposta compacta padrão | ~200 | ~70 |
+| `/now`: Resposta compacta padrão | ~80 | ~35 |
 
-Textos de resposta medidos em 23 de outubro de 2026 com dois tokenizadores: o200k_base e cl100k_base. A quantidade varia conforme o modelo, o idioma e o conteúdo. A configuração das ferramentas e o formato do cliente são adicionais. São tamanhos de amostras típicas, não totais de cobrança nem limites garantidos.
+Textos de resposta medidos em 1º de novembro de 2026 com dois tokenizadores: o200k_base e cl100k_base. A quantidade varia conforme o modelo, o idioma e o conteúdo. A configuração das ferramentas e o formato do cliente são adicionais. São tamanhos de amostras típicas, não totais de cobrança nem limites garantidos.
 
 
 <!-- figure:developers -->

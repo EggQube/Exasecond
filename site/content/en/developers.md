@@ -147,11 +147,11 @@ For Ollama and other local models used through Open WebUI: download [/dev/openwe
 | `/unix`: Unix timestamp | 11 | ~5 |
 | `/utc`: UTC timestamp, to the second | 21 | ~14 |
 | `/local?tz=Oslo`: English local-time sentence | ~70-120 | ~25-40 |
-| `/now`: Default compact response | ~200 | ~70 |
+| `/now`: Default compact response | ~80 | ~35 |
 
-Sample response text measured with two tokenizers: o200k_base and cl100k_base, on 23 October 2026. Counts vary by model, language and response details. Tool setup and client overhead are additional. These are typical sample sizes, not billing totals or guaranteed limits.
+Sample response text measured with two tokenizers: o200k_base and cl100k_base, on 1 November 2026. Counts vary by model, language and response details. Tool setup and client overhead are additional. These are typical sample sizes, not billing totals or guaranteed limits.
 
-Setup context, measured separately: prompt line 26 tokens; one supplied tool definition 136-144; both MCP tool schemas 247-258. Client formatting can add more.
+Setup context, measured separately: prompt line 26 tokens; one supplied tool definition 136-144; both MCP tool schemas 245-256. Client formatting can add more.
 
 | Address | Answer |
 |---|---|
@@ -160,7 +160,8 @@ Setup context, measured separately: prompt line 26 tokens; one supplied tool def
 | `/beijing?lang=zh` | The same sentence in Chinese |
 | `/berlin?lang=de` | The same sentence in German; also `fr`, `es`, `pt`, `ru`, `sv`, `ja` and `ko` |
 | `/utc` | The ISO 8601 UTC timestamp only |
-| `/now` | Compact text: UTC, weekday and Unix time; no secondary calendars or cosmic time |
+| `/unix` | Unix seconds only, also `unix` in `/now.json`. Not in the short answers, since language models read a date, not a Unix number |
+| `/now` | Compact text: UTC and weekday; no secondary calendars or cosmic time |
 | `/now?tz=Oslo&cutoff=2025-06` | Adds local time and how long ago a training cutoff was |
 | `exasecond.com` (markdown) | The front page for agents: every big city's time, clock changes, a fact |
 | `/now.md` | Everything: all calendars, world clocks |

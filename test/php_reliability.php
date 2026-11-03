@@ -130,7 +130,7 @@ foreach (['en' => 'directly', 'zh' => '工具连接', 'de' => 'Werkzeugverbindun
         && str_contains($doc, 'o200k_base') && str_contains($doc, 'cl100k_base')
         && str_contains($doc, '| 21 | ~14 |') && str_contains($doc, '| ~70-120 | ~25-40 |')
         && str_contains(file_get_contents(content_path($lang, 'about.md')), '| 11 | ~5 |')
-        && str_contains($doc, '247-258') && !str_contains($doc, '| ~50 |'));
+        && str_contains($doc, '245-256') && !str_contains($doc, '| ~50 |'));
     verify("copyright sign in licence notice $lang", str_contains($doc, '© 2026 EggQube') && !str_contains($doc, '(c) 2026'));
     verify("developer UTF-8 $lang", preg_match('//u', $doc) === 1 && !str_contains($doc, "\u{FFFD}"));
 }

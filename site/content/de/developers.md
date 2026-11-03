@@ -151,11 +151,11 @@ Für Ollama und andere lokale Modelle in Open WebUI: Laden Sie [/dev/openwebui_e
 | `/unix`: Unix-Zeitstempel | 11 | ~5 |
 | `/utc`: UTC-Zeitstempel, sekundengenau | 21 | ~14 |
 | `/local?tz=Oslo`: Englischer Satz zur Ortszeit | ~70-120 | ~25-40 |
-| `/now`: Kompakte Standardantwort | ~200 | ~70 |
+| `/now`: Kompakte Standardantwort | ~80 | ~35 |
 
-Antworttexte am 23. Oktober 2026 mit zwei Tokenizern gemessen: o200k_base und cl100k_base. Die Zahlen hängen von Modell, Sprache und Antwortdetails ab. Einrichtung und Client-Aufwand kommen hinzu. Typische Stichprobenwerte, keine Abrechnungssummen oder garantierten Grenzen.
+Antworttexte am 1. November 2026 mit zwei Tokenizern gemessen: o200k_base und cl100k_base. Die Zahlen hängen von Modell, Sprache und Antwortdetails ab. Einrichtung und Client-Aufwand kommen hinzu. Typische Stichprobenwerte, keine Abrechnungssummen oder garantierten Grenzen.
 
-Einrichtungskontext, getrennt gemessen: Promptzeile 26 Tokens; eine bereitgestellte Werkzeugdefinition 136-144; beide MCP-Werkzeugschemas 247-258. Client-Formatierung kann weitere Tokens hinzufügen.
+Einrichtungskontext, getrennt gemessen: Promptzeile 26 Tokens; eine bereitgestellte Werkzeugdefinition 136-144; beide MCP-Werkzeugschemas 245-256. Client-Formatierung kann weitere Tokens hinzufügen.
 
 | Adresse | Antwort |
 |---|---|
@@ -164,7 +164,8 @@ Einrichtungskontext, getrennt gemessen: Promptzeile 26 Tokens; eine bereitgestel
 | `/local?tz=Oslo&lang=de` | Derselbe Satz |
 | `/beijing?lang=zh`, `/paris?lang=fr` | Derselbe Satz auf Chinesisch, Französisch; auch `es`, `pt`, `ru`, `sv`, `ja` und `ko` |
 | `/utc` | Nur der ISO-8601-Zeitstempel in UTC |
-| `/now` | Kompakter Text: UTC, Wochentag und Unix-Zeit; keine weiteren Kalender oder kosmische Zeit |
+| `/unix` | Nur die Unix-Sekunden, auch als `unix` in `/now.json`. Nicht in den kurzen Antworten, denn Sprachmodelle lesen ein Datum, keine Unix-Zahl |
+| `/now` | Kompakter Text: UTC und Wochentag; keine weiteren Kalender oder kosmische Zeit |
 | `/now?tz=Oslo&cutoff=2025-06` | Dazu die Ortszeit und wie lange ein Trainingsstichtag zurückliegt |
 | `exasecond.com` (markdown) | Die Startseite für Agenten: die Zeit aller großen Städte, Zeitumstellungen, eine Tatsache |
 | `/now.md` | Alles: alle Kalender, Weltuhren |

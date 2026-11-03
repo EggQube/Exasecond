@@ -14,7 +14,7 @@ function mcp_tools(): array {
                 'tz' => ['type' => 'string', 'description' => 'City (Oslo), country, IANA zone, abbreviation or UTC offset (+02:00)'],
                 'cutoff' => ['type' => 'string', 'description' => 'Training cutoff, YYYY-MM'],
                 'lang' => ['type' => 'string', 'enum' => SENTENCE_LANGS, 'description' => 'Local sentence language; default en'],
-                'detail' => ['type' => 'string', 'enum' => ['basic', 'full', 'local'], 'description' => 'basic (default): UTC, weekday, Unix; local: date, time and part of day in one sentence (use tz); full: calendars and world clocks'],
+                'detail' => ['type' => 'string', 'enum' => ['basic', 'full', 'local'], 'description' => 'basic (default): UTC and weekday; local: date, time and part of day in one sentence (use tz); full: calendars and world clocks'],
             ]],
         ],
         [
@@ -42,7 +42,7 @@ function mcp_call_tool($name, $args): string {
         $o = tz_opts($str('tz'), $str('cutoff'));
         $s = snapshot(null, $o);
         if ($str('detail') === 'local') return local_sentence($s, $o['tz_res'], $str('lang') ?? 'en');
-        return $str('detail') === 'full' ? now_md($s) : now_text($s);
+        return $str('detail') === 'full' ? now_md($s) : now_text($s, false);
     }
     if ($name === 'convert_time') {
         $d = parse_instant($args);

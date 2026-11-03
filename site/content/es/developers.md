@@ -151,11 +151,11 @@ Para Ollama y otros modelos locales usados con Open WebUI: descarga [/dev/openwe
 | `/unix`: Marca de tiempo Unix | 11 | ~5 |
 | `/utc`: Marca de tiempo UTC, al segundo | 21 | ~14 |
 | `/local?tz=Oslo`: Frase en inglés con la hora local | ~70-120 | ~25-40 |
-| `/now`: Respuesta compacta predeterminada | ~200 | ~70 |
+| `/now`: Respuesta compacta predeterminada | ~80 | ~35 |
 
-Textos de respuesta medidos el 23 de octubre de 2026 con dos tokenizadores: o200k_base y cl100k_base. La cantidad varía según el modelo, el idioma y el contenido. La configuración de herramientas y el formato del cliente son adicionales. Son tamaños de muestras típicas, no totales de facturación ni límites garantizados.
+Textos de respuesta medidos el 1 de noviembre de 2026 con dos tokenizadores: o200k_base y cl100k_base. La cantidad varía según el modelo, el idioma y el contenido. La configuración de herramientas y el formato del cliente son adicionales. Son tamaños de muestras típicas, no totales de facturación ni límites garantizados.
 
-Contexto de configuración medido por separado: línea de prompt 26 tokens; una definición de herramienta proporcionada 136-144; ambos esquemas MCP 247-258. El formato del cliente puede añadir más.
+Contexto de configuración medido por separado: línea de prompt 26 tokens; una definición de herramienta proporcionada 136-144; ambos esquemas MCP 245-256. El formato del cliente puede añadir más.
 
 | Dirección | Respuesta |
 |---|---|
@@ -164,7 +164,8 @@ Contexto de configuración medido por separado: línea de prompt 26 tokens; una 
 | `/local?tz=Oslo&lang=es` | La misma frase |
 | `/beijing?lang=zh`, `/berlin?lang=de` | La misma frase en chino, en alemán; también `fr`, `pt`, `ru`, `sv`, `ja` y `ko` |
 | `/utc` | Solo la marca de tiempo UTC ISO 8601 |
-| `/now` | Texto compacto: UTC, día de la semana y tiempo Unix; sin otros calendarios ni tiempo cósmico |
+| `/unix` | Solo los segundos Unix, también como `unix` en `/now.json`. No está en las respuestas cortas, porque los modelos de lenguaje leen una fecha, no un número Unix |
+| `/now` | Texto compacto: UTC y día de la semana; sin otros calendarios ni tiempo cósmico |
 | `/now?tz=Oslo&cutoff=2025-06` | Añade la hora local y cuánto hace de una fecha de corte de entrenamiento |
 | `exasecond.com` (markdown) | La página de inicio para agentes: la hora de todas las grandes ciudades, los cambios de hora, un dato |
 | `/now.md` | Todo: todos los calendarios, relojes del mundo |
