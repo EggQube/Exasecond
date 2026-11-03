@@ -37,7 +37,7 @@ The requirements follow from how AI agents read the web:
 
 1. **No JavaScript.** Most automated fetchers read the HTML or text a server sends and do not run scripts. The time has to be in the response itself.
 2. **Small.** Many models, especially local ones, have small context windows. A time answer should be a few lines, not a web page.
-3. **Exact and unambiguous.** ISO 8601 in UTC, with the time zone stated, plus a Unix timestamp.
+3. **Exact and unambiguous.** ISO 8601 in UTC, with the time zone stated.
 4. **Fresh.** Generated at the moment of the request, and never cached.
 5. **Neutral.** The answer should contain only data. Instructions hidden in fetched content ("prompt injection") are a real security problem for AI agents, and well-built agents distrust them.
 6. **Context.** Besides the date, an agent benefits from knowing how far it is from its own training cutoff, so it can judge what may have changed.

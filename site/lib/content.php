@@ -6,7 +6,7 @@ defined('EXA') or exit;
 const SITE = 'https://exasecond.com';
 
 function now_line(array $s): string {
-    return "Current time (generated at request): {$s['utc']} UTC | unix {$s['unix']} | universe_seconds {$s['universe_seconds']} | {$s['technical']['weekday']}";
+    return "Current time (generated at request): {$s['utc']} UTC | universe_seconds {$s['universe_seconds']} | {$s['technical']['weekday']}";
 }
 
 /** Measured sample response costs; setup and client framing are separate. */
