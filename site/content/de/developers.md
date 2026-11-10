@@ -162,6 +162,7 @@ Einrichtungskontext, getrennt gemessen: Promptzeile 26 Tokens; eine bereitgestel
 | `/berlin?lang=de`, `/new-york?lang=de` | Ein Satz in Sprechreihenfolge: Ort, Ortszeit, Tageszeit und Wochentag, in Klammern Datum und Zone, dazu eine anstehende Zeitumstellung. Jede Stadt, Region, Insel, jedes Land, jede Zone oder Abweichung als Adresse |
 | `/oslo`, `/new-york`, `/sweden` | Derselbe Satz auf Englisch |
 | `/local?tz=Oslo&lang=de` | Derselbe Satz |
+| `/local.json?tz=Oslo&lang=de` | Derselbe Satz als JSON, dazu Abweichung, Zonenkürzel, Sommerzeit (`dst`) und die nächste Zeitumstellung |
 | `/beijing?lang=zh`, `/paris?lang=fr` | Derselbe Satz auf Chinesisch, Französisch; auch `es`, `pt`, `ru`, `sv`, `ja` und `ko` |
 | `/utc` | Nur der ISO-8601-Zeitstempel in UTC |
 | `/unix` | Nur die Unix-Sekunden, auch als `unix` in `/now.json`. Nicht in den kurzen Antworten, denn Sprachmodelle lesen ein Datum, keine Unix-Zahl |

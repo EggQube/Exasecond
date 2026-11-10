@@ -78,7 +78,7 @@ function home_md(array $s, ?string $place = null, string $lang = 'en'): string {
     $fact = pick_fact($s['unix'], null, $lang);
     $p = lang_prefix($lang);
     $o = $place !== null ? [$place, ''] : [];
-    array_push($o, t($lang, 'agentbar_who') . ' ' . t($lang, 'agentbar_now') . " {$s['utc']} (UTC), " . t($lang, 'agentbar_gen') . ' · exasecond.com/stockholm?lang=' . $lang . ' · exasecond.com/utc?r=' . bin2hex(random_bytes(3)),
+    array_push($o, agent_line($lang, false),
         '', '# Exasecond.com', '', t($lang, 'service_title') . ' ' . t($lang, 'service_promise'), '',
         '[/utc](' . SITE . '/utc): ' . t($lang, 'service_utc') . ' · [/local?tz=Oslo](' . SITE . '/local?tz=Oslo&lang=' . $lang . '): ' . t($lang, 'service_local'),
         '[' . t($lang, 'service_setup') . '](' . SITE . $p . '/developers.md): HTTP / MCP',

@@ -162,6 +162,7 @@ Open WebUI で使う Ollama などのローカルモデルの場合：[/dev/open
 | `/tokyo?lang=ja`、`/new-york?lang=ja` | 話し言葉の順の一文：場所、曜日と時間帯、現地時刻、括弧内に日付とタイムゾーン、そして近く迫った時計の切り替え。どの都市、地域、島、国、タイムゾーン、時差でもアドレスにできます |
 | `/oslo`、`/new-york`、`/sweden` | 同じ一文の英語版 |
 | `/local?tz=Oslo&lang=ja` | 同じ一文 |
+| `/local.json?tz=Oslo&lang=ja` | 同じ一文をJSONで。時差、タイムゾーンの略称、夏時間かどうか（`dst`）、次の時計の切り替えも付きます |
 | `/beijing?lang=zh`、`/seoul?lang=ko` | 同じ一文の中国語版、韓国語版。`de`、`fr`、`es`、`pt`、`ru`、`sv` も使えます |
 | `/utc` | ISO 8601 形式のUTCタイムスタンプのみ |
 | `/unix` | Unix秒のみ。`/now.json` の `unix` にもあります。言語モデルが読むのはUnixの数値ではなく日付なので、短い応答には含めません |

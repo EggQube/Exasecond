@@ -162,6 +162,7 @@ Contexto de configuração medido separadamente: linha de prompt 26 tokens; uma 
 | `/rio?lang=pt`, `/lisboa?lang=pt` | Uma frase na ordem falada: lugar, dia e período do dia, hora local, e entre parênteses a data e o fuso, mais uma mudança de horário próxima. Qualquer cidade, região, ilha, país, fuso ou diferença como endereço |
 | `/oslo`, `/new-york`, `/sweden` | A mesma frase em inglês |
 | `/local?tz=Oslo&lang=pt` | A mesma frase |
+| `/local.json?tz=Oslo&lang=pt` | A mesma frase em JSON, com a diferença, a abreviação do fuso, o horário de verão (`dst`) e a próxima mudança de horário |
 | `/beijing?lang=zh`, `/berlin?lang=de` | A mesma frase em chinês, em alemão; também `fr`, `es`, `ru`, `sv`, `ja` e `ko` |
 | `/utc` | Só o carimbo de tempo UTC ISO 8601 |
 | `/unix` | Só os segundos Unix, também como `unix` em `/now.json`. Fora das respostas curtas, porque modelos de linguagem leem uma data, não um número Unix |

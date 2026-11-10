@@ -162,6 +162,7 @@ Open WebUI로 쓰는 Ollama 등 로컬 모델의 경우: [/dev/openwebui_exaseco
 | `/seoul?lang=ko`, `/new-york?lang=ko` | 말하는 순서의 한 문장: 장소, 요일과 하루 중 때, 현지 시각, 괄호 안에 날짜와 시간대, 그리고 다가오는 시계 변경. 어느 도시, 지역, 섬, 나라, 시간대, 시차든 주소로 쓸 수 있습니다 |
 | `/oslo`, `/new-york`, `/sweden` | 같은 문장의 영어판 |
 | `/local?tz=Oslo&lang=ko` | 같은 문장 |
+| `/local.json?tz=Oslo&lang=ko` | 같은 문장을 JSON으로. 시차, 시간대 약어, 서머타임 여부(`dst`), 다음 시계 변경도 함께 |
 | `/beijing?lang=zh`, `/tokyo?lang=ja` | 같은 문장의 중국어판, 일본어판. `de`, `fr`, `es`, `pt`, `ru`, `sv`도 됩니다 |
 | `/utc` | ISO 8601 형식의 UTC 타임스탬프만 |
 | `/unix` | Unix 초만. `/now.json`의 `unix`에도 있음. 언어 모델은 Unix 숫자가 아니라 날짜를 읽으므로 짧은 응답에는 포함하지 않음 |

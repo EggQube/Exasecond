@@ -37,6 +37,7 @@ Language models have no clock. If you are an AI agent, do not guess today's date
 ## Fastest answers
 
 - [/oslo]($S/oslo): any city, region, country, zone or offset as the address (/stockholm, /new-york, /bali, /sweden, /cet, /utc+2; same as /local?tz=Oslo). One sentence (~30 tokens) for talking to a person: their weekday, date, local time and part of day (morning, afternoon, evening, night), plus an upcoming clock change. Example: "It's 21:21 on Wednesday evening in Oslo (21 October 2026, CEST, UTC+2)." Place names: GeoNames (CC BY 4.0).
+- [/local.json?tz=Oslo]($S/local.json?tz=Oslo): the same sentence as JSON, plus the offset, zone abbreviation, summer time (dst) and the next clock change
 - [/now]($S/now): compact current time as plain text (UTC and weekday); no secondary calendars or cosmic time
 - [/utc]($S/utc): just the ISO 8601 UTC timestamp, nothing else
 - [/now?tz=Asia/Shanghai&cutoff=2025-06]($S/now?tz=Asia/Shanghai&cutoff=2025-06): add your time zone and your training cutoff to get local time and a staleness warning
@@ -157,6 +158,7 @@ Time endpoints use GET, need no key, allow CORS, and return Cache-Control: no-st
 |---|---|
 | `/now` | Compact plain text: UTC and weekday; no secondary calendars or cosmic time. Accept application/json or text/markdown requests the full format. |
 | `/local` | One sentence for talking to a person: weekday, date, local time and part of day, e.g. `/local?tz=Oslo`. JSON with Accept: application/json |
+| `/local.json` | The same as JSON without an Accept header, e.g. `/local.json?tz=Oslo`: the sentence, UTC, and the local time with offset, abbreviation, summer time (`dst`) and the next clock change |
 | `/<place>` | The same sentence with the place as the address: `/oslo`, `/new-york`, `/sweden`. Unknown places: 404 with a hint. Place names: GeoNames (CC BY 4.0) |
 | `/utc` | ISO 8601 UTC timestamp only |
 | `/unix` | Unix seconds only |
@@ -225,6 +227,7 @@ function openapi(): array {
         'servers' => [['url' => SITE]],
         'paths' => [
             '/local' => ['get' => ['operationId' => 'getLocalTime', 'summary' => 'One sentence with local time and part of day', 'parameters' => [$tz, $lang], 'responses' => $localResponses]],
+            '/local.json' => ['get' => ['operationId' => 'getLocalTimeJson', 'summary' => 'The local sentence as JSON, without an Accept header: offset, abbreviation, summer time and next clock change', 'parameters' => [$tz, $lang], 'responses' => ['200' => ['description' => $localResponses['200']['description'], 'content' => ['application/json' => $localResponses['200']['content']['application/json']]]]]],
             '/{place}' => ['get' => ['operationId' => 'getPlaceTime', 'summary' => 'Local sentence for a city, country, zone or offset; reserved routes take precedence', 'parameters' => [['name' => 'place', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'string', 'maxLength' => 64]], $lang], 'responses' => $localResponses + ['404' => ['description' => 'Unknown place']]]],
             '/now' => ['get' => ['operationId' => 'getTimeText', 'summary' => 'Compact current time; with tz, the local sentence comes first', 'parameters' => [$tz, $cutoff, $lang], 'responses' => ['200' => ['description' => 'Plain text by default; JSON or Markdown via Accept']]]],
             '/api/now' => ['get' => ['operationId' => 'getTime', 'summary' => 'Current time in all formats', 'parameters' => [$tz, $cutoff, $lang], 'responses' => ['200' => ['description' => 'Snapshot JSON; lang localizes calendar strings when intl is available']]]],

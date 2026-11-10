@@ -157,6 +157,7 @@ Setup context, measured separately: prompt line 26 tokens; one supplied tool def
 |---|---|
 | `/oslo`, `/new-york`, `/sweden` | One sentence in spoken order: local time, part of day, weekday and place, then the date and zone in brackets, and an upcoming clock change. Any city, region, island, country, zone or offset as the address |
 | `/local?tz=Oslo` | The same sentence |
+| `/local.json?tz=Oslo` | The same sentence as JSON, plus the offset, zone abbreviation, summer time (`dst`) and the next clock change |
 | `/beijing?lang=zh` | The same sentence in Chinese |
 | `/berlin?lang=de` | The same sentence in German; also `fr`, `es`, `pt`, `ru`, `sv`, `ja` and `ko` |
 | `/utc` | The ISO 8601 UTC timestamp only |

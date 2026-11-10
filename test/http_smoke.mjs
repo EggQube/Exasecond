@@ -63,6 +63,8 @@ await get('/api/convert?iso=2026-02-29', 400);
 await get('/api/convert?iso=2000-01-01&unix=0', 400);
 await get('/api/convert?iso%5B%5D=2000-01-01', 400);
 assert.ok(JSON.parse((await get('/openapi.json')).body).paths['/local']);
+const localJson = await get('/local.json?tz=Oslo');
+assert.ok(localJson.headers.get('content-type').startsWith('application/json') && JSON.parse(localJson.body).local.zone === 'Europe/Oslo', '/local.json');
 await get('/kiruna');
 assert.ok((await get('/', 200, { headers: { Accept: 'text/markdown' } })).body.startsWith('For AI agents:'));
 const head = await get('/local?tz=Oslo', 200, { method: 'HEAD' });

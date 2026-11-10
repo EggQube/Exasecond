@@ -162,6 +162,7 @@ Contexto de configuración medido por separado: línea de prompt 26 tokens; una 
 | `/madrid?lang=es`, `/new-york?lang=es` | Una frase en orden hablado: lugar, día y momento del día, hora local, y entre paréntesis la fecha y la zona, más un cambio de hora próximo. Cualquier ciudad, región, isla, país, zona o desfase como dirección |
 | `/oslo`, `/new-york`, `/sweden` | La misma frase en inglés |
 | `/local?tz=Oslo&lang=es` | La misma frase |
+| `/local.json?tz=Oslo&lang=es` | La misma frase en JSON, con el desfase, la abreviatura de la zona, el horario de verano (`dst`) y el próximo cambio de hora |
 | `/beijing?lang=zh`, `/berlin?lang=de` | La misma frase en chino, en alemán; también `fr`, `pt`, `ru`, `sv`, `ja` y `ko` |
 | `/utc` | Solo la marca de tiempo UTC ISO 8601 |
 | `/unix` | Solo los segundos Unix, también como `unix` en `/now.json`. No está en las respuestas cortas, porque los modelos de lenguaje leen una fecha, no un número Unix |

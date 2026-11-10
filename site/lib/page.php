@@ -5,6 +5,30 @@ defined('EXA') or exit;
 
 function lang_prefix(string $lang): string { return $lang === 'en' ? '' : '/' . $lang; }
 
+/**
+ * The agent line: first on every HTML page and in the front page's Markdown, since a fetch tool often reads only one page.
+ * The time, then where to get the rest: any place, the same as JSON, a fresh time, all addresses. Data, not instructions.
+ */
+function agent_line(string $lang, bool $html): string {
+    $e = $html ? fn(string $s): string => h($s) : fn(string $s): string => $s;
+    $L = fn(string $k): string => $e(t($lang, $k));
+    $iso = iso_utc(time());
+    $city = t($lang, 'agentbar_tz');
+    $lq = $lang === 'en' ? '' : 'lang=' . $lang;   // the answers in the page's language
+    // "Generated at the moment of this request" keeps saved copies honest; the fresh link has a new code on every page,
+    // so even a saved copy links to an address no fetch tool has a copy of.
+    $links = [
+        [$L('agentbar_what') . $L('agentbar_kinds'), '/' . strtolower($city) . ($lq ? "?$lq" : '')],
+        [$L('agentbar_json'), '/local.json?tz=' . $city . ($lq ? "&$lq" : '')],
+        [$L('agentbar_fresh'), '/utc?r=' . bin2hex(random_bytes(3))],
+        [$L('agentbar_all'), '/llms.txt'],
+    ];
+    $out = ($html ? '<b>' . $L('agentbar_who') . '</b>' : $L('agentbar_who')) . ' ' . $L('agentbar_now') . ' '
+        . ($html ? '<time datetime="' . $iso . '">' . $iso . '</time>' : $iso) . ' (UTC), ' . $L('agentbar_gen');
+    foreach ($links as [$label, $href]) $out .= " · $label → " . ($html ? '<a href="' . h($href) . '">exasecond.com' . h($href) . '</a>' : 'exasecond.com' . $href);
+    return $out;
+}
+
 // Each language in its own name; 'tag' is the hreflang/lang code, 'icu' and 'js' the locales for dates.
 const LANG_INFO = [
     'en' => ['name' => 'English', 'short' => 'EN', 'tag' => 'en', 'icu' => 'en_GB', 'js' => 'en-GB'],
@@ -112,7 +136,7 @@ sup { font-size: .7em; line-height: 0; }
 .agentbar b { font-weight: 600; }
 .agentbar a { color: inherit; text-decoration-color: var(--line); overflow-wrap: anywhere; }
 .agentbar:hover { opacity: 1; }
-.agentbar { overflow: hidden; max-height: 8em; transition: max-height .7s ease, padding .7s ease, opacity .7s ease, border-color .7s ease; }
+.agentbar { overflow: hidden; max-height: 14em; transition: max-height .7s ease, padding .7s ease, opacity .7s ease, border-color .7s ease; }
 .agentbar.folded { max-height: 0; padding-top: 0; padding-bottom: 0; opacity: 0; border-bottom-color: transparent; }
 @media (prefers-reduced-motion: reduce) { .agentbar { transition: none; } }
 @media (max-width: 560px) {
@@ -381,15 +405,7 @@ function layout(string $lang, array $o, string $body): string {
     $logo = '/logo.svg?v=' . substr(md5(LOGO_SVG), 0, 8);
     $year = gmdate('Y');
     // Visible, quiet, first in the page: the time itself, then where to get the rest. On every page, since agents can land anywhere.
-    $ex = $L('agentbar_tz');
-    $iso = iso_utc(time());
-    $lq = $lang === 'en' ? '' : '?lang=' . $lang;   // the answer in the page's language
-    // "Generated at the moment of this request" keeps saved copies honest; the fresh link has a new code on every page,
-    // so even a saved copy links to an address no fetch tool has a copy of.
-    $fresh = '/utc?r=' . bin2hex(random_bytes(3));
-    $agentbar = '<b>' . h($L('agentbar_who')) . '</b> ' . h($L('agentbar_now')) . ' <time datetime="' . $iso . '">' . $iso . '</time> (UTC), ' . h($L('agentbar_gen')) . ' · '
-        . h($L('agentbar_what')) . ' → <a href="/' . h(strtolower($ex) . $lq) . '">exasecond.com/' . h(strtolower($ex) . $lq) . '</a>'
-        . ' · ' . h($L('agentbar_fresh')) . ' → <a href="' . $fresh . '">exasecond.com' . $fresh . '</a>';
+    $agentbar = agent_line($lang, true);
     return <<<HTML
 <!doctype html>
 <html lang="$htmlLang">

@@ -197,6 +197,7 @@ function route(string $method, string $uri, array $q, array $hdr, string $rawBod
             case '/health': return json_resp(['ok' => true]);
             case '/local': case '/local.txt':
                 return local_answer(opts($q), $q, $path === '/local' ? $accept : '');
+            case '/local.json': return local_answer(opts($q), $q, 'application/json');   // for fetch tools that can't send Accept
             case '/fact': case '/fact.txt': case '/fact.json':
                 // General fact without a place; with ?tz= a place-specific one when there is one. ?lang=zh, ?lang=de, ...
                 $o = opts($q);

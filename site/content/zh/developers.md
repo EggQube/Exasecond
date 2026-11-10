@@ -162,6 +162,7 @@ def get_local_time(place: str = "") -> str:
 | `/shanghai?lang=zh`、`/北京?lang=zh` | 一句按口语顺序的话：地点、星期、时段和本地时间，括号里是日期和时区，以及即将到来的调钟。地址可以是任何城市、地区、岛屿、国家、时区或偏移 |
 | `/oslo`、`/new-york`、`/sweden` | 同一句话，英文 |
 | `/local?tz=Oslo&lang=zh` | 同一句话 |
+| `/local.json?tz=Oslo&lang=zh` | 同一句话，JSON 格式，另附偏移、时区缩写、是否夏令时（`dst`）和下一次调钟 |
 | `/berlin?lang=de` | 同一句话，德语；也支持 `fr`、`es`、`pt`、`ru`、`sv`、`ja` 和 `ko` |
 | `/utc` | 只有 ISO 8601 UTC 时间戳 |
 | `/unix` | 只有 Unix 秒数，也见 `/now.json` 中的 `unix`。简短回答不含它，因为语言模型读的是日期，而不是 Unix 数字 |

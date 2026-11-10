@@ -162,6 +162,7 @@ Inställningskontext mätt separat: promptrad 26 token; en tillhandahållen verk
 | `/stockholm?lang=sv`, `/new-york?lang=sv` | En mening i talordning: plats, lokal tid, veckodag och tid på dygnet, inom parentes datum och zon, plus en kommande tidsomställning. Vilken stad, region, ö, vilket land, vilken zon eller avvikelse som helst som adress |
 | `/oslo`, `/new-york`, `/sweden` | Samma mening på engelska |
 | `/local?tz=Oslo&lang=sv` | Samma mening |
+| `/local.json?tz=Oslo&lang=sv` | Samma mening som JSON, med avvikelse, zonförkortning, sommartid (`dst`) och nästa tidsomställning |
 | `/beijing?lang=zh`, `/berlin?lang=de` | Samma mening på kinesiska, tyska; även `fr`, `es`, `pt`, `ru`, `ja` och `ko` |
 | `/utc` | Bara ISO 8601-tidsstämpeln i UTC |
 | `/unix` | Bara Unix-sekunderna, även som `unix` i `/now.json`. Inte med i de korta svaren, eftersom språkmodeller läser ett datum, inte ett Unix-tal |

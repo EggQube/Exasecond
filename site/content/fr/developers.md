@@ -162,6 +162,7 @@ Contexte de configuration mesuré séparément : ligne de prompt 26 tokens ; une
 | `/paris?lang=fr`, `/new-york?lang=fr` | Une phrase dans l'ordre parlé : lieu, heure locale, jour et moment de la journée, puis la date et le fuseau entre parenthèses, et un changement d'heure à venir. N'importe quelle ville, région, île, pays, fuseau ou décalage comme adresse |
 | `/oslo`, `/new-york`, `/sweden` | La même phrase en anglais |
 | `/local?tz=Oslo&lang=fr` | La même phrase |
+| `/local.json?tz=Oslo&lang=fr` | La même phrase en JSON, avec le décalage, l'abréviation du fuseau, l'heure d'été (`dst`) et le prochain changement d'heure |
 | `/beijing?lang=zh`, `/berlin?lang=de` | La même phrase en chinois, en allemand ; aussi `es`, `pt`, `ru`, `sv`, `ja` et `ko` |
 | `/utc` | Seulement l'horodatage UTC ISO 8601 |
 | `/unix` | Seulement les secondes Unix, aussi en `unix` dans `/now.json`. Absent des réponses courtes, car les modèles de langage lisent une date, pas un nombre Unix |

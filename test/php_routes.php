@@ -21,7 +21,7 @@ check('exaseconds',to_exaseconds(435084632045903278) === '0.435084632045903278')
 check('/utc', (bool)preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\n$/', get('/utc')[2]));
 check('/now text', str_starts_with(get('/now')[2], 'UTC: '));
 check('/now markdown', get('/now', 'text/markdown')[1]['Content-Type'] === 'text/markdown; charset=utf-8');
-check('home markdown: answer first', (fn($b) => str_starts_with($b, 'For AI agents: now ') && str_contains($b, 'exasecond.com/stockholm') && str_contains($b, '## Your time') && !preg_match('/^- In .*clocks go/m', $b) && str_contains($b, 'Stockholm') && !str_contains($b, '## Calendars'))(get('/', 'text/markdown, text/html;q=0.9')[2]));
+check('home markdown: answer first', (fn($b) => str_starts_with($b, 'For AI agents: time now ') && str_contains($b, 'exasecond.com/stockholm') && str_contains($b, '## Your time') && !preg_match('/^- In .*clocks go/m', $b) && str_contains($b, 'Stockholm') && !str_contains($b, '## Calendars'))(get('/', 'text/markdown, text/html;q=0.9')[2]));
 // Time zones: forgiving input, and a bad zone never costs the agent the time
 [$st, , $b] = get('/now?tz=Not/AZone');
 check('/now bad tz: 200, time kept, note given', $st === 200 && str_starts_with($b, 'UTC: ') && str_contains($b, 'Time zone: "Not/AZone" is not a time zone'));
@@ -51,6 +51,18 @@ check('/local route', (bool)preg_match('/^It\'s \d\d:\d\d (in the early hours of
 check('/local without tz gives UTC and a hint', str_contains(get('/local')[2], ' UTC on ') && str_contains(get('/local')[2], '. For a person'));
 check('/local bad tz keeps the time', str_contains(get('/local?tz=IST')[2], '. Time zone: "IST" is ambiguous'));
 check('/local is short', strlen(get('/local?tz=Oslo')[2]) < 160);
+// /local.json: the same answer as JSON for fetch tools that can't send an Accept header
+[$st, $hd, $b] = get('/local.json?tz=Oslo');
+$j = json_decode($b, true);
+check('/local.json: JSON without Accept, never cached', $st === 200 && str_starts_with($hd['Content-Type'], 'application/json') && $hd['Cache-Control'] === 'no-store' && is_array($j));
+check('/local.json: sentence, UTC, zone, offset, dst, next change', $j['text'] === trim(get('/local?tz=Oslo')[2]) && preg_match('/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$/', $j['utc']) === 1
+    && $j['local']['zone'] === 'Europe/Oslo' && preg_match('/^\+0[12]:00$/', $j['local']['offset']) === 1 && is_bool($j['local']['dst']) && array_key_exists('next_change', $j['local']));
+check('/local.json equals /local with Accept: application/json', preg_replace('/\d/', '0', get('/local.json?tz=Tokyo')[2]) === preg_replace('/\d/', '0', get('/local?tz=Tokyo', 'application/json')[2]));   // digits masked: the two calls may fall in different seconds
+check('/local.json?lang=zh: the sentence in Chinese', str_starts_with(json_decode(get('/local.json?tz=Oslo&lang=zh')[2], true)['text'], '奥斯陆'));
+check('/local.json without tz: UTC, no local, the hint', (fn($j) => $j['local'] === null && str_contains($j['text'], ' UTC on ') && str_contains($j['text'], '?tz='))(json_decode(get('/local.json')[2], true)));
+check('/local.json unknown place: the time and a note', (fn($j) => $j['local'] === null && isset($j['utc']) && str_contains($j['tz_note'], 'not a time zone I recognise'))(json_decode(get('/local.json?tz=Xyzzyville')[2], true)));
+check('OpenAPI lists /local.json as JSON', isset(openapi()['paths']['/local.json']['get']['responses']['200']['content']['application/json']));
+check('llms.txt and every developer page name /local.json', str_contains(llms_txt(snapshot()), '/local.json?tz=Oslo') && count(array_filter(LANGS, fn($l) => str_contains(get(lang_prefix($l) . '/developers.md')[2], '`/local.json?tz=Oslo')) ) === count(LANGS));
 [$st, , $b] = route('POST', '/mcp', [], [], '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"get_time","arguments":{"tz":"Oslo","detail":"local"}}}');
 check('mcp get_time detail=local', str_contains(json_decode($b, true)['result']['content'][0]['text'], ' in Oslo ('));
 // "Did you know?" facts and the answer block on the home page
@@ -63,6 +75,10 @@ check('live fact after Europe changed (27 Oct)', str_contains(pick_fact(17929000
 check('no clock-change fact for Moscow', pick_fact($oct, 'Europe/Moscow', 'en')['kind'] !== 'live');
 check('regional fact for Nepal', str_contains(pick_fact($oct, 'Asia/Kathmandu', 'en')['text'], '45 minutes'));
 check('Chinese fact', str_starts_with(get('/fact?tz=Tokyo&lang=zh')[2], '你知道吗？'));
+// The Oslo fact gives its reason in the same sentence; "whatever the clock says" read like a bug on its own.
+$osloFact = array_key_first(array_filter(FACTS, fn($f) => $f[3] === ['NO']));
+check('Oslo fact for Norway in 10 languages (1 Dec 2026)', count(array_filter(LANGS, fn($l) => pick_fact(1796083200, 'Europe/Oslo', $l)['text'] === fact_text($osloFact, $l))) === count(LANGS) && str_starts_with(fact_text($osloFact, 'en'), 'Changing the clocks adds no daylight: '));
+check('no "whatever the clock says" in any fact', !preg_match("/whatever the clock|无论时钟|egal was die Uhr|quoi qu'indique|diga lo que diga|importa o que diga|что бы ни показывали|vad klockan än|何時を指していても|몇 시를 가리키든/u", json_encode([FACTS, FACTS_TR], JSON_UNESCAPED_UNICODE)));
 check('/local in Chinese', str_contains(local_sentence(snapshot([$oct, 0], tz_opts('Oslo', null)), tz_opts('Oslo', null)['tz_res'], 'zh'), '奥斯陆现在是星期四早上 07:51（2026年10月22日，CEST，UTC+2）'));
 $home = get('/', 'text/html')[2];
 check('home: answer block comes before the counter', strpos($home, 'id="ans-now"') < strpos($home, 'id="count"') && strpos($home, 'id="ans-you"') < strpos($home, 'id="count"'));
@@ -191,6 +207,42 @@ check('cities link to their short address', (fn($b) => str_contains($b, '<a href
 check('fresh link: a new code on every page', (fn($a, $b) => $a !== $b && $a !== null)(preg_match('#/utc\?r=([0-9a-f]{6})#', get('/', 'text/html')[2], $m1) ? $m1[1] : null, preg_match('#/utc\?r=([0-9a-f]{6})#', get('/', 'text/html')[2], $m2) ? $m2[1] : null));
 check('markdown says generated at the moment of this request', str_contains(get('/', 'text/markdown')[2], 'generated at the moment of this request'));
 check('agent bar points to the short address', str_contains(get('/', 'text/html')[2], 'exasecond.com/stockholm</a>'));
+// The agent line: a fetch tool often reads only the first page, so it says what the place address takes and where the rest is
+$bar = fn(string $html) => preg_match('#<div class="agentbar"[^>]*><div class="wrap">(.*?)</div></div>#s', $html, $m) ? $m[1] : '';
+check('agent line: time now, kinds of place, JSON, all addresses', (fn($b) => str_contains($b, '</b> time now <time datetime="') && str_contains($b, 'local time for any place (city, country, zone, offset) → <a href="/stockholm">')
+    && str_contains($b, 'as JSON → <a href="/local.json?tz=Stockholm">exasecond.com/local.json?tz=Stockholm</a>') && str_contains($b, 'all addresses → <a href="/llms.txt">'))($bar(get('/', 'text/html')[2])));
+check('agent line on every kind of page', count(array_filter(['/about', '/developers', '/time/machines', '/story'], fn($p) => str_contains($bar(get($p, 'text/html')[2]), '/local.json?tz='))) === 4);
+check('agent line in every language: own words, links in the page language', count(array_filter(LANGS, function ($l) use ($bar) {
+    $b = $bar(get(lang_prefix($l) . '/', 'text/html')[2]);
+    foreach (['agentbar_now', 'agentbar_kinds', 'agentbar_json', 'agentbar_all'] as $k) if (!str_contains($b, h(t($l, $k))) || ($l !== 'en' && t($l, $k) === t('en', $k))) return false;
+    return $l === 'en' || str_contains($b, '/local.json?tz=' . t($l, 'agentbar_tz') . '&amp;lang=' . $l . '"');
+})) === count(LANGS));
+check('agent line links all answer', (function () use ($bar) {
+    foreach (LANGS as $l) foreach (preg_match_all('#href="([^"]+)"#', $bar(get(lang_prefix($l) . '/', 'text/html')[2]), $m) ? $m[1] : [] as $href) {
+        $r = get(html_entity_decode($href));
+        if ($r[0] !== 200 || ($href !== '/llms.txt' && !str_starts_with($href, '/utc') && !preg_match('/\(\d+|（|\d{4}年/u', $r[2]))) return false;   // a real local answer, not the UTC fallback
+    }
+    return true;
+})());
+// Summer time: newer tz data marks Irish winter (GMT) as daylight saving ("negative DST"); people mean the opposite
+$winter = strtotime('2026-11-10T12:00:00Z');
+$summer = strtotime('2026-07-01T12:00:00Z');
+check('Dublin in winter: GMT, not summer time; next change forward into summer time', (fn($l) => $l['abbreviation'] === 'GMT' && $l['dst'] === false && $l['next_change']['direction'] === 'forward' && $l['next_change']['dst_after'] === true)(local_details($winter, 'Europe/Dublin')));
+check('Dublin in summer: IST is summer time; next change back out of it', (fn($l) => $l['abbreviation'] === 'IST' && $l['dst'] === true && $l['next_change']['direction'] === 'back' && $l['next_change']['dst_after'] === false)(local_details($summer, 'Europe/Dublin')));
+check('Oslo unchanged: CET not summer time, CEST summer time', local_details($winter, 'Europe/Oslo')['dst'] === false && local_details($summer, 'Europe/Oslo')['dst'] === true && local_details($winter, 'Europe/Oslo')['next_change']['dst_after'] === true);
+check('Dublin texts: no "summer time" in winter, "summer time" in summer', !str_contains(now_text(snapshot([$winter, 0], opts(['tz' => 'Dublin'])), false), 'summer time') && str_contains(now_text(snapshot([$summer, 0], opts(['tz' => 'Dublin'])), false), 'summer time'));
+check('/zones: Dublin not summer time in winter', zones_list($winter, 'dublin')[0]['dst'] === false && !str_contains(zones_text($winter, 'dublin'), 'summer time') && zones_list($summer, 'dublin')[0]['dst'] === true);
+check('every zone: summer time is never the lowest offset of the years around it', (function () use ($winter, $summer) {
+    // a year back too: zones moving to permanent summer time (Vancouver, 1 November 2026 in tzdb 2026.5) were ahead of last winter
+    foreach ([$winter, $summer] as $t) foreach (zones_list($t, null) as $r) {
+        if (!$r['dst']) continue;
+        $offsets = array_column(@(new DateTimeZone($r['zone']))->getTransitions($t - 366 * 86400, $t + 366 * 86400) ?: [], 'offset');
+        $now = (new DateTimeImmutable('@' . $t))->setTimezone(new DateTimeZone($r['zone']))->getOffset();
+        if (!$offsets || $now <= min($offsets)) return false;
+    }
+    return true;
+})());
+check('agent line in Markdown: same line, plain links', (fn($b) => str_starts_with($b, 'For AI agents: time now ') && str_contains($b, '→ exasecond.com/stockholm ·') && str_contains($b, 'as JSON → exasecond.com/local.json?tz=Stockholm ·') && str_contains($b, 'all addresses → exasecond.com/llms.txt'))(get('/', 'text/markdown')[2]));
 
 echo $fails ? "$fails failed\n" : "all passed\n";
 exit($fails ? 1 : 0);

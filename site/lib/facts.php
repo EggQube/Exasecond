@@ -80,7 +80,7 @@ const FACTS = [
     ['dst', 'Mexico stopped changing its clocks in 2022, except near the US border.', '墨西哥在 2022 年停止了拨钟，美墨边境附近地区除外。', ['MX']],
     ['dst', 'Egypt has stopped and restarted daylight saving time several times; it resumed in 2023 to save energy.', '埃及多次停止又恢复夏令时；2023 年为节约能源再次恢复。', ['EG']],
     ['dst', 'In the southern hemisphere the clocks move the other way: when Europe falls back in October, Sydney has just sprung forward.', '南半球的时钟朝相反方向拨：欧洲在 10 月拨回时，悉尼刚刚拨快。', ['AU', 'NZ', 'CL']],
-    ['dst', 'On the shortest day in Oslo the Sun is up for about six hours, whatever the clock says.', '在奥斯陆一年中白昼最短的那天，无论时钟怎么显示，太阳都只在天上约六个小时。', ['NO']],
+    ['dst', 'Changing the clocks adds no daylight: on the shortest day in Oslo the Sun is up for only about six hours.', '拨动时钟不会增加白昼：在奥斯陆一年中白昼最短的那天，太阳只在天上约六个小时。', ['NO']],
     ['dst', 'A study of Indiana found that daylight saving time raised household electricity use by about 1 percent.', '一项针对印第安纳州的研究发现，夏令时让居民用电增加了约 1%。', []],
     ['dst', 'In the week after clocks spring forward, studies find about 6 percent more fatal car crashes in the United States.', '研究发现，在美国，春季拨快时钟后的一周内，致命车祸约多 6%。', []],
 ];

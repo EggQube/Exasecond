@@ -250,6 +250,20 @@ function tz_note(?array $r): ?string {
     return "$q is not a time zone I recognise. Try a city (Oslo), a country (Norway), an IANA name (Europe/Oslo) or an offset (+02:00). All names: /zones";
 }
 
+/**
+ * Summer time as people mean it. Newer tz data marks Irish winter (GMT) as the daylight-saving period and Irish summer time
+ * as standard ("negative DST"); older data, still on some servers, has it the usual way round. So the isdst flag is trusted,
+ * except in a zone whose "daylight saving" offset is the lower one in the year ahead: there it is turned around.
+ * (Not "the higher offset is summer time": that would call the months before a permanent move back summer time.)
+ */
+function negative_dst(DateTimeZone $tz, int $unix): bool {
+    $std = $dst = [];
+    foreach (@$tz->getTransitions($unix, $unix + 366 * 86400) ?: [] as $x) {
+        if ($x['isdst']) $dst[] = (int)$x['offset']; else $std[] = (int)$x['offset'];
+    }
+    return $std && $dst && min($dst) < max($std);
+}
+
 /** The next clock change in a zone within $days days, or null. */
 function next_clock_change(int $unix, string $zone, int $days = 366): ?array {
     try { $tz = new DateTimeZone($zone); } catch (Exception $e) { return null; }
@@ -267,7 +281,7 @@ function next_clock_change(int $unix, string $zone, int $days = 366): ?array {
         'amount' => $amount,
         'offset_after' => fmt_offset((int)$next['offset']),
         'abbreviation_after' => $next['abbr'],
-        'dst_after' => (bool)$next['isdst'],
+        'dst_after' => (bool)$next['isdst'] !== negative_dst($tz, $unix),
     ];
 }
 
@@ -285,12 +299,13 @@ function short_offset(string $off): string {
 
 /** The extra block for the requested zone: abbreviation, daylight saving, next clock change. */
 function local_details(int $unix, string $zone): array {
-    $d = (new DateTimeImmutable('@' . $unix))->setTimezone(new DateTimeZone($zone));
+    $tz = new DateTimeZone($zone);
+    $d = (new DateTimeImmutable('@' . $unix))->setTimezone($tz);
     $abbr = $d->format('T');
     if (preg_match('/^(GMT)?[+-]\d/', $abbr)) $abbr = null;   // fixed offsets have no real abbreviation
     return [
         'part_of_day' => part_of_day((int)$d->format('G')),
-        'abbreviation' => $abbr, 'dst' => (bool)(int)$d->format('I'), 'next_change' => next_clock_change($unix, $zone),
+        'abbreviation' => $abbr, 'dst' => (bool)(int)$d->format('I') !== negative_dst($tz, $unix), 'next_change' => next_clock_change($unix, $zone),
     ];
 }
 
@@ -418,9 +433,10 @@ function zones_list(int $unix, ?string $q): array {
     $hit = $resolved ? array_filter(array_merge([$resolved['zone']], $resolved['options'])) : [];
     foreach (DateTimeZone::listIdentifiers() as $id) {
         if ($needle !== null && !in_array($id, $hit, true) && !str_contains(mb_strtolower_safe(str_replace('_', ' ', $id)), str_replace('_', ' ', $needle))) continue;
-        $d = (new DateTimeImmutable('@' . $unix))->setTimezone(new DateTimeZone($id));
+        $tz = new DateTimeZone($id);
+        $d = (new DateTimeImmutable('@' . $unix))->setTimezone($tz);
         $abbr = $d->format('T');
-        $rows[] = ['zone' => $id, 'offset' => fmt_offset($d->getOffset()), 'abbreviation' => preg_match('/^[+-]\d/', $abbr) ? null : $abbr, 'dst' => (bool)(int)$d->format('I')];
+        $rows[] = ['zone' => $id, 'offset' => fmt_offset($d->getOffset()), 'abbreviation' => preg_match('/^[+-]\d/', $abbr) ? null : $abbr, 'dst' => (bool)(int)$d->format('I') !== negative_dst($tz, $unix)];
     }
     return $rows;
 }
