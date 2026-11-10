@@ -13,7 +13,6 @@ curl https://exasecond.com/now
 | `site/` | **The current site** (PHP 8.0+). Upload the contents of this folder, including the `.htaccess` files, to the web root. |
 | `tools/check.php` | One-time host check (PHP version, intl). Upload, open, read, delete. |
 | `test/` | `php test/php_routes.php` tests every route and chapter. |
-| `backup/version 02 node-worker/` | The Node / Cloudflare Worker version, kept as an alternative deploy target and as the reference for its `test/parity.mjs`. It does not have the chapters. |
 
 Run the site locally: `php -S 127.0.0.1:8791 site/index.php` (from this folder), then open http://127.0.0.1:8791/
 
@@ -44,16 +43,6 @@ If PHP is not on your PATH, call `php.exe` by its full path and pass `-c path/to
 ### Response sizes
 
 `php tools/measure_tokens.php` estimates response sizes as characters divided by four; it is not a model tokenizer. With `--json` it also exports the sample texts, so they can be measured with a target model's own tokenizer. The samples cover both MCP schemas and all ten answer languages, with and without an upcoming clock change. Client framing and billing are not measured.
-
-### Parity with the archived Node engine
-
-From `backup/version 02 node-worker/`:
-
-```
-node test/parity.mjs path/to/php.exe path/to/php.ini
-```
-
-The calculations shared with the Node version should still match. Features added since, and the stricter input validation, are covered by the PHP suites; the archive does not have the current feature set.
 
 ## Deploy
 

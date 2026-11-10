@@ -1,8 +1,7 @@
 node_modules/
 .wrangler/
 .dev.vars
-backup/version 01/
 __pycache__/
 *.pyc
 site/data/places/
-backup/snapshots/
+backup/
