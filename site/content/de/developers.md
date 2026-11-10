@@ -3,6 +3,8 @@ title: Für Entwickler
 description: Die aktuelle Zeit für KI. Sekundengenau. Minimaler Token-Aufwand. HTTP / MCP.
 ---
 
+<!-- figure:guide -->
+
 ## Schnellstart
 
 Die aktuelle Zeit für KI. **Sekundengenau. Minimaler Token-Aufwand.**
@@ -58,7 +60,7 @@ Oslo: Es ist 08:15 Uhr am frühen Donnerstagmorgen (22. Oktober 2026, CEST, UTC+
 
 ## 2. MCP: eine KI-App verbinden
 
-Exasecond.com betreibt einen entfernten MCP-Server unter `https://exasecond.com/mcp` (streamable HTTP, kein Schlüssel). Er bietet zwei Werkzeuge: `get_time` (mit `detail: "local"` für die Antwort in einem Satz) und `convert_time`.
+Exasecond.com betreibt einen entfernten MCP-Server unter `https://exasecond.com/mcp` (streamable HTTP, kein Schlüssel). Er bietet ein Werkzeug: `get_time` (mit `detail: "local"` für die Antwort in einem Satz).
 
 Für einen übersetzten lokalen Zeitsatz diese Argumente an `get_time` übergeben:
 
@@ -150,12 +152,12 @@ Für Ollama und andere lokale Modelle in Open WebUI: Laden Sie [/dev/openwebui_e
 |---|---:|---:|
 | `/unix`: Unix-Zeitstempel | 11 | ~5 |
 | `/utc`: UTC-Zeitstempel, sekundengenau | 21 | ~14 |
-| `/local?tz=Oslo`: Englischer Satz zur Ortszeit | ~70-120 | ~25-40 |
+| `/local?tz=Oslo`: Englischer Satz zur Ortszeit | ~65-135 | ~25-40 |
 | `/now`: Kompakte Standardantwort | ~80 | ~35 |
 
-Antworttexte am 1. November 2026 mit zwei Tokenizern gemessen: o200k_base und cl100k_base. Die Zahlen hängen von Modell, Sprache und Antwortdetails ab. Einrichtung und Client-Aufwand kommen hinzu. Typische Stichprobenwerte, keine Abrechnungssummen oder garantierten Grenzen.
+Antworttexte am 10. November 2026 mit zwei Tokenizern gemessen: o200k_base und cl100k_base. Die Zahlen hängen von Modell, Sprache und Antwortdetails ab. Einrichtung und Client-Aufwand kommen hinzu. Typische Stichprobenwerte, keine Abrechnungssummen oder garantierten Grenzen.
 
-Einrichtungskontext, getrennt gemessen: Promptzeile 26 Tokens; eine bereitgestellte Werkzeugdefinition 136-144; beide MCP-Werkzeugschemas 245-256. Client-Formatierung kann weitere Tokens hinzufügen.
+Einrichtungskontext, getrennt gemessen: Promptzeile 26 Tokens; eine bereitgestellte Werkzeugdefinition 136-144; das MCP-Werkzeugschema 153-158. Client-Formatierung kann weitere Tokens hinzufügen.
 
 | Adresse | Antwort |
 |---|---|
@@ -171,10 +173,11 @@ Einrichtungskontext, getrennt gemessen: Promptzeile 26 Tokens; eine bereitgestel
 | `exasecond.com` (markdown) | Die Startseite für Agenten: die Zeit aller großen Städte, Zeitumstellungen, eine Tatsache |
 | `/now.md` | Alles: alle Kalender, Weltuhren |
 | `/now.json` | Alles, als JSON |
+| `/api/convert?iso=2030-01-01T00:00:00Z` | Rechnet einen Zeitpunkt (`iso`, `unix`, `universe` oder `es`) in UTC, Ortszeit (`tz`) und Kalender um, als JSON |
 | `/fact?tz=Berlin&lang=de` | Eine "Schon gewusst?"-Tatsache über die Zeit, wenn möglich passend zum Ort |
 | `/zones?q=oslo` | Zeitzonennamen und ihre aktuelle Abweichung |
 
-`tz` und die kurze Adresse nehmen etwa eine Million Namen an: jeden Ort mit mindestens 1.000 Einwohnern, Bundesländer und Regionen, bekannte Inseln (GeoNames), Länder (Norway, Norwegen), IANA-Namen (Europe/Berlin), Abkürzungen (CET, JST) und Abweichungen (+02:00). Wenn etwas nicht gelesen werden kann, kommt die Zeit trotzdem, mit einem Hinweis. Die vollständige Beschreibung steht in [/llms.txt](/llms.txt) und [/openapi.json](/openapi.json).
+`tz` und die kurze Adresse nehmen über eine Million Namen für etwa 180.000 Orte an: jeden Ort mit mindestens 1.000 Einwohnern, Bundesländer und Regionen, bekannte Inseln (GeoNames), Länder (Norway, Norwegen), IANA-Namen (Europe/Berlin), Abkürzungen (CET, JST) und Abweichungen (+02:00). Wenn etwas nicht gelesen werden kann, kommt die Zeit trotzdem, mit einem Hinweis. Die vollständige Beschreibung steht in [/llms.txt](/llms.txt) und [/openapi.json](/openapi.json).
 
 ## Lizenz
 

@@ -54,7 +54,7 @@ assert.match((await get('/utc')).body, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\n$
 const initialized = await rpc({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'http-smoke', version: '1' } } });
 assert.equal(initialized.result.protocolVersion, '2025-06-18');
 assert.equal(await rpc({ jsonrpc: '2.0', method: 'notifications/initialized' }, 202), null);
-assert.equal((await rpc({ jsonrpc: '2.0', id: 2, method: 'tools/list' })).result.tools.length, 2);
+assert.equal((await rpc({ jsonrpc: '2.0', id: 2, method: 'tools/list' })).result.tools.length, 1);
 assert.equal((await rpc(null, 400)).error.code, -32600);
 await get('/mcp', 405);
 const converted = JSON.parse((await get('/api/convert?unix=-0.125')).body);
@@ -103,8 +103,10 @@ if (process.argv.includes('--compare-local')) {
             const path = prefix + page;
             const local = await fetch(localBase + path, { signal: AbortSignal.timeout(10000) });
             assert.equal(local.status, 200, 'Local reference ' + path);
-            const published = (await get(path + fresh)).body;
-            const reference = await local.text();
+            // The developer pages open with the guide's live answers: mask the clock (UTC stamp, hh:mm) before comparing
+            const clock = (s) => s.replace(/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ/g, 'UTC').replace(/(?<!\d)\d{1,2}:\d\d(?!\d)/g, 'hh:mm');
+            const published = clock((await get(path + fresh)).body);
+            const reference = clock(await local.text());
             if (published !== reference) {
                 const publishedLines = published.split('\n');
                 const referenceLines = reference.split('\n');

@@ -25,10 +25,10 @@ A tool connection requests time directly on each call. Caching and permission pr
 |---|---:|---:|
 | `/unix`: Unix timestamp | 11 | ~5 |
 | `/utc`: UTC timestamp, to the second | 21 | ~14 |
-| `/local?tz=Oslo`: English local-time sentence | ~70-120 | ~25-40 |
+| `/local?tz=Oslo`: English local-time sentence | ~65-135 | ~25-40 |
 | `/now`: Default compact response | ~80 | ~35 |
 
-Sample response text measured with two tokenizers: o200k_base and cl100k_base, on 1 November 2026. Counts vary by model, language and response details. Tool setup and client overhead are additional. These are typical sample sizes, not billing totals or guaranteed limits.
+Sample response text measured with two tokenizers: o200k_base and cl100k_base, on 10 November 2026. Counts vary by model, language and response details. Tool setup and client overhead are additional. These are typical sample sizes, not billing totals or guaranteed limits.
 
 
 <!-- figure:developers -->

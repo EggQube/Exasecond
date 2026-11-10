@@ -25,10 +25,10 @@ Eine Werkzeugverbindung fragt die Zeit bei jedem Aufruf direkt ab. Cache und Ber
 |---|---:|---:|
 | `/unix`: Unix-Zeitstempel | 11 | ~5 |
 | `/utc`: UTC-Zeitstempel, sekundengenau | 21 | ~14 |
-| `/local?tz=Oslo`: Englischer Satz zur Ortszeit | ~70-120 | ~25-40 |
+| `/local?tz=Oslo`: Englischer Satz zur Ortszeit | ~65-135 | ~25-40 |
 | `/now`: Kompakte Standardantwort | ~80 | ~35 |
 
-Antworttexte am 1. November 2026 mit zwei Tokenizern gemessen: o200k_base und cl100k_base. Die Zahlen hängen von Modell, Sprache und Antwortdetails ab. Einrichtung und Client-Aufwand kommen hinzu. Typische Stichprobenwerte, keine Abrechnungssummen oder garantierten Grenzen.
+Antworttexte am 10. November 2026 mit zwei Tokenizern gemessen: o200k_base und cl100k_base. Die Zahlen hängen von Modell, Sprache und Antwortdetails ab. Einrichtung und Client-Aufwand kommen hinzu. Typische Stichprobenwerte, keine Abrechnungssummen oder garantierten Grenzen.
 
 
 <!-- figure:developers -->

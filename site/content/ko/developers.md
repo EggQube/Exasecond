@@ -3,6 +3,8 @@ title: 개발자를 위해
 description: AI를 위한 현재 시각. 초 단위로. 토큰 사용은 최소한으로. HTTP / MCP.
 ---
 
+<!-- figure:guide -->
+
 ## 빠른 시작
 
 AI를 위한 현재 시각. **초 단위로. 토큰 사용은 최소한으로.**
@@ -58,7 +60,7 @@ https://exasecond.com/<상대의 도시>?lang=ko 를 읽고 그 시각을 사용
 
 ## 2. MCP: AI 앱 연결하기
 
-Exasecond.com은 `https://exasecond.com/mcp`에서 원격 MCP 서버를 운영합니다(streamable HTTP, 키 불필요). 도구는 두 가지입니다. `get_time`(`detail: "local"`이면 한 문장 답)과 `convert_time`.
+Exasecond.com은 `https://exasecond.com/mcp`에서 원격 MCP 서버를 운영합니다(streamable HTTP, 키 불필요). 도구는 하나입니다. `get_time`(`detail: "local"`이면 한 문장 답).
 
 번역된 현지 시간 문장을 받으려면 `get_time`에 다음 인수를 전달하세요.
 
@@ -150,12 +152,12 @@ Open WebUI로 쓰는 Ollama 등 로컬 모델의 경우: [/dev/openwebui_exaseco
 |---|---:|---:|
 | `/unix`: Unix 타임스탬프 | 11 | ~5 |
 | `/utc`: 초 단위 UTC 타임스탬프 | 21 | ~14 |
-| `/local?tz=Oslo`: 영어로 된 현지 시각 문장 | ~70-120 | ~25-40 |
+| `/local?tz=Oslo`: 영어로 된 현지 시각 문장 | ~65-135 | ~25-40 |
 | `/now`: 기본 간결 응답 | ~80 | ~35 |
 
-2026년 11월 1일 o200k_base와 cl100k_base 두 토크나이저로 응답 텍스트 샘플을 측정했습니다. 수는 모델, 언어, 응답 내용에 따라 달라집니다. 도구 설정과 클라이언트 처리 비용은 별도입니다. 일반적인 샘플 크기이며 전체 과금량이나 보장된 상한이 아닙니다.
+2026년 11월 10일 o200k_base와 cl100k_base 두 토크나이저로 응답 텍스트 샘플을 측정했습니다. 수는 모델, 언어, 응답 내용에 따라 달라집니다. 도구 설정과 클라이언트 처리 비용은 별도입니다. 일반적인 샘플 크기이며 전체 과금량이나 보장된 상한이 아닙니다.
 
-설정 컨텍스트는 별도로 측정했습니다. 프롬프트 한 줄은 26토큰, 제공하는 도구 정의 하나는 136-144, MCP 도구 스키마 둘은 245-256입니다. 클라이언트 형식에 따라 추가될 수 있습니다.
+설정 컨텍스트는 별도로 측정했습니다. 프롬프트 한 줄은 26토큰, 제공하는 도구 정의 하나는 136-144, MCP 도구 스키마는 153-158입니다. 클라이언트 형식에 따라 추가될 수 있습니다.
 
 | 주소 | 답 |
 |---|---|
@@ -171,10 +173,11 @@ Open WebUI로 쓰는 Ollama 등 로컬 모델의 경우: [/dev/openwebui_exaseco
 | `exasecond.com`(markdown) | 에이전트용 첫 페이지: 주요 도시의 시각, 시계 변경, 사실 하나 |
 | `/now.md` | 전부: 모든 달력, 세계 시계 |
 | `/now.json` | 전부, JSON으로 |
+| `/api/convert?iso=2030-01-01T00:00:00Z` | 한 시점(`iso`, `unix`, `universe`, `es` 중 하나)을 UTC, 현지 시각(`tz`), 여러 달력으로 환산해 JSON으로 |
 | `/fact?tz=Seoul&lang=ko` | 시간에 관한 "알고 계셨나요?", 가능하면 그 장소에 관한 것 |
 | `/zones?q=oslo` | 시간대 이름과 현재 시차 |
 
-`tz`와 짧은 주소는 약 백만 개의 이름을 받습니다. 인구 1,000명 이상의 모든 곳, 주와 지역, 잘 알려진 섬(GeoNames), 나라(Korea, 한국), IANA 이름(Asia/Seoul), 약어(CET, JST), 시차(+09:00). 읽을 수 없는 경우에도 시각은 돌아오고 설명이 붙습니다. 전체 설명은 [/llms.txt](/llms.txt)와 [/openapi.json](/openapi.json)에 있습니다.
+`tz`와 짧은 주소는 약 18만 곳을 가리키는 100만 개가 넘는 이름을 받습니다. 인구 1,000명 이상의 모든 곳, 주와 지역, 잘 알려진 섬(GeoNames), 나라(Korea, 한국), IANA 이름(Asia/Seoul), 약어(CET, JST), 시차(+09:00). 읽을 수 없는 경우에도 시각은 돌아오고 설명이 붙습니다. 전체 설명은 [/llms.txt](/llms.txt)와 [/openapi.json](/openapi.json)에 있습니다.
 
 ## 라이선스
 

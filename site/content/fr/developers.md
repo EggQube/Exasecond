@@ -3,6 +3,8 @@ title: Pour les développeurs
 description: L’heure actuelle pour l’IA. À la seconde. Un minimum de tokens. HTTP / MCP.
 ---
 
+<!-- figure:guide -->
+
 ## Démarrage rapide
 
 L’heure actuelle pour l’IA. **À la seconde. Un minimum de tokens.**
@@ -58,7 +60,7 @@ Oslo : il est 8 h 15, jeudi, tôt le matin (22 octobre 2026, CEST, UTC+2). Le di
 
 ## 2. MCP : connecter une application IA
 
-Exasecond.com fait tourner un serveur MCP distant à `https://exasecond.com/mcp` (streamable HTTP, sans clé). Il propose deux outils : `get_time` (avec `detail: "local"` pour la réponse en une phrase) et `convert_time`.
+Exasecond.com fait tourner un serveur MCP distant à `https://exasecond.com/mcp` (streamable HTTP, sans clé). Il propose un outil : `get_time` (avec `detail: "local"` pour la réponse en une phrase).
 
 Pour une phrase locale traduite, passez ces arguments à `get_time` :
 
@@ -150,12 +152,12 @@ Pour Ollama et les autres modèles locaux utilisés via Open WebUI : télécharg
 |---|---:|---:|
 | `/unix`: Horodatage Unix | 11 | ~5 |
 | `/utc`: Horodatage UTC, à la seconde | 21 | ~14 |
-| `/local?tz=Oslo`: Phrase en anglais donnant l’heure locale | ~70-120 | ~25-40 |
+| `/local?tz=Oslo`: Phrase en anglais donnant l’heure locale | ~65-135 | ~25-40 |
 | `/now`: Réponse compacte par défaut | ~80 | ~35 |
 
-Textes de réponse mesurés le 1er novembre 2026 avec deux tokenizers : o200k_base et cl100k_base. Le nombre varie selon le modèle, la langue et le contenu. La configuration des outils et l’enveloppe du client s’ajoutent. Ce sont des tailles d’exemples typiques, pas des totaux facturés ni des limites garanties.
+Textes de réponse mesurés le 10 novembre 2026 avec deux tokenizers : o200k_base et cl100k_base. Le nombre varie selon le modèle, la langue et le contenu. La configuration des outils et l’enveloppe du client s’ajoutent. Ce sont des tailles d’exemples typiques, pas des totaux facturés ni des limites garanties.
 
-Contexte de configuration mesuré séparément : ligne de prompt 26 tokens ; une définition d’outil fournie 136-144 ; les deux schémas MCP 245-256. Le format du client peut en ajouter.
+Contexte de configuration mesuré séparément : ligne de prompt 26 tokens ; une définition d’outil fournie 136-144 ; le schéma MCP 153-158. Le format du client peut en ajouter.
 
 | Adresse | Réponse |
 |---|---|
@@ -171,10 +173,11 @@ Contexte de configuration mesuré séparément : ligne de prompt 26 tokens ; une
 | `exasecond.com` (markdown) | La page d'accueil pour les agents : l'heure de toutes les grandes villes, les changements d'heure, un fait |
 | `/now.md` | Tout : tous les calendriers, les horloges du monde |
 | `/now.json` | Tout, en JSON |
+| `/api/convert?iso=2030-01-01T00:00:00Z` | Convertit un instant (`iso`, `unix`, `universe` ou `es`) en UTC, heure locale (`tz`) et calendriers, en JSON |
 | `/fact?tz=Paris&lang=fr` | Un fait « Le saviez-vous ? » sur le temps, propre au lieu quand c'est possible |
 | `/zones?q=oslo` | Les noms de fuseaux et leur décalage actuel |
 
-`tz` et l'adresse courte acceptent environ un million de noms : tous les lieux de 1 000 habitants ou plus, les États et régions, les îles connues (GeoNames), les pays (Norway, Norvège), les noms IANA (Europe/Paris), les abréviations (CET, JST) et les décalages (+02:00). Si quelque chose ne peut pas être lu, l'heure est quand même renvoyée, avec une note. La description complète se trouve dans [/llms.txt](/llms.txt) et [/openapi.json](/openapi.json).
+`tz` et l'adresse courte acceptent plus d'un million de noms pour environ 180 000 lieux : tous les lieux de 1 000 habitants ou plus, les États et régions, les îles connues (GeoNames), les pays (Norway, Norvège), les noms IANA (Europe/Paris), les abréviations (CET, JST) et les décalages (+02:00). Si quelque chose ne peut pas être lu, l'heure est quand même renvoyée, avec une note. La description complète se trouve dans [/llms.txt](/llms.txt) et [/openapi.json](/openapi.json).
 
 ## Licence
 

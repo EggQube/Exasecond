@@ -3,7 +3,7 @@
 Current time for AI. To the second. Minimal token overhead. Fetch a short UTC timestamp over HTTP or connect through MCP, with no key and no sign-up needed. Local conversational answers and "The question of time", a sourced reference, are available separately.
 
 ```
-curl https://exasecond.com/now
+curl https://exasecond.com/utc
 ```
 
 ## Folders

@@ -219,6 +219,15 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .ans-fact { font: 14.5px/1.65 var(--mono); color: var(--ink-2); max-width: 70ch; }
 .ans-fact a { font: 13px/1 var(--mono); color: var(--accent); text-decoration: none; white-space: nowrap; }
 @media (max-width: 640px) { .ans-row { grid-template-columns: 1fr; } }
+/* "Which answer do you need?" on phones: each row stacks (need, then address, answer and tokens), no sideways scrolling */
+@media (max-width: 640px) {
+  .prose .guide thead { display: none; }
+  .prose .guide tr { display: block; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .prose .guide td { display: inline; padding: 0 10px 0 0; border: 0; white-space: normal; }
+  .prose .guide td:first-child { display: block; padding-bottom: 4px; color: var(--ink-2); }
+  .prose .guide td:nth-child(3) { display: block; padding: 2px 0; }
+  .prose .guide td:last-child { color: var(--ink-3); }
+}
 .devbtn { display: inline-block; margin: 6px 0 4px; padding: 12px 18px; border: 1px solid var(--accent); border-radius: 0; font: 14px/1.4 var(--mono); color: var(--ink); text-decoration: none; }
 .devbtn::before { content: "[ "; content: "[ " / ""; color: var(--accent); }
 .devbtn::after { content: " ]"; content: " ]" / ""; color: var(--accent); }
@@ -879,7 +888,7 @@ function dev_button(string $lang): string {
 function render_doc(array $d, string $lang, string $path, array $s): string {
     $p = lang_prefix($lang);
     $body = '<main class="read"><p class="kicker"><a href="' . $p . '/">Exasecond</a></p><h1>' . h($d['title']) . '</h1><p class="lede">' . h($d['description']) . '</p>'
-        . '<article class="prose">' . md_render($d['body']) . '</article></main>' . read_footer($lang, $s, $p . $path . '.md');
+        . '<article class="prose">' . md_render($d['body'], fn(string $f) => $f === 'guide' ? '<div class="guide">' . md_render(rtrim(guide_md($lang))) . '</div>' : '') . '</article></main>' . read_footer($lang, $s, $p . $path . '.md');
     return layout($lang, ['title' => $d['title'] . ' · Exasecond', 'desc' => $d['description'], 'path' => $path, 'md' => $p . $path . '.md', 'langs' => doc_langs(ltrim($path, '/'))], $body);
 }
 

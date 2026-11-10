@@ -8,7 +8,9 @@ function now_text(array $s, bool $tip = true): string {
         "UTC: {$s['utc']}",
         "Weekday: {$s['technical']['weekday']}",
     ];
-    if (isset($s['tz_note'])) $lines[] = "Time zone: {$s['tz_note']}";
+    // How ?tz= was read. When the note only names the zone, the Local line below already says it; any extra
+    // (the country, other places with the name, a fixed offset, ambiguity, not recognised) keeps the line.
+    if (isset($s['tz_note']) && !($s['local'] && str_ends_with($s['tz_note'], ' read as ' . $s['local']['zone']))) $lines[] = "Time zone: {$s['tz_note']}";
     if ($s['local']) {
         $lines[] = "Local ({$s['local']['zone']}): {$s['local']['iso']} {$s['local']['weekday']}" . (isset($s['local']['part_of_day']) ? " {$s['local']['part_of_day']}" : '') . local_suffix($s['local']);
         if ($c = clock_change_line($s['local'], $s['unix'], 60)) $lines[] = $c;

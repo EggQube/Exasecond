@@ -56,7 +56,7 @@ function load_doc(string $lang, string $name): ?array {
 function doc_md(array $d, string $lang = 'en'): string {
     // Buttons drawn in HTML become plain links in the text version.
     $link = '[' . t($lang, 'dev_btn_who') . ' ' . t($lang, 'dev_btn_what') . '](' . SITE . lang_prefix($lang) . '/developers)';
-    $body = str_replace('<!-- figure:developers -->', $link, $d['body']);
+    $body = str_replace(['<!-- figure:developers -->', '<!-- figure:guide -->'], [$link, rtrim(guide_md($lang))], $d['body']);
     return "# {$d['title']}\n\n> {$d['description']}\n\n$body";
 }
 

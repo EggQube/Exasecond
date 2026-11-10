@@ -3,6 +3,8 @@ title: För utvecklare
 description: Aktuell tid för AI. På sekunden. Minimalt med token. HTTP / MCP.
 ---
 
+<!-- figure:guide -->
+
 ## Snabbstart
 
 Aktuell tid för AI. **På sekunden. Minimalt med token.**
@@ -58,7 +60,7 @@ Oslo: Klockan är 08:15 på torsdagsförmiddagen (22 oktober 2026, CEST, UTC+2).
 
 ## 2. MCP: koppla in en AI-app
 
-Exasecond.com kör en fjärr-MCP-server på `https://exasecond.com/mcp` (streamable HTTP, ingen nyckel). Den erbjuder två verktyg: `get_time` (med `detail: "local"` för svaret på en mening) och `convert_time`.
+Exasecond.com kör en fjärr-MCP-server på `https://exasecond.com/mcp` (streamable HTTP, ingen nyckel). Den erbjuder ett verktyg: `get_time` (med `detail: "local"` för svaret på en mening).
 
 För en översatt lokal tidsmening, skicka dessa argument till `get_time`:
 
@@ -150,12 +152,12 @@ För Ollama och andra lokala modeller i Open WebUI: ladda ner [/dev/openwebui_ex
 |---|---:|---:|
 | `/unix`: Unix-tidsstämpel | 11 | ~5 |
 | `/utc`: UTC-tidsstämpel, på sekunden | 21 | ~14 |
-| `/local?tz=Oslo`: Lokal tid i en engelsk mening | ~70-120 | ~25-40 |
+| `/local?tz=Oslo`: Lokal tid i en engelsk mening | ~65-135 | ~25-40 |
 | `/now`: Kort standardsvar | ~80 | ~35 |
 
-Svarstexter uppmätta den 1 november 2026 med två tokeniserare: o200k_base och cl100k_base. Antalet varierar med modell, språk och innehåll. Verktygsinställningar och klientens inramning tillkommer. Typiska exempelstorlekar, inte faktureringstotaler eller garanterade gränser.
+Svarstexter uppmätta den 10 november 2026 med två tokeniserare: o200k_base och cl100k_base. Antalet varierar med modell, språk och innehåll. Verktygsinställningar och klientens inramning tillkommer. Typiska exempelstorlekar, inte faktureringstotaler eller garanterade gränser.
 
-Inställningskontext mätt separat: promptrad 26 token; en tillhandahållen verktygsdefinition 136-144; båda MCP-schemana 245-256. Klientens formatering kan lägga till fler.
+Inställningskontext mätt separat: promptrad 26 token; en tillhandahållen verktygsdefinition 136-144; MCP-schemat 153-158. Klientens formatering kan lägga till fler.
 
 | Adress | Svar |
 |---|---|
@@ -171,10 +173,11 @@ Inställningskontext mätt separat: promptrad 26 token; en tillhandahållen verk
 | `exasecond.com` (markdown) | Startsidan för agenter: tiden i alla stora städer, tidsomställningar, ett faktum |
 | `/now.md` | Allt: alla kalendrar, världsklockor |
 | `/now.json` | Allt, som JSON |
+| `/api/convert?iso=2030-01-01T00:00:00Z` | Räknar om en tidpunkt (`iso`, `unix`, `universe` eller `es`) till UTC, lokal tid (`tz`) och kalendrar, som JSON |
 | `/fact?tz=Stockholm&lang=sv` | Ett "Visste du?"-faktum om tid, gärna om platsen |
 | `/zones?q=oslo` | Tidszonernas namn och deras aktuella avvikelse |
 
-`tz` och den korta adressen tar emot ungefär en miljon namn: varje ort med minst 1 000 invånare, delstater och regioner, kända öar (GeoNames), länder (Norway, Norge), IANA-namn (Europe/Stockholm), förkortningar (CET, JST) och avvikelser (+02:00). Om något inte kan läsas kommer tiden ändå, med en kommentar. Hela beskrivningen finns i [/llms.txt](/llms.txt) och [/openapi.json](/openapi.json).
+`tz` och den korta adressen tar emot över en miljon namn för ungefär 180 000 platser: varje ort med minst 1 000 invånare, delstater och regioner, kända öar (GeoNames), länder (Norway, Norge), IANA-namn (Europe/Stockholm), förkortningar (CET, JST) och avvikelser (+02:00). Om något inte kan läsas kommer tiden ändå, med en kommentar. Hela beskrivningen finns i [/llms.txt](/llms.txt) och [/openapi.json](/openapi.json).
 
 ## Licens
 

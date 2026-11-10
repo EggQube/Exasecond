@@ -3,6 +3,8 @@ title: For developers
 description: Current time for AI. To the second. Minimal token overhead. HTTP / MCP.
 ---
 
+<!-- figure:guide -->
+
 ## Quick start
 
 Current time for AI. **To the second. Minimal token overhead.**
@@ -56,7 +58,7 @@ It's 08:15 early on Thursday morning in Oslo (22 October 2026, CEST, UTC+2). The
 
 ## 2. MCP: connect an AI app
 
-Exasecond.com runs a remote MCP server at `https://exasecond.com/mcp` (streamable HTTP, no key). It offers two tools: `get_time` (with `detail: "local"` for the one-sentence answer) and `convert_time`.
+Exasecond.com runs a remote MCP server at `https://exasecond.com/mcp` (streamable HTTP, no key). It offers one tool: `get_time` (with `detail: "local"` for the one-sentence answer).
 
 For a translated local sentence, pass these arguments to `get_time`:
 
@@ -146,12 +148,12 @@ For Ollama and other local models used through Open WebUI: download [/dev/openwe
 |---|---:|---:|
 | `/unix`: Unix timestamp | 11 | ~5 |
 | `/utc`: UTC timestamp, to the second | 21 | ~14 |
-| `/local?tz=Oslo`: English local-time sentence | ~70-120 | ~25-40 |
+| `/local?tz=Oslo`: English local-time sentence | ~65-135 | ~25-40 |
 | `/now`: Default compact response | ~80 | ~35 |
 
-Sample response text measured with two tokenizers: o200k_base and cl100k_base, on 1 November 2026. Counts vary by model, language and response details. Tool setup and client overhead are additional. These are typical sample sizes, not billing totals or guaranteed limits.
+Sample response text measured with two tokenizers: o200k_base and cl100k_base, on 10 November 2026. Counts vary by model, language and response details. Tool setup and client overhead are additional. These are typical sample sizes, not billing totals or guaranteed limits.
 
-Setup context, measured separately: prompt line 26 tokens; one supplied tool definition 136-144; both MCP tool schemas 245-256. Client formatting can add more.
+Setup context, measured separately: prompt line 26 tokens; one supplied tool definition 136-144; the MCP tool schema 153-158. Client formatting can add more.
 
 | Address | Answer |
 |---|---|
@@ -167,10 +169,11 @@ Setup context, measured separately: prompt line 26 tokens; one supplied tool def
 | `exasecond.com` (markdown) | The front page for agents: every big city's time, clock changes, a fact |
 | `/now.md` | Everything: all calendars, world clocks |
 | `/now.json` | Everything, as JSON |
+| `/api/convert?iso=2030-01-01T00:00:00Z` | Converts one moment (`iso`, `unix`, `universe` or `es`) to UTC, local time (`tz`) and calendars, as JSON |
 | `/fact?tz=Oslo` | One "did you know?" fact about time, specific to the place when possible |
 | `/zones?q=oslo` | Time zone names and their current offsets |
 
-`tz` and the short address accept about a million names: every place with 1,000 or more people, states and regions, well-known islands (GeoNames), countries (Norway, 挪威), IANA names (Europe/Oslo), abbreviations (CET, JST) and offsets (+02:00). If it can't be read, the time is still returned, with a note. The full description is in [/llms.txt](/llms.txt) and [/openapi.json](/openapi.json).
+`tz` and the short address accept over a million names for about 180,000 places: every place with 1,000 or more people, states and regions, well-known islands (GeoNames), countries (Norway, 挪威), IANA names (Europe/Oslo), abbreviations (CET, JST) and offsets (+02:00). If it can't be read, the time is still returned, with a note. The full description is in [/llms.txt](/llms.txt) and [/openapi.json](/openapi.json).
 
 ## License
 

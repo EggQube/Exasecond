@@ -126,9 +126,9 @@ check('pages link the icon and the logo, no inline SVG', str_contains($h1, '<lin
 check('/now without tz unchanged', !str_contains(get('/now')[2], 'Time zone') && str_contains(get('/now')[2], 'Tip: add ?tz='));
 check('/now without tz: UTC, weekday and the short tip, no Unix line', preg_match('/^UTC: \S+Z\nWeekday: \w+\nTip: add \?tz=YourCity for local time\.\n$/', get('/now')[2]) === 1);
 check('/now with tz: no Unix line, the local time stays', !str_contains($nowOslo = get('/now?tz=Oslo')[2], 'Unix:') && str_contains($nowOslo, 'Local (Europe/Oslo): '));
-check('token tables: /now is ~80 bytes, ~35 tokens everywhere', str_contains(llms_txt(snapshot()), " | ~80 | ~35 |\n") && array_reduce(LANGS, fn($ok, $l) => $ok && str_contains(load_doc($l, 'about')['body'] ?? '', '| ~80 | ~35 |') && str_contains(load_doc($l, 'developers')['body'] ?? '', '| ~80 | ~35 |') && str_contains(load_doc($l, 'developers')['body'] ?? '', '245-256') && !str_contains(load_doc($l, 'developers')['body'] ?? '', 'Unix time;'), true));
+check('token tables: /now is ~80 bytes, ~35 tokens everywhere', str_contains(llms_txt(snapshot()), " | ~80 | ~35 |\n") && array_reduce(LANGS, fn($ok, $l) => $ok && str_contains(load_doc($l, 'about')['body'] ?? '', '| ~80 | ~35 |') && str_contains(load_doc($l, 'developers')['body'] ?? '', '| ~80 | ~35 |') && str_contains(load_doc($l, 'developers')['body'] ?? '', '153-158') && !str_contains(load_doc($l, 'developers')['body'] ?? '', 'Unix time;'), true));
 check('/unix: available, not in the short answers (llms.txt, developer pages in every language)', str_contains($l = llms_txt(snapshot()), "- [/unix](https://exasecond.com/unix): Unix seconds only, also `unix` in /now.json. Not in the short answers, since language models read a date, not a Unix number.\n\n## Full answers") && !str_contains($l, 'just the unix timestamp') && array_reduce(LANGS, fn($ok, $lg) => $ok && preg_match('/^\| `\/utc` \|[^\n]*\n\| `\/unix` \| [^\n]*`\/now\.json`[^\n]*\|$/mu', load_doc($lg, 'developers')['body'] ?? '') === 1, true));
-check('token tables: measured on 1 November 2026, same note in i18n, About and developer pages, every language', array_reduce(LANGS, fn($ok, $lg) => $ok && preg_match('/1\. November 2026|1 November 2026|11 月 1 日|1er novembre 2026|1 de noviembre de 2026|1º de novembro de 2026|1 ноября 2026|1 november 2026|2026年11月1日|2026년 11월 1일/u', $n = t($lg, 'cost_note')) === 1 && str_contains(load_doc($lg, 'about')['body'] ?? '', $n) && str_contains(load_doc($lg, 'developers')['body'] ?? '', $n), true));
+check('token tables: measured on 10 November 2026, same note in i18n, About and developer pages, every language', array_reduce(LANGS, fn($ok, $lg) => $ok && preg_match('/(?<!\d)(10\. November 2026|10 November 2026|11 月 10 日|10 novembre 2026|10 de noviembre de 2026|10 de novembro de 2026|10 ноября 2026|10 november 2026|2026年11月10日|2026년 11월 10일)/u', $n = t($lg, 'cost_note')) === 1 && str_contains(load_doc($lg, 'about')['body'] ?? '', $n) && str_contains(load_doc($lg, 'developers')['body'] ?? '', $n), true));
 check('llms.txt first time line: UTC, universe seconds and weekday, no Unix number', preg_match('/^Current time \(generated at request\): \S+Z UTC \| universe_seconds \d+ \| \w+$/m', llms_txt(snapshot())) === 1 && !preg_match('/\| unix \d/', llms_full_txt(snapshot())));
 check('Machines chapter: an exact answer is ISO 8601 in UTC with the zone, no Unix timestamp asked for (en, zh)', str_contains($mEn = chapter_md(chapter('en', 'machines'), 'en'), '3. **Exact and unambiguous.** ISO 8601 in UTC, with the time zone stated.' . "\n") && !str_contains($mEn, 'plus a Unix timestamp') && !str_contains(chapter_md(chapter('zh', 'machines'), 'zh'), '外加一个 Unix 时间戳'));
 check('Machines chapter describes /now as it is (en, zh)', str_contains(chapter_md(chapter('en', 'machines'), 'en'), '**/now** returns a few short lines of plain text: the UTC time and the weekday.') && !str_contains(chapter_md(chapter('zh', 'machines'), 'zh'), '约八行'));
@@ -146,7 +146,43 @@ foreach (CHAPTERS as $slug) {
 }
 check('chapters have sources', count(array_filter(CHAPTERS, fn($s) => str_contains(chapter('en', $s)['body'], '## Sources') && str_contains(chapter('zh', $s)['body'], '## 来源'))) === count(CHAPTERS));
 check('/time/unknown is 404', get('/time/nope', 'text/html')[0] === 404);
-check('llms.txt lists chapters and story', str_contains(get('/llms.txt')[2], '/time/scale.md') && str_contains(get('/llms.txt')[2], '/story.md'));
+check('llms.txt names every chapter on one line, links the index and the story', (fn($b) => str_contains($b, 'Each is at https://exasecond.com/time/<name>.md') && str_contains($b, 'Names: ' . implode(', ', array_column(chapters('en'), 'slug')) . '.') && str_contains($b, '(https://exasecond.com/time.md)') && str_contains($b, '/story.md'))(get('/llms.txt')[2]));
+check('every chapter name in llms.txt answers, and /time.md has a line on each', count(array_filter(chapters('en'), fn($c) => get('/time/' . $c['slug'] . '.md')[0] === 200 && str_contains(get('/time.md')[2], $c['title']))) === count(chapters('en')));
+// The "Time zone:" line in /now and MCP basic only when it says more than the Local line (which names the zone)
+check('/now?tz=Oslo: no "read as" line, the Local line names the zone', !str_contains(get('/now?tz=Oslo')[2], 'Time zone:') && str_contains(get('/now?tz=Oslo')[2], 'Local (Europe/Oslo): '));
+check('/now keeps the note when it says more: country, other places, fixed offset, ambiguity, unknown', str_contains(get('/now?tz=Springfield')[2], 'Time zone: "Springfield" read as America/Chicago (Springfield, United States). Other places')
+    && str_contains(get('/now?tz=%2B2')[2], 'Time zone: "+2" read as +02:00 (a fixed offset') && str_contains(get('/now?tz=IST')[2], 'Time zone: "IST" is ambiguous') && str_contains(get('/now?tz=Xyzzyville')[2], 'Time zone: "Xyzzyville" is not a time zone'));
+// "Which answer do you need?": first on the developer page (every language, Markdown and HTML) and in llms.txt, answers live
+check('guide: first section of every developer page, live answers, smallest first, own words', count(array_filter(LANGS, function ($l) {
+    $g = GUIDE_COPY[$l];
+    $md = get(lang_prefix($l) . '/developers.md')[2];
+    $body = substr($md, strpos($md, "\n\n> ") + 4);
+    $body = substr($body, strpos($body, "\n\n") + 2);   // after the title and description
+    if (!str_starts_with($body, '## ' . $g['h'] . "\n\n" . $g['small'])) return false;
+    if (!preg_match('/\| `\/utc` \| `(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ)` \| 14 \|/', $body, $m) || abs(strtotime($m[1]) - time()) > 5) return false;
+    $sentence = local_sentence(snapshot(null, tz_opts('Oslo', null)), tz_opts('Oslo', null)['tz_res'], $l);
+    $p = [strpos($body, '`/utc`'), strpos($body, '`/oslo'), strpos($body, '`/now.json`')];
+    if (!str_contains($body, mb_substr($sentence, 0, 12)) || $p[0] === false || !($p[0] < $p[1] && $p[1] < $p[2])) return false;
+    if (!str_contains($body, $g['mcp']) || !str_contains($body, $g['unix']) || str_contains($md, 'figure:guide')) return false;
+    foreach (['h', 'small', 'moment', 'person', 'all', 'mcp', 'unix'] as $k) if ($l !== 'en' && $g[$k] === GUIDE_COPY['en'][$k]) return false;
+    return true;
+})) === count(LANGS));
+check('guide in the HTML developer page: before Quick start, a table, no placeholder', (fn($h) => strpos($h, '>Which answer do you need?</h2>') !== false && strpos($h, '>Which answer do you need?</h2>') < strpos($h, '>Quick start</h2>') && str_contains($h, '<td><code>/utc</code></td>') && !str_contains($h, 'figure:guide'))(get('/developers', 'text/html')[2]));
+check('guide in llms.txt: before Fastest answers, live UTC and the English sentence', (fn($t) => ($a = strpos($t, "## Which answer do you need?\n")) !== false && $a < strpos($t, '## Fastest answers') && preg_match('/\| `\/utc` \| `\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ` \| 14 \|/', $t) === 1 && str_contains($t, "| `/oslo` (their place) | It's "))(get('/llms.txt')[2]));
+check('guide figures match the token table: /utc 14, English sentence ~25-40, /unix 5', str_contains(token_cost_md('en'), '| 21 | ~14 |') && str_contains(token_cost_md('en'), '| ~65-135 | ~25-40 |') && GUIDE_COPY['en']['person_tokens'] === '25-40' && str_contains(GUIDE_COPY['en']['unix'], '(5 tokens)') && str_contains(token_cost_md('en'), '| 11 | ~5 |'));
+// The stated range must hold all year: the English Oslo sentence every 6 hours for a year stays within ~65-135 bytes
+// (tokens can't be counted in PHP; re-measure the guide's token ranges with js-tiktoken when the sentence changes)
+check('token table: English sentence bytes stay within ~65-135 all year', (function () {
+    $o = tz_opts('Oslo', null);
+    $t0 = strtotime('2026-11-10T00:00:00Z');
+    [$min, $max] = [PHP_INT_MAX, 0];
+    for ($h = 0; $h < 366 * 24; $h += 6) {
+        $n = strlen(local_sentence(snapshot([$t0 + $h * 3600, 0], $o), $o['tz_res'], 'en') . "\n");
+        [$min, $max] = [min($min, $n), max($max, $n)];
+    }
+    return $min >= 65 * 0.95 && $max <= 135;   // "~": the low end may sit a little under
+})());
+check('JSON keeps tz_note for a plain read', json_decode(get('/now?tz=Oslo', 'application/json')[2], true)['tz_note'] === '"Oslo" read as Europe/Oslo');
 check('llms-full has chapters and play', str_contains(get('/llms-full.txt')[2], 'The arrow of time') && str_contains(get('/llms-full.txt')[2], 'infinite number of pottery workshops'));
 check('/now has no story or science', !str_contains(get('/now')[2], 'Pottery') && !str_contains(get('/now')[2], 'chapter'));
 check('/story', str_contains(get('/story', 'text/html')[2], 'Pottery Lecture'));
@@ -209,8 +245,11 @@ check('markdown says generated at the moment of this request', str_contains(get(
 check('agent bar points to the short address', str_contains(get('/', 'text/html')[2], 'exasecond.com/stockholm</a>'));
 // The agent line: a fetch tool often reads only the first page, so it says what the place address takes and where the rest is
 $bar = fn(string $html) => preg_match('#<div class="agentbar"[^>]*><div class="wrap">(.*?)</div></div>#s', $html, $m) ? $m[1] : '';
-check('agent line: time now, kinds of place, JSON, all addresses', (fn($b) => str_contains($b, '</b> time now <time datetime="') && str_contains($b, 'local time for any place (city, country, zone, offset) → <a href="/stockholm">')
+check('agent line: time now, kinds of place, JSON, all addresses', (fn($b) => str_contains($b, '</b> time now <time datetime="') && str_contains($b, 'local time for any place (city, country, zone, offset; over a million names) → <a href="/stockholm">')
     && str_contains($b, 'as JSON → <a href="/local.json?tz=Stockholm">exasecond.com/local.json?tz=Stockholm</a>') && str_contains($b, 'all addresses → <a href="/llms.txt">'))($bar(get('/', 'text/html')[2])));
+// How many names: rounded, so a GeoNames rebuild keeps it true (counted 2026-11-10: 1,011,447 names for 180,754 places)
+check('number of names: agent line, llms.txt and every developer page say it', str_contains(get('/llms.txt')[2], 'over a million names for about 180,000 places, in many languages')
+    && count(array_filter(LANGS, fn($l) => preg_match('/^`tz`[^\n]*(180[,. ]000|18万|18만)/um', load_doc($l, 'developers')['body']) === 1 && preg_match('/million|миллион|百多万|Million|millón|milhão|miljon|100万|100만/iu', t($l, 'agentbar_kinds')) === 1)) === count(LANGS));
 check('agent line on every kind of page', count(array_filter(['/about', '/developers', '/time/machines', '/story'], fn($p) => str_contains($bar(get($p, 'text/html')[2]), '/local.json?tz='))) === 4);
 check('agent line in every language: own words, links in the page language', count(array_filter(LANGS, function ($l) use ($bar) {
     $b = $bar(get(lang_prefix($l) . '/', 'text/html')[2]);

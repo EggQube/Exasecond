@@ -3,6 +3,8 @@ title: 开发者
 description: 给 AI 的当前时间。 精确到秒。尽量减少 token 开销。 HTTP / MCP.
 ---
 
+<!-- figure:guide -->
+
 ## 快速入门
 
 给 AI 的当前时间。 **精确到秒。尽量减少 token 开销。**
@@ -58,7 +60,7 @@ https://exasecond.com/<对方所在的城市>?lang=zh 并使用那个时间。
 
 ## 2. MCP：连接 AI 应用
 
-Exasecond.com 在 `https://exasecond.com/mcp` 运行一个远程 MCP 服务器（streamable HTTP，无需密钥）。它提供两个工具：`get_time`（加 `detail: "local"` 得到一句话的回答）和 `convert_time`。
+Exasecond.com 在 `https://exasecond.com/mcp` 运行一个远程 MCP 服务器（streamable HTTP，无需密钥）。它提供一个工具：`get_time`（加 `detail: "local"` 得到一句话的回答）。
 
 要获得相应语言的本地时间句子，向 `get_time` 传入这些参数：
 
@@ -150,12 +152,12 @@ def get_local_time(place: str = "") -> str:
 |---|---:|---:|
 | `/unix`: Unix 时间戳 | 11 | ~5 |
 | `/utc`: UTC 时间戳，精确到秒 | 21 | ~14 |
-| `/local?tz=Oslo`: 英文的本地时间句子 | ~70-120 | ~25-40 |
+| `/local?tz=Oslo`: 英文的本地时间句子 | ~65-135 | ~25-40 |
 | `/now`: 默认简短响应 | ~80 | ~35 |
 
-2026 年 11 月 1 日使用 o200k_base 和 cl100k_base 两种分词器测量响应文本样本。数量因模型、语言和响应内容而异。工具配置和客户端开销另计。这些是典型样本大小，不是计费总量或保证上限。
+2026 年 11 月 10 日使用 o200k_base 和 cl100k_base 两种分词器测量响应文本样本。数量因模型、语言和响应内容而异。工具配置和客户端开销另计。这些是典型样本大小，不是计费总量或保证上限。
 
-单独测量的配置上下文：提示词行 26 token；一个提供的工具定义 136-144；两个 MCP 工具的 schema 共 245-256。客户端格式可能增加开销。
+单独测量的配置上下文：提示词行 26 token；一个提供的工具定义 136-144；MCP 工具的 schema 153-158。客户端格式可能增加开销。
 
 | 地址 | 回答 |
 |---|---|
@@ -171,10 +173,11 @@ def get_local_time(place: str = "") -> str:
 | `exasecond.com`（markdown） | 给智能体的首页：各大城市的时间、调钟、一条知识 |
 | `/now.md` | 全部内容：所有历法、世界时钟 |
 | `/now.json` | 全部内容，JSON 格式 |
+| `/api/convert?iso=2030-01-01T00:00:00Z` | 把一个时刻（`iso`、`unix`、`universe` 或 `es`）换算为 UTC、本地时间（`tz`）和各种历法，JSON 格式 |
 | `/fact?tz=Shanghai&lang=zh` | 一条关于时间的"你知道吗？"，尽可能与该地点相关 |
 | `/zones?q=oslo` | 时区名称及其当前偏移 |
 
-`tz` 和简短地址可以接受大约一百万个名称：所有人口 1,000 以上的地方、州和地区、知名岛屿（GeoNames），国家（挪威、Norway），IANA 名称（Asia/Shanghai），缩写（CET、JST）和偏移（+08:00）。如果无法识别，仍会返回时间，并附上一条说明。完整说明见 [/llms.txt](/llms.txt) 和 [/openapi.json](/openapi.json)。
+`tz` 和简短地址可以接受一百多万个名称，对应约 180,000 个地方：所有人口 1,000 以上的地方、州和地区、知名岛屿（GeoNames），国家（挪威、Norway），IANA 名称（Asia/Shanghai），缩写（CET、JST）和偏移（+08:00）。如果无法识别，仍会返回时间，并附上一条说明。完整说明见 [/llms.txt](/llms.txt) 和 [/openapi.json](/openapi.json)。
 
 ## 许可
 

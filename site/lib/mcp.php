@@ -17,14 +17,7 @@ function mcp_tools(): array {
                 'detail' => ['type' => 'string', 'enum' => ['basic', 'full', 'local'], 'description' => 'basic (default): UTC and weekday; local: date, time and part of day in one sentence (use tz); full: calendars and world clocks'],
             ]],
         ],
-        [
-            'name' => 'convert_time',
-            'description' => 'Convert exactly one of iso, unix, universe or es to UTC, local time and calendars.',
-            'inputSchema' => ['type' => 'object', 'oneOf' => array_map(fn($k) => ['required' => [$k]], ['iso', 'unix', 'universe', 'es']), 'properties' => [
-                'iso' => ['type' => 'string'], 'unix' => ['type' => 'string'], 'universe' => ['type' => 'string'], 'es' => ['type' => 'string'],
-                'tz' => ['type' => 'string'],
-            ]],
-        ],
+        // One tool: its schema is in every MCP conversation's context. Converting other moments is HTTP /api/convert.
     ];
 }
 
@@ -33,7 +26,7 @@ class McpError extends Exception {}
 function mcp_call_tool($name, $args): string {
     $args = is_array($args) ? $args : [];
     foreach ($args as $key => $value) {
-        if (in_array($key, ['tz', 'cutoff', 'detail', 'lang', 'iso', 'unix', 'universe', 'es'], true) && !is_string($value)) throw new InputError("$key must be a string");
+        if (in_array($key, ['tz', 'cutoff', 'detail', 'lang'], true) && !is_string($value)) throw new InputError("$key must be a string");
     }
     $str = fn($k) => isset($args[$k]) && is_scalar($args[$k]) ? (string)$args[$k] : null;
     if ($name === 'get_time') {
@@ -43,10 +36,6 @@ function mcp_call_tool($name, $args): string {
         $s = snapshot(null, $o);
         if ($str('detail') === 'local') return local_sentence($s, $o['tz_res'], $str('lang') ?? 'en');
         return $str('detail') === 'full' ? now_md($s) : now_text($s, false);
-    }
-    if ($name === 'convert_time') {
-        $d = parse_instant($args);
-        return now_md(snapshot($d, tz_opts($str('tz'), null)), 'Converted time');
     }
     throw new McpError('Unknown tool: ' . (is_scalar($name) ? $name : ''), -32602);
 }

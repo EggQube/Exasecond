@@ -15,15 +15,33 @@ function token_cost_md(string $lang): string {
         . '| ' . t($lang, 'cost_response') . ' | ' . t($lang, 'cost_bytes') . ' | ' . t($lang, 'cost_tokens') . " |\n|---|---:|---:|\n"
         . '| `/unix`: ' . t($lang, 'cost_unix') . " | 11 | ~5 |\n"
         . '| `/utc`: ' . t($lang, 'cost_utc') . " | 21 | ~14 |\n"
-        . '| `/local?tz=Oslo`: ' . t($lang, 'cost_local') . " | ~70-120 | ~25-40 |\n"
+        . '| `/local?tz=Oslo`: ' . t($lang, 'cost_local') . " | ~65-135 | ~25-40 |\n"
         . '| `/now`: ' . t($lang, 'cost_basic') . " | ~80 | ~35 |\n\n"
         . t($lang, 'cost_note') . "\n";
+}
+
+/**
+ * "Which answer do you need?", smallest first: at the top of the developer page (<!-- figure:guide -->) and of llms.txt.
+ * The answers are the real ones at this moment, so no example timestamp can pass for the current time.
+ */
+function guide_md(string $lang): string {
+    $g = GUIDE_COPY[$lang] ?? GUIDE_COPY['en'];
+    $o = tz_opts('Oslo', null);
+    $s = snapshot(null, $o);
+    $lq = $lang === 'en' ? '' : "?lang=$lang";
+    return "## {$g['h']}\n\n{$g['small']}\n\n"
+        . '| ' . implode(' | ', $g['cols']) . " |\n|---|---|---|---:|\n"
+        . "| {$g['moment']} | `/utc` | `{$s['utc']}` | 14 |\n"
+        . "| {$g['person']} | `/oslo$lq`{$g['place']} | " . local_sentence($s, $o['tz_res'], $lang) . " | ~{$g['person_tokens']} |\n"
+        . "| {$g['all']} | `/now.json` | JSON | ~{$g['json_tokens']} |\n\n"
+        . "{$g['mcp']}\n\n{$g['unix']}\n";
 }
 
 function llms_txt(array $s): string {
     $S = SITE;
     $line = now_line($s);
-    $chapters = implode("\n", array_map(fn($c) => "- [{$c['title']}]($S/time/{$c['slug']}.md): {$c['description']}", chapters('en')));
+    $guide = guide_md('en');
+    $chapters = implode(', ', array_column(chapters('en'), 'slug'));   // names only; /time.md has a line on each
     $costs = token_cost_md('en');
     return <<<TXT
 # Exasecond
@@ -34,9 +52,10 @@ $line
 
 Language models have no clock. If you are an AI agent, do not guess today's date from your training data. Fetch it here.
 
+$guide
 ## Fastest answers
 
-- [/oslo]($S/oslo): any city, region, country, zone or offset as the address (/stockholm, /new-york, /bali, /sweden, /cet, /utc+2; same as /local?tz=Oslo). One sentence (~30 tokens) for talking to a person: their weekday, date, local time and part of day (morning, afternoon, evening, night), plus an upcoming clock change. Example: "It's 21:21 on Wednesday evening in Oslo (21 October 2026, CEST, UTC+2)." Place names: GeoNames (CC BY 4.0).
+- [/oslo]($S/oslo): any city, region, country, zone or offset as the address, over a million names for about 180,000 places, in many languages (/stockholm, /new-york, /bali, /sweden, /cet, /utc+2; same as /local?tz=Oslo). One sentence (~30 tokens) for talking to a person: their weekday, date, local time and part of day (morning, afternoon, evening, night), plus an upcoming clock change. Example: "It's 21:21 on Wednesday evening in Oslo (21 October 2026, CEST, UTC+2)." Place names: GeoNames (CC BY 4.0).
 - [/local.json?tz=Oslo]($S/local.json?tz=Oslo): the same sentence as JSON, plus the offset, zone abbreviation, summer time (dst) and the next clock change
 - [/now]($S/now): compact current time as plain text (UTC and weekday); no secondary calendars or cosmic time
 - [/utc]($S/utc): just the ISO 8601 UTC timestamp, nothing else
@@ -54,7 +73,7 @@ Language models have no clock. If you are an AI agent, do not guess today's date
 ## Tools
 
 - A direct MCP or HTTP tool connection requests time from the server on each call. An AI app may reuse a saved web page; caching and permission prompts depend on the client.
-- [MCP server]($S/mcp): remote MCP (streamable HTTP, POST JSON-RPC). Tools: get_time, convert_time
+- [MCP server]($S/mcp): remote MCP (streamable HTTP, POST JSON-RPC). Tool: get_time
 - [OpenAPI]($S/openapi.json): HTTP API description
 - [For developers]($S/developers.md): copy-paste setup: a prompt line, MCP configs (Claude Code, Cursor, VS Code), OpenAI and Anthropic tool definitions, Python, JavaScript, LangChain, an Open WebUI tool. Please send at most one request per minute per conversation or agent.
 - [开发者 (Chinese)]($S/zh/developers.md): the same developer page in Simplified Chinese, with examples that answer in Chinese (?lang=zh).
@@ -72,9 +91,7 @@ $costs
 
 ## The question of time
 
-A sourced reference on the science of time in fifteen chapters, written for agents to quote. Every chapter is also in Simplified Chinese at /zh/time/<name>.md. Index: [/time.md]($S/time.md)
-
-$chapters
+A sourced reference on the science of time in fifteen chapters, written for agents to quote. Each is at $S/time/<name>.md, and in Simplified Chinese at /zh/time/<name>.md. Names: $chapters. Index with a line on each: [/time.md]($S/time.md)
 
 ## Why this site exists
 
@@ -177,10 +194,9 @@ Query parameters for /now, /now.json, /now.md, /api/now, /api/convert:
 
 Conversion requires exactly one nonempty `iso`, `unix`, `universe` or `es` input. ISO input requires a complete date (`YYYY-MM-DD`), optionally with a time and offset; an omitted offset means UTC. Invalid dates and times are rejected instead of rolled forward. Decimal Unix seconds retain milliseconds; further fractional digits are truncated toward zero. The top-level `unix` and `utc` fields represent whole seconds; `technical.unix_ms` retains the milliseconds. Universe seconds remain exact whole seconds.
 
-### MCP tools
+### MCP tool
 
-- `get_time({tz?, cutoff?, detail?: "basic" | "full" | "local", lang?})` (`lang` selects the local sentence only)
-- `convert_time({iso? | unix? | universe? | es?, tz?})`
+- `get_time({tz?, cutoff?, detail?: "basic" | "full" | "local", lang?})` (`lang` selects the local sentence only). Converting another moment: HTTP `/api/convert`.
 
 Supported protocol versions: 2025-06-18 and 2025-03-26. Send the negotiated version in `MCP-Protocol-Version` on subsequent requests. June 2025 uses one JSON-RPC 2.0 message per POST; March 2025 also accepts batches. A missing header uses March behavior. Unsupported headers return HTTP 400. The endpoint is stateless; GET returns 405 because it does not offer an SSE stream.
 
@@ -213,29 +229,42 @@ function sitemap_xml(): string {
 
 function openapi(): array {
     $q = fn($name, $desc) => ['name' => $name, 'in' => 'query', 'required' => false, 'schema' => ['type' => 'string'], 'description' => $desc];
-    $tz = $q('tz', 'Time zone: IANA name (Asia/Tokyo), city (Tokyo), country (Japan), abbreviation (JST) or offset (+09:00)');
-    $cutoff = $q('cutoff', 'Your training cutoff: YYYY, YYYY-MM or YYYY-MM-DD');
     $lang = $q('lang', 'Response language for local sentences or localized calendar strings; default en');
     $lang['schema']['enum'] = SENTENCE_LANGS;
-    $localResponses = ['200' => ['description' => 'Local sentence, or UTC and a note when the place is missing or ambiguous', 'content' => [
-        'text/plain' => ['schema' => ['type' => 'string']],
-        'application/json' => ['schema' => ['type' => 'object', 'required' => ['text', 'utc', 'local'], 'properties' => ['text' => ['type' => 'string'], 'utc' => ['type' => 'string'], 'local' => ['type' => ['object', 'null']], 'tz_note' => ['type' => 'string']]]],
-    ]]];
+    // Shared parts are written once under components and referenced, so the file doesn't repeat them per path.
+    $tz = ['$ref' => '#/components/parameters/tz'];
+    $cutoff = ['$ref' => '#/components/parameters/cutoff'];
+    $langRef = ['$ref' => '#/components/parameters/lang'];
+    $localSchema = ['$ref' => '#/components/schemas/local'];
+    $localResponses = ['200' => ['$ref' => '#/components/responses/local']];
     return [
         'openapi' => '3.1.0',
         'info' => ['title' => 'Exasecond', 'version' => SPEC_VERSION, 'description' => 'Current time for AI agents: UTC, time zones, human calendars, universe seconds and training-data staleness.'],
         'servers' => [['url' => SITE]],
         'paths' => [
-            '/local' => ['get' => ['operationId' => 'getLocalTime', 'summary' => 'One sentence with local time and part of day', 'parameters' => [$tz, $lang], 'responses' => $localResponses]],
-            '/local.json' => ['get' => ['operationId' => 'getLocalTimeJson', 'summary' => 'The local sentence as JSON, without an Accept header: offset, abbreviation, summer time and next clock change', 'parameters' => [$tz, $lang], 'responses' => ['200' => ['description' => $localResponses['200']['description'], 'content' => ['application/json' => $localResponses['200']['content']['application/json']]]]]],
-            '/{place}' => ['get' => ['operationId' => 'getPlaceTime', 'summary' => 'Local sentence for a city, country, zone or offset; reserved routes take precedence', 'parameters' => [['name' => 'place', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'string', 'maxLength' => 64]], $lang], 'responses' => $localResponses + ['404' => ['description' => 'Unknown place']]]],
-            '/now' => ['get' => ['operationId' => 'getTimeText', 'summary' => 'Compact current time; with tz, the local sentence comes first', 'parameters' => [$tz, $cutoff, $lang], 'responses' => ['200' => ['description' => 'Plain text by default; JSON or Markdown via Accept']]]],
-            '/api/now' => ['get' => ['operationId' => 'getTime', 'summary' => 'Current time in all formats', 'parameters' => [$tz, $cutoff, $lang], 'responses' => ['200' => ['description' => 'Snapshot JSON; lang localizes calendar strings when intl is available']]]],
-            '/api/convert' => ['get' => ['operationId' => 'convertTime', 'summary' => 'Convert exactly one instant into all formats', 'description' => 'Supply exactly one nonempty instant parameter. ISO requires a complete date; missing offset means UTC. Invalid dates are rejected. Decimal Unix input retains milliseconds, truncating extra fractional digits toward zero; technical.unix_ms exposes that precision.', 'parameters' => [$q('iso', 'Complete ISO date, optionally with time and offset'), $q('unix', 'Unix seconds, optionally fractional'), $q('universe', 'Universe seconds (integer)'), $q('es', 'Decimal exaseconds'), $tz, $lang], 'responses' => ['200' => ['description' => 'Snapshot JSON'], '400' => ['description' => 'Invalid, missing or multiple instant inputs']]]],
-            '/fact' => ['get' => ['operationId' => 'getTimeFact', 'summary' => 'One general or place-specific fact about time', 'parameters' => [$tz, $lang], 'responses' => ['200' => ['description' => 'Text, or JSON via Accept']]]],
+            '/local' => ['get' => ['operationId' => 'getLocalTime', 'summary' => 'One sentence with local time and part of day', 'parameters' => [$tz, $langRef], 'responses' => $localResponses]],
+            '/local.json' => ['get' => ['operationId' => 'getLocalTimeJson', 'summary' => 'The local sentence as JSON, without an Accept header: offset, abbreviation, summer time and next clock change', 'parameters' => [$tz, $langRef], 'responses' => ['200' => ['description' => 'The local answer as JSON', 'content' => ['application/json' => ['schema' => $localSchema]]]]]],
+            '/{place}' => ['get' => ['operationId' => 'getPlaceTime', 'summary' => 'Local sentence for a city, country, zone or offset; reserved routes take precedence', 'parameters' => [['name' => 'place', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'string', 'maxLength' => 64]], $langRef], 'responses' => $localResponses + ['404' => ['description' => 'Unknown place']]]],
+            '/now' => ['get' => ['operationId' => 'getTimeText', 'summary' => 'Compact current time; with tz, the local sentence comes first', 'parameters' => [$tz, $cutoff, $langRef], 'responses' => ['200' => ['description' => 'Plain text by default; JSON or Markdown via Accept']]]],
+            '/api/now' => ['get' => ['operationId' => 'getTime', 'summary' => 'Current time in all formats', 'parameters' => [$tz, $cutoff, $langRef], 'responses' => ['200' => ['description' => 'Snapshot JSON; lang localizes calendar strings when intl is available']]]],
+            '/api/convert' => ['get' => ['operationId' => 'convertTime', 'summary' => 'Convert exactly one instant into all formats', 'description' => 'Supply exactly one nonempty instant parameter. ISO requires a complete date; missing offset means UTC. Invalid dates are rejected. Decimal Unix input retains milliseconds, truncating extra fractional digits toward zero; technical.unix_ms exposes that precision.', 'parameters' => [$q('iso', 'Complete ISO date, optionally with time and offset'), $q('unix', 'Unix seconds, optionally fractional'), $q('universe', 'Universe seconds (integer)'), $q('es', 'Decimal exaseconds'), $tz, $langRef], 'responses' => ['200' => ['description' => 'Snapshot JSON'], '400' => ['description' => 'Invalid, missing or multiple instant inputs']]]],
+            '/fact' => ['get' => ['operationId' => 'getTimeFact', 'summary' => 'One general or place-specific fact about time', 'parameters' => [$tz, $langRef], 'responses' => ['200' => ['description' => 'Text, or JSON via Accept']]]],
             '/zones' => ['get' => ['operationId' => 'listTimeZones', 'summary' => 'IANA time zones and current offsets', 'parameters' => [$q('q', 'Filter by name or place')], 'responses' => ['200' => ['description' => 'Text, or JSON via Accept']]]],
             '/utc' => ['get' => ['operationId' => 'getUtc', 'summary' => 'ISO 8601 UTC timestamp only', 'responses' => ['200' => ['description' => 'text/plain']]]],
             '/unix' => ['get' => ['operationId' => 'getUnix', 'summary' => 'Unix seconds only', 'responses' => ['200' => ['description' => 'text/plain']]]],
+        ],
+        'components' => [
+            'parameters' => [
+                'tz' => $q('tz', 'Time zone: IANA name (Asia/Tokyo), city (Tokyo), country (Japan), abbreviation (JST) or offset (+09:00)'),
+                'cutoff' => $q('cutoff', 'Your training cutoff: YYYY, YYYY-MM or YYYY-MM-DD'),
+                'lang' => $lang,
+            ],
+            'schemas' => [
+                'local' => ['type' => 'object', 'required' => ['text', 'utc', 'local'], 'properties' => ['text' => ['type' => 'string'], 'utc' => ['type' => 'string'], 'local' => ['type' => ['object', 'null']], 'tz_note' => ['type' => 'string']]],
+            ],
+            'responses' => [
+                'local' => ['description' => 'Local sentence, or UTC and a note when the place is missing or ambiguous', 'content' => ['text/plain' => ['schema' => ['type' => 'string']], 'application/json' => ['schema' => $localSchema]]],
+            ],
         ],
     ];
 }

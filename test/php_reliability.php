@@ -63,7 +63,7 @@ verify('initialize negotiates supported version', $status === 200 && $body['resu
 [, $body] = request_rpc('initialize');
 verify('initialize validates required fields', $body['error']['code'] === -32602);
 [, $body] = request_rpc('tools/list');
-verify('two MCP tools remain available', count($body['result']['tools']) === 2);
+verify('one MCP tool: get_time (convert_time removed 2026-11-10)', count($body['result']['tools']) === 1 && $body['result']['tools'][0]['name'] === 'get_time');
 verify('MCP language schema matches engine', $body['result']['tools'][0]['inputSchema']['properties']['lang']['enum'] === SENTENCE_LANGS);
 foreach (SENTENCE_LANGS as $lang) {
     [, $body] = request_rpc('tools/call', ['name' => 'get_time', 'arguments' => (object)['tz' => 'Tokyo', 'detail' => 'local', 'lang' => $lang]]);
@@ -78,8 +78,9 @@ foreach ([['tz' => []], ['detail' => 'bad'], ['lang' => 'xx']] as $args) {
 verify('array arguments rejected', $body['error']['code'] === -32602);
 [, $body] = request_rpc('tools/call', ['name' => 'unknown']);
 verify('unknown tool error', $body['error']['code'] === -32602);
-[, $body] = request_rpc('tools/call', ['name' => 'convert_time', 'arguments' => (object)['iso' => '2026-02-29']]);
-verify('invalid conversion is a tool error', ($body['result']['isError'] ?? false) === true);
+[, $body] = request_rpc('tools/call', ['name' => 'convert_time', 'arguments' => (object)['iso' => '2030-01-01']]);
+verify('convert_time is gone: unknown tool', ($body['error']['code'] ?? null) === -32602 && !isset($body['result']));
+verify('/api/convert still converts over HTTP', (fn($r) => $r[0] === 200 && json_decode($r[2], true)['utc'] === '2030-01-01T00:00:00Z')(route('GET', '/api/convert?iso=2030-01-01', ['iso' => '2030-01-01'], [])));
 
 $oslo = tz_opts('Oslo', null);
 $basic = now_text(snapshot([1792610508, 0], $oslo));
@@ -120,17 +121,32 @@ verify('unknown protocol header rejected', $status === 400 && $body['error']['co
 verify('March notification-only batch has no body', $status === 202 && $body === null);
 
 $api = openapi();
-verify('OpenAPI exposes local language enum', $api['paths']['/local']['get']['parameters'][1]['schema']['enum'] === SENTENCE_LANGS);
-verify('OpenAPI exposes text and JSON local answers', isset($api['paths']['/local']['get']['responses']['200']['content']['text/plain'], $api['paths']['/local']['get']['responses']['200']['content']['application/json']));
+// Shared parts live under components; follow a {"$ref": "#/components/..."} to what it names
+$deref = function ($node) use ($api) {
+    if (!is_array($node) || !isset($node['$ref'])) return $node;
+    $out = $api;
+    foreach (explode('/', substr($node['$ref'], 2)) as $k) $out = $out[$k] ?? null;
+    return $out;
+};
+verify('OpenAPI exposes local language enum', $deref($api['paths']['/local']['get']['parameters'][1])['schema']['enum'] === SENTENCE_LANGS);
+$localOk = $deref($api['paths']['/local']['get']['responses']['200']);
+verify('OpenAPI exposes text and JSON local answers', isset($localOk['content']['text/plain'], $localOk['content']['application/json']));
+verify('OpenAPI: every $ref resolves', (function () use ($api, $deref) {
+    $ok = true;
+    array_walk_recursive($api, function ($v, $k) use (&$ok, $deref) { if ($k === '$ref' && $deref(['$ref' => $v]) === null) $ok = false; });
+    return $ok;
+})());
+verify('OpenAPI: the language list is written once', substr_count((string)json_encode($api), json_encode(SENTENCE_LANGS)) === 1);
 verify('OpenAPI describes place, facts and zones', isset($api['paths']['/{place}'], $api['paths']['/fact'], $api['paths']['/zones']));
 foreach (['en' => 'directly', 'zh' => '工具连接', 'de' => 'Werkzeugverbindung', 'fr' => 'connexion', 'es' => 'conexión', 'pt' => 'conexão', 'ru' => 'инструмент', 'sv' => 'verktygsanslutning', 'ja' => 'ツール接続', 'ko' => '도구 연결'] as $lang => $word) {
     verify("translated connection notice $lang", str_contains(t($lang, 'tool_connection'), $word));
     $doc = file_get_contents(content_path($lang, 'developers.md'));
     verify("MCP language example and costs $lang", str_contains($doc, '"lang":"' . $lang . '"')
         && str_contains($doc, 'o200k_base') && str_contains($doc, 'cl100k_base')
-        && str_contains($doc, '| 21 | ~14 |') && str_contains($doc, '| ~70-120 | ~25-40 |')
+        && str_contains($doc, '| 21 | ~14 |') && str_contains($doc, '| ~65-135 | ~25-40 |')
         && str_contains(file_get_contents(content_path($lang, 'about.md')), '| 11 | ~5 |')
-        && str_contains($doc, '245-256') && !str_contains($doc, '| ~50 |'));
+        && str_contains($doc, '153-158') && !str_contains($doc, '245-256') && !str_contains($doc, '| ~50 |')
+        && !str_contains($doc, 'convert_time') && str_contains($doc, '| `/api/convert?iso=2030-01-01T00:00:00Z` |') && str_contains(t($lang, 'cost_setup'), '153-158'));
     verify("copyright sign in licence notice $lang", str_contains($doc, '© 2026 EggQube') && !str_contains($doc, '(c) 2026'));
     verify("developer UTF-8 $lang", preg_match('//u', $doc) === 1 && !str_contains($doc, "\u{FFFD}"));
 }
